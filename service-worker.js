@@ -15,7 +15,7 @@
       l'app installée pouvait ne jamais voir les positions de partis mises
       à jour, même après republication.
    ========================================================================= */
-const CACHE_VERSION = 'v6.3.0';
+const CACHE_VERSION = 'v7.0.0';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
   './index.html',

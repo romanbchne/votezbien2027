@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Votez bien ! — Comprendre où vous vous situez avant 2027</title>
 <meta name="description" content="Un test politique gratuit, neutre et sourcé pour comprendre vos propres positions avant l'élection présidentielle de 2027, et explorer les partis qui s'en rapprochent — sans jargon.">
-<meta name="theme-color" content="#6D4AFF">
+<meta name="theme-color" content="#171B26">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
@@ -44,7 +44,7 @@
           <div class="hero-text">
             <p class="eyebrow-note">Présidentielle 2027 · gratuit, anonyme, sans compte</p>
             <h1>Trouvez d’abord <span class="accent">votre position</span>. Regardez ensuite qui s’en approche.</h1>
-            <p class="lede">21 questions en langage simple, sur les grands sujets qui divisent la France aujourd’hui. Aucun jargon, aucune question piégée : à chaque fois, deux idées, et vous choisissez celle qui vous parle le plus — ou vous dites que vous ne savez pas.</p>
+            <p class="lede">21 questions en langage simple sur les grands sujets qui divisent la France, puis des questions concrètes pour départager les partis qui vous correspondent. Aucun jargon, aucune question piégée : vous choisissez ce qui vous parle le plus — ou vous dites que vous ne savez pas.</p>
             <div class="hero-actions btn-row">
               <button class="btn btn-brass" id="btnStart">Commencer le test</button>
               <button class="btn btn-ghost" data-nav="method">Voir la méthode</button>
@@ -69,8 +69,8 @@
         <div class="how-it-works">
           <h2>Comment ça marche</h2>
           <div class="hiw-list">
-            <div class="hiw-item"><span class="hiw-num">1</span><div><h3>21 questions</h3><p>Deux propositions à chaque fois, une échelle en 5 positions, et une case « je ne sais pas » qui reste toujours disponible — aucune réponse n’est forcée.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>8 questions de précision</h3><p>Un premier aperçu provisoire, puis l’application cible les thèmes où votre position reste incertaine et, si plusieurs partis se disputent la tête, ceux où ils divergent le plus — jamais au hasard.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">1</span><div><h3>21 questions</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible — aucune réponse n’est forcée.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Jusqu’à 8 questions concrètes</h3><p>Un premier aperçu provisoire et le choix de vos 3 priorités, puis des questions précises (retraites, nucléaire, OTAN…) choisies une à une pour départager les partis qui restent proches de vous. Le test s’arrête dès qu’un parti ressort nettement.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">3</span><div><h3>Votre profil</h3><p>Une orientation générale, le détail sur 6 thèmes avec leur niveau de clarté, et vos priorités personnelles.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Vos partis les plus proches</h3><p>Un pourcentage de proximité par parti, thème par thème, expliqué et sourcé — jamais un chiffre sans détail derrière.</p></div></div>
           </div>
@@ -90,19 +90,21 @@
           <button class="q-why-toggle" id="qWhyToggle" type="button">Pourquoi cette question ?</button>
           <p class="q-why" id="qWhy"></p>
 
-          <div class="propositions">
-            <div class="prop"><span class="letter">Proposition A</span><p id="propA"></p><p class="clarify" id="clarifyA" hidden></p></div>
-            <div class="prop"><span class="letter">Proposition B</span><p id="propB"></p><p class="clarify" id="clarifyB" hidden></p></div>
+          <div id="viewScale">
+            <div class="propositions">
+              <div class="prop"><span class="letter">Proposition A</span><p id="propA"></p><p class="clarify" id="clarifyA" hidden></p></div>
+              <div class="prop"><span class="letter">Proposition B</span><p id="propB"></p><p class="clarify" id="clarifyB" hidden></p></div>
+            </div>
+            <div class="scale" id="scaleButtons" role="group" aria-label="Votre réponse"></div>
+            <div class="dk-row"><button class="dk-btn" id="dkBtn" type="button">Je ne sais pas / je n’ai pas assez d’informations</button></div>
           </div>
+
+          <div id="viewChoice" hidden>
+            <div class="choice-list" id="choiceList" role="group" aria-label="Votre choix"></div>
+            <div class="dk-row"><button class="dk-btn" id="dkBtnChoice" type="button">Aucune de ces options / je ne sais pas</button></div>
+          </div>
+
           <p class="plain-box" id="plainBox" hidden><strong>En clair :</strong> <span id="plainText"></span></p>
-
-          <div class="scale" id="scaleButtons" role="group" aria-label="Votre réponse"></div>
-          <div class="dk-row"><button class="dk-btn" id="dkBtn" type="button">Je ne sais pas / je n’ai pas assez d’informations</button></div>
-
-          <div class="importance-row">
-            <span>À quel point ce sujet compte-t-il pour vous ?</span>
-            <div class="imp-choices" id="impChoices" role="group" aria-label="Importance du sujet"></div>
-          </div>
         </div>
         <div class="quiz-nav">
           <button class="btn btn-ghost" id="btnBack">Précédent</button>
@@ -145,12 +147,18 @@
 
         <div class="method-section">
           <h2>Ce n’est ni scientifique, ni infaillible</h2>
-          <p>Ce test simplifie des sujets complexes en 21 questions principales suivies de 8 questions de précision, toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes (que l’application appelle des « dimensions »), pas une vérité psychologique ni un verdict définitif sur qui vous êtes. Deux personnes qui partagent vos réponses peuvent avoir des raisons très différentes de les avoir choisies.</p>
+          <p>Ce test simplifie des sujets complexes en 21 questions principales suivies d’au plus 8 questions concrètes, toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes (que l’application appelle des « dimensions »), pas une vérité psychologique ni un verdict définitif sur qui vous êtes. Deux personnes qui partagent vos réponses peuvent avoir des raisons très différentes de les avoir choisies.</p>
         </div>
 
         <div class="method-section">
-          <h2>Position ≠ importance</h2>
-          <p>Chaque question mesure deux choses séparément : <strong>ce que vous pensez</strong> d’un sujet, et <strong>à quel point il compte</strong> pour vous. L’importance ne modifie jamais votre position sur l’échelle gauche-droite : elle sert uniquement à choisir les questions de précision et à mettre en avant vos priorités dans l’exploration des partis.</p>
+          <h2>Position ≠ importance : vos 3 priorités</h2>
+          <p>Ce que vous <strong>pensez</strong> d’un sujet et <strong>l’importance</strong> que vous lui donnez sont deux choses séparées. L’importance ne modifie jamais votre position sur l’échelle gauche-droite.</p>
+          <p>Demander « à quel point ce sujet compte-t-il pour vous ? » après chaque question ne fonctionne pas : quand on parle de grands thèmes de la République, presque tout paraît « important », voire « essentiel ». À la place, l’application vous demande <strong>une seule fois</strong> de désigner, dans l’ordre, vos 3 sujets prioritaires — ce qui oblige à arbitrer. Ils comptent davantage dans la comparaison aux partis (le premier compte double) ; tous les autres thèmes comptent à égalité. Vous pouvez ne rien choisir : tous les thèmes comptent alors autant.</p>
+        </div>
+
+        <div class="method-section">
+          <h2>Un ordre d’affichage aléatoire, sans effet sur le résultat</h2>
+          <p>Pour que l’ordre des propositions ne vous influence pas, la proposition de gauche ou de droite est affichée tantôt en A, tantôt en B (à peu près moitié-moitié dans chaque thème, jamais plus de trois fois de suite dans le même sens). Les options des questions concrètes sont aussi mélangées. Ce qui est enregistré est toujours <strong>le texte que vous avez choisi</strong>, jamais sa place à l’écran : deux personnes qui pensent la même chose obtiennent le même résultat, quel que soit l’ordre affiché.</p>
         </div>
 
         <div class="method-section">
@@ -166,8 +174,10 @@
         </div>
 
         <div class="method-section">
-          <h2>Les 8 questions de précision</h2>
-          <p>Après les 21 questions principales, l’application en choisit 8 de plus parmi une banque de 36 questions écrites à l’avance (jamais générées à la volée). Elle privilégie les thèmes où votre position reste floue ou compte beaucoup pour vous et, lorsque plusieurs partis se rapprochent de vous à peu près autant, les thèmes où ces partis diffèrent réellement. <strong>Les noms des partis restent cachés pendant ces questions</strong>, pour ne pas orienter vos réponses vers un résultat espéré.</p>
+          <h2>Les questions concrètes pour départager les partis</h2>
+          <p>Les 21 premières questions placent votre profil entre la gauche et la droite, mais elles ne suffisent pas à distinguer deux partis d’un même camp (par exemple Les Écologistes et le Parti socialiste). L’application pose donc ensuite, <strong>une par une et jusqu’à 8</strong>, des questions <strong>concrètes à plusieurs options</strong> (retraites à 60, 62 ou 64 ans ; avenir du nucléaire ; impôt sur les très grandes fortunes ; OTAN…), toutes écrites à l’avance dans une banque de questions et jamais générées à la volée.</p>
+          <p>Chaque question est choisie d’après vos réponses précédentes : on estime quels partis sont encore les plus proches de vous, et on pose la question sur laquelle ces partis-là se séparent le plus. Si vous êtes proche de partis de gauche, elle distingue des partis de gauche ; si vous êtes proche de partis de droite, des partis de droite. Les options ne sont pas rangées de « gauche » à « droite » : ce sont de vrais choix de politique, présentés sans nom de parti.</p>
+          <p><strong>Les noms et pourcentages des partis restent cachés pendant ces questions</strong>, pour ne pas orienter vos réponses vers un résultat espéré. Le test s’arrête dès qu’un parti mène nettement (au moins 4 questions posées) ; il va jusqu’à 8 sinon.</p>
           <p>Ce choix de questions ne garantit aucun écart final : si vos réponses sincères vous laissent à égalité entre deux partis, c’est le bon résultat, pas un échec à corriger.</p>
         </div>
 
@@ -178,8 +188,15 @@
 
         <div class="method-section">
           <h2>Comparaison aux partis</h2>
-          <p>Les positions attribuées à chaque parti sont des <strong>estimations que nous avons construites nous-mêmes</strong>, à partir de leurs programmes et prises de position publiques à la date indiquée sur chaque fiche — ce ne sont pas des scores donnés par les partis eux-mêmes, et elles peuvent être discutées. Le pourcentage affiché mesure la proximité moyenne entre vos positions et celles d’un parti, thème par thème, en donnant plus de poids aux sujets qui comptent le plus pour vous — jamais un thème auquel vous n’avez pas répondu, qui n’est compté ni pour ni contre. Il n’est jamais affiché seul : la fiche de chaque parti détaille le calcul, avec les points communs et les différences, et renvoie vers le programme source.</p>
-          <p>Quand un parti n’a pas de position identifiable sur un thème (par exemple un parti centré sur un seul sujet), ce thème est <strong>exclu</strong> de sa comparaison au lieu d’être compté comme un « centre » : sans cette précaution, un parti sans position aurait paru proche de tous les profils centristes.</p>
+          <p>Les positions attribuées à chaque parti sont des <strong>estimations que nous avons construites nous-mêmes</strong>, à partir des programmes et des propositions déclarées de leurs candidats à la date indiquée sur chaque fiche — ce ne sont pas des scores donnés par les partis eux-mêmes, elles sont <strong>provisoires</strong> (la plupart des programmes 2027 ne sont pas encore publiés) et elles peuvent être discutées. Quand la position d’un parti se confond avec celle de son candidat, c’est celle du candidat déclaré qui est retenue.</p>
+          <p>Le pourcentage affiché mesure la proximité moyenne entre vos positions et celles d’un parti, sur les 6 thèmes et sur les questions concrètes, en donnant plus de poids à vos 3 priorités. Un point auquel vous n’avez pas répondu, ou une position non codée pour un parti, est <strong>exclu</strong> du calcul : ni compté pour, ni compté contre, et jamais pris pour un « centre ». Le pourcentage n’est jamais affiché seul : la fiche de chaque parti détaille le calcul, avec les points communs et les différences, et renvoie vers son programme.</p>
+          <p><strong>Comparaison partielle.</strong> Certains partis (par exemple MoDem, UDI, UDR) n’ont presque aucune position codée sur les questions concrètes. Comparés seulement sur les 6 thèmes, ils auraient mécaniquement l’air plus proches de tout le monde que les partis confrontés à des propositions précises. Dès que vous avez répondu à quelques questions concrètes, ils ne sont donc plus classés avec les autres : leur fiche l’indique, et donne leur proximité sur les seuls thèmes.</p>
+        </div>
+
+        <div class="method-section">
+          <h2>Sources de recoupement</h2>
+          <p>Les positions ont été recoupées avec les sources suivantes. MonVote2027 est un outil citoyen indépendant : sa licence n’étant pas précisée, ses données n’ont pas été copiées, seulement consultées pour vérifier la cohérence de nos propres codages.</p>
+          <ul id="methodSources"></ul>
         </div>
 
         <div class="method-section">

@@ -1,0 +1,11 @@
+{
+  "name": "votez-bien-tests",
+  "private": true,
+  "description": "Suite de tests automatiques pour Votez bien ! — voir ../README.md pour le contexte.",
+  "scripts": {
+    "test": "node tests.js && node test-simulation.js && node test-order.js && node test-integration.js && node test-flows.js && node test-departage-ui.js && node test-e2e-signconvention.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

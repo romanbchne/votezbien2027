@@ -7,9 +7,12 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'votezbien:v6:state';
+  const STORAGE_KEY = 'votezbien:v7:state'; // v7 : nouvelle structure d'état (priorités, départage) — les sauvegardes v6 sont ignorées
   const SCALE_LABELS = ['Beaucoup plus A', 'Plutôt A', 'Entre les deux', 'Plutôt B', 'Beaucoup plus B'];
-  const IMP_LABELS = ['Peu important', 'Important', 'Essentiel'];
+
+  const qById = {};
+  QUESTIONS.forEach(q => { qById[q.id] = q; });
+  DEPARTAGE.forEach(q => { qById[q.id] = q; });
 
   let state = freshState();
   let lastDimResults = null;
@@ -19,48 +22,59 @@
   let lastFocusedEl = null;
 
   function freshState() {
-    return { phase: 'main', index: 0, answers: {}, importances: {}, diagnosticQuestions: [], completed: false };
+    return {
+      phase: 'main',            // 'main' | 'checkpoint' | 'diagnostic'
+      index: 0,
+      answers: {},              // question générale -> valeur SÉMANTIQUE (-2..2) ou 'dk'
+      flips: Scoring.makeBalancedFlips(QUESTIONS), // id -> true si A/B affichés à l'envers (présentation seulement)
+      priorities: [],           // thèmes prioritaires, dans l'ordre (3 max)
+      dp: [],                   // ids des questions de départage choisies jusqu'ici, dans l'ordre
+      dpAnswers: {},            // id -> position d'option choisie, ou 'dk'
+      dpOrders: {},             // id -> ordre d'affichage des options (présentation seulement)
+      dpSignature: null,        // empreinte (réponses + priorités) ayant servi à choisir dp
+      completed: false
+    };
   }
 
-  /* ---------------- Persistance locale (namespace propre, aucun serveur) ---------------- */
-  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible : l'app continue de fonctionner sans reprise */ } }
-  function loadState() { try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } }
+  /* ---------------- Persistance locale (aucun serveur) ---------------- */
+  function validState(s) {
+    return !!(s && typeof s === 'object' && typeof s.phase === 'string' && s.answers && s.flips &&
+      Array.isArray(s.priorities) && Array.isArray(s.dp) && s.dpAnswers && s.dpOrders);
+  }
+  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible : l'app continue sans reprise */ } }
+  function loadState() { try { const raw = localStorage.getItem(STORAGE_KEY); const s = raw ? JSON.parse(raw) : null; return validState(s) ? s : null; } catch (e) { return null; } }
   function clearState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
-  function hasProgress(s) { return !!(s && s.answers && Object.keys(s.answers).length > 0); }
+  function hasProgress(s) { return !!(s && Object.keys(s.answers).length > 0); }
 
-  /* ---------------- Ensemble de questions actif ---------------- */
-  function fullQuestionSet() { return QUESTIONS.concat(state.diagnosticQuestions || []); }
-  function currentList() { return state.phase === 'diagnostic' ? state.diagnosticQuestions : QUESTIONS; }
-  function currentQuestion() { return currentList()[state.index]; }
+  /* ---------------- Aides ---------------- */
+  function currentQuestion() { return state.phase === 'diagnostic' ? qById[state.dp[state.index]] : QUESTIONS[state.index]; }
+  function signature() { return JSON.stringify([state.answers, state.priorities]); }
+  function mainDimResults() { return Scoring.computeDimensionResults(state.answers, QUESTIONS); }
+  function matchOpts() { return { priorities: state.priorities, departageAnswers: state.dpAnswers, departageBank: DEPARTAGE }; }
+  function lower(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
 
   function computeResults() {
-    lastDimResults = Scoring.computeDimensionResults(state.answers, state.importances, fullQuestionSet());
+    lastDimResults = mainDimResults();
     lastOverall = Scoring.computeOverall(lastDimResults);
     return { dimResults: lastDimResults, overall: lastOverall };
   }
 
   function positionLabel(dimKey, score) {
-    if (score === null || score === undefined) return 'Pas de position établie';
+    if (score === null || score === undefined) return 'Pas de position codée';
     const dim = DIMENSIONS[dimKey];
     const p = (score + 2) / 4 * 100;
     if (p < 43) return 'Plutôt ' + lower(dim.labelLeft);
     if (p > 57) return 'Plutôt ' + lower(dim.labelRight);
     return 'Position équilibrée entre les deux';
   }
-  function lower(s) { return s.charAt(0).toLowerCase() + s.slice(1); }
 
-  /* Anneau visuel de correspondance : le pourcentage affiché est TOUJOURS
-     la même valeur qui sert à classer les partis (aucun écart entre ce qui
-     est montré et ce qui est trié), et n'est jamais affiché seul dans
-     l'application — toujours à côté d'une phrase d'explication et d'un
-     accès au détail dimension par dimension. */
-  // Légende explicative sous chaque pourcentage (jamais un chiffre nu).
-  function captionFor(m) {
-    if (m.partyKnownCount < 3) return 'Parti centré sur un seul sujet : comparaison trop partielle pour un pourcentage';
-    if (m.comparableCount < 3) return 'Pas encore assez de réponses de votre part pour comparer';
-    return 'Rapprochement sur ' + m.rapprochements + ' des ' + m.comparableCount + ' thèmes comparables';
+  function pickNextDepartage() {
+    return Scoring.selectNextDepartage({ dimResults: mainDimResults(), parties: PARTIES, bank: DEPARTAGE, answers: state.dpAnswers, priorities: state.priorities });
   }
 
+  /* Anneau visuel de correspondance : le pourcentage affiché est TOUJOURS la
+     valeur qui sert à classer les partis, et n'est jamais affiché seul —
+     toujours à côté d'une explication et d'un accès au détail. */
   function matchRingHTML(percent, size) {
     size = size || 64;
     const stroke = size < 56 ? 5 : 6;
@@ -72,6 +86,23 @@
     }
     const offset = (c * (1 - percent / 100)).toFixed(2);
     return `<div class="match-ring" style="--size:${size}px"><svg viewBox="0 0 ${size} ${size}"><circle class="ring-bg" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}"/><circle class="ring-fill" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}" style="stroke-dasharray:${c.toFixed(2)};stroke-dashoffset:${offset}"/></svg><span class="ring-label">${percent}%</span></div>`;
+  }
+
+  // Légende explicative sous chaque pourcentage (jamais un chiffre nu).
+  function captionFor(m) {
+    if (m.partial) return 'Comparaison partielle : les positions de ce parti sont peu codées sur les questions de précision' + (m.themePercent !== null ? ' (sur les 6 thèmes seulement : ' + m.themePercent + ' %)' : '');
+    if (m.partyKnownCount < 3) return 'Parti dont seules quelques positions sont codées ici : comparaison trop partielle pour un pourcentage';
+    if (m.comparableCount < 3) return 'Pas encore assez de réponses de votre part pour comparer';
+    let s = 'Rapprochement sur ' + m.rapprochements + ' des ' + m.comparableCount + ' thèmes';
+    if (m.questionComparableCount) s += ' et ' + m.questionCloseCount + ' des ' + m.questionComparableCount + ' questions de précision';
+    return s;
+  }
+
+  function formatStatusDate(ym) {
+    if (!ym) return 'date inconnue';
+    const parts = ym.split('-');
+    const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    return mois[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
   }
 
   /* ================================================================
@@ -98,6 +129,11 @@
     });
   });
 
+  function setNavEnabled(enabled) {
+    document.getElementById('navResults').disabled = !enabled;
+    document.getElementById('navParties').disabled = !enabled;
+  }
+
   /* ================================================================
      ACCUEIL
      ================================================================ */
@@ -119,13 +155,12 @@
 
   function refreshResumeBanner() {
     const stored = loadState();
-    const banner = document.getElementById('resumeBanner');
-    if (hasProgress(stored) && !stored.completed) banner.hidden = false;
-    else banner.hidden = true;
+    document.getElementById('resumeBanner').hidden = !(hasProgress(stored) && !stored.completed);
   }
 
   document.getElementById('btnStart').addEventListener('click', () => {
     state = freshState();
+    lastDimResults = null; lastOverall = null; compareSelection = [];
     saveState();
     beginQuiz();
   });
@@ -140,76 +175,117 @@
   });
 
   function beginQuiz() {
-    document.getElementById('navResults').disabled = !state.completed;
-    document.getElementById('navParties').disabled = !state.completed;
-    if (state.phase === 'checkpoint') { showScreen('checkpoint'); return; }
+    setNavEnabled(state.completed);
+    if (state.phase === 'checkpoint' || (state.phase === 'diagnostic' && !state.dp.length)) { state.phase = 'checkpoint'; showScreen('checkpoint'); return; }
     showScreen('quiz');
     renderQuestion();
   }
 
   /* ================================================================
-     QUIZ
+     QUESTIONS (générales à échelle, puis de départage à options)
      ================================================================ */
   function renderQuestion() {
     const q = currentQuestion();
-    if (!q) return; // sécurité : ne devrait jamais arriver
-    const list = currentList();
-
-    const chipWrap = document.getElementById('phaseChipWrap');
-    chipWrap.innerHTML = state.phase === 'diagnostic'
-      ? '<span class="phase-chip">Questions de précision — sur les sujets où votre position reste à préciser</span>'
+    if (!q) return;
+    const isDp = state.phase === 'diagnostic';
+    const total = QUESTIONS.length + Scoring.MAX_DEPARTAGE;
+    const done = isDp ? QUESTIONS.length + state.index : state.index;
+    document.getElementById('progressFill').style.width = Math.round((done / total) * 100) + '%';
+    document.getElementById('progressLabel').textContent = isDp
+      ? 'Précision ' + (state.index + 1) + ' (jusqu’à ' + Scoring.MAX_DEPARTAGE + ')'
+      : (state.index + 1) + ' / ' + QUESTIONS.length;
+    document.getElementById('phaseChipWrap').innerHTML = isDp
+      ? '<span class="phase-chip">Questions de précision : concrètes, sur les points où vos partis les plus proches se distinguent</span>'
       : '';
-
-    const doneBefore = state.phase === 'main' ? state.index : QUESTIONS.length + state.index;
-    const total = QUESTIONS.length + (state.diagnosticQuestions.length || 8);
-    document.getElementById('progressFill').style.width = Math.round((doneBefore / total) * 100) + '%';
-    document.getElementById('progressLabel').textContent = (doneBefore + 1) + ' / ' + total;
-
-    document.getElementById('qTopic').textContent = q.topic;
-    document.getElementById('qDim').textContent = DIMENSIONS[q.dim].name;
-    document.getElementById('qWhy').textContent = q.why || '';
+    document.getElementById('viewScale').hidden = isDp;
+    document.getElementById('viewChoice').hidden = !isDp;
     document.getElementById('qWhy').classList.remove('show');
-    document.getElementById('propA').textContent = q.a;
-    document.getElementById('propB').textContent = q.b;
 
-    const clA = document.getElementById('clarifyA'), clB = document.getElementById('clarifyB');
-    if (q.clarifyA) { clA.textContent = q.clarifyA; clA.hidden = false; } else clA.hidden = true;
-    if (q.clarifyB) { clB.textContent = q.clarifyB; clB.hidden = false; } else clB.hidden = true;
     const plainBox = document.getElementById('plainBox');
     if (q.plain) { document.getElementById('plainText').textContent = q.plain; plainBox.hidden = false; } else plainBox.hidden = true;
 
-    const existing = state.answers[q.id];
-    const scaleWrap = document.getElementById('scaleButtons');
-    scaleWrap.innerHTML = '';
+    let canAdvance;
+    if (isDp) canAdvance = renderChoiceView(q); else canAdvance = renderScaleView(q);
+
+    const nextBtn = document.getElementById('btnNext');
+    nextBtn.disabled = !canAdvance;
+    let label = 'Suivant';
+    if (isDp && canAdvance && state.index === state.dp.length - 1 && !pickNextDepartage()) label = 'Voir mon profil';
+    nextBtn.textContent = label;
+    document.getElementById('btnBack').disabled = (state.phase === 'main' && state.index === 0);
+  }
+
+  // Question générale : A/B éventuellement inversés à l'affichage. La valeur
+  // ENREGISTRÉE reste liée au texte choisi (sémantique), jamais à sa place.
+  function renderScaleView(q) {
+    const flip = !!state.flips[q.id];
+    const first = flip ? 'b' : 'a', second = flip ? 'a' : 'b';
+    document.getElementById('qTopic').textContent = q.topic;
+    document.getElementById('qDim').textContent = DIMENSIONS[q.dim].name;
+    document.getElementById('qWhy').textContent = q.why || '';
+    document.getElementById('propA').textContent = q[first];
+    document.getElementById('propB').textContent = q[second];
+    const clA = document.getElementById('clarifyA'), clB = document.getElementById('clarifyB');
+    const tA = q['clarify' + first.toUpperCase()], tB = q['clarify' + second.toUpperCase()];
+    if (tA) { clA.textContent = tA; clA.hidden = false; } else clA.hidden = true;
+    if (tB) { clB.textContent = tB; clB.hidden = false; } else clB.hidden = true;
+
+    const stored = state.answers[q.id];
+    const shown = typeof stored === 'number' ? (flip ? -stored : stored) : stored; // valeur telle qu'affichée (A = 1er texte)
+    const wrap = document.getElementById('scaleButtons');
+    wrap.innerHTML = '';
     SCALE_LABELS.forEach((label, j) => {
       const v = j - 2;
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'scale-btn' + (existing === v ? ' sel' : '');
+      const selected = typeof shown === 'number' && shown === v;
+      b.type = 'button'; b.className = 'scale-btn' + (selected ? ' sel' : '');
       b.textContent = label;
-      b.setAttribute('aria-pressed', existing === v ? 'true' : 'false');
-      b.addEventListener('click', () => { state.answers[q.id] = v; saveState(); renderQuestion(); });
-      scaleWrap.appendChild(b);
+      b.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      b.addEventListener('click', () => { state.answers[q.id] = (flip ? -v : v) || 0; saveState(); renderQuestion(); });
+      wrap.appendChild(b);
     });
-    const dkBtn = document.getElementById('dkBtn');
-    dkBtn.classList.toggle('sel', existing === 'dk');
-    dkBtn.onclick = () => { state.answers[q.id] = 'dk'; saveState(); renderQuestion(); };
+    const dk = document.getElementById('dkBtn');
+    dk.classList.toggle('sel', stored === 'dk');
+    dk.onclick = () => { state.answers[q.id] = 'dk'; saveState(); renderQuestion(); };
+    return typeof stored === 'number' || stored === 'dk';
+  }
 
-    const impWrap = document.getElementById('impChoices');
-    impWrap.innerHTML = '';
-    const existingImp = state.importances[q.id];
-    IMP_LABELS.forEach((label, lvl) => {
+  // Question de départage : options concrètes, ordre d'affichage aléatoire.
+  function renderChoiceView(q) {
+    document.getElementById('qTopic').textContent = DIMENSIONS[q.dim].name;
+    document.getElementById('qDim').textContent = q.q;
+    document.getElementById('qWhy').textContent = 'Cette question porte sur un point où des partis proches de vos réponses se distinguent réellement. Ses options sont présentées dans un ordre aléatoire, sans lien avec un parti : choisissez celle qui vous ressemble le plus.';
+    const order = state.dpOrders[q.id] || (state.dpOrders[q.id] = Scoring.makeOptionOrder(q.options.length));
+    const stored = state.dpAnswers[q.id];
+    const list = document.getElementById('choiceList');
+    list.innerHTML = '';
+    order.forEach(i => {
+      const o = q.options[i];
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'imp-btn' + (existingImp === lvl ? ' sel' : '');
-      b.textContent = label;
-      b.setAttribute('aria-pressed', existingImp === lvl ? 'true' : 'false');
-      b.addEventListener('click', () => { state.importances[q.id] = lvl; saveState(); renderQuestion(); });
-      impWrap.appendChild(b);
+      const selected = stored === o.pos;
+      b.type = 'button'; b.className = 'choice-btn' + (selected ? ' sel' : '');
+      b.textContent = o.text;
+      b.dataset.pos = String(o.pos);
+      b.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      b.addEventListener('click', () => setDpAnswer(q, o.pos));
+      list.appendChild(b);
     });
+    const dk = document.getElementById('dkBtnChoice');
+    dk.classList.toggle('sel', stored === 'dk');
+    dk.onclick = () => setDpAnswer(q, 'dk');
+    return stored !== undefined;
+  }
 
-    const canAdvance = (typeof existing === 'number' || existing === 'dk') && typeof existingImp === 'number';
-    document.getElementById('btnNext').disabled = !canAdvance;
-    document.getElementById('btnNext').textContent = (state.phase === 'diagnostic' && state.index === list.length - 1) ? 'Voir mon profil' : 'Suivant';
-    document.getElementById('btnBack').disabled = (state.phase === 'main' && state.index === 0);
+  // Modifier une réponse déjà donnée invalide les questions choisies APRÈS
+  // elle (leur choix dépendait de cette réponse) : elles seront recalculées.
+  function setDpAnswer(q, value) {
+    if (state.dpAnswers[q.id] !== value && state.index < state.dp.length - 1) {
+      state.dp.slice(state.index + 1).forEach(id => { delete state.dpAnswers[id]; delete state.dpOrders[id]; });
+      state.dp = state.dp.slice(0, state.index + 1);
+    }
+    state.dpAnswers[q.id] = value;
+    saveState();
+    renderQuestion();
   }
 
   document.getElementById('qWhyToggle').addEventListener('click', () => {
@@ -217,58 +293,41 @@
   });
 
   document.getElementById('btnBack').addEventListener('click', () => {
-    if (state.index > 0) { state.index--; }
-    else if (state.phase === 'diagnostic') { state.phase = 'checkpoint'; saveState(); showScreen('checkpoint'); return; }
-    saveState();
-    renderQuestion();
+    if (state.index > 0) { state.index--; saveState(); renderQuestion(); return; }
+    if (state.phase === 'diagnostic') { state.phase = 'checkpoint'; saveState(); showScreen('checkpoint'); }
   });
 
   document.getElementById('btnNext').addEventListener('click', () => {
-    const list = currentList();
-    if (state.index < list.length - 1) {
-      state.index++;
-      saveState();
-      renderQuestion();
-      return;
-    }
     if (state.phase === 'main') {
-      state.phase = 'checkpoint';
-      saveState();
-      showScreen('checkpoint');
+      if (state.index < QUESTIONS.length - 1) { state.index++; saveState(); renderQuestion(); return; }
+      state.phase = 'checkpoint'; saveState(); showScreen('checkpoint');
       return;
     }
-    // fin de la phase diagnostique : le test est terminé
-    state.completed = true;
-    saveState();
-    document.getElementById('navResults').disabled = false;
-    document.getElementById('navParties').disabled = false;
-    computeResults();
-    showScreen('results');
+    // phase de départage : question suivante déjà choisie, ou nouvelle sélection
+    if (state.index < state.dp.length - 1) { state.index++; saveState(); renderQuestion(); return; }
+    const next = pickNextDepartage();
+    if (next) { state.dp.push(next.id); state.index++; saveState(); renderQuestion(); return; }
+    finishTest();
   });
 
-  /* ================================================================
-     PALIER INTERMÉDIAIRE — après les 21 questions principales
-     ================================================================ */
-  function beginDiagnosticPhase() {
-    const dimResults = Scoring.computeDimensionResults(state.answers, state.importances, QUESTIONS);
-    const topPartyMatches = Scoring.computePartyMatches(dimResults, PARTIES);
-    state.diagnosticQuestions = Scoring.selectDiagnosticQuestions({
-      dimResults, bank: BANK, askedIds: QUESTIONS.map(q => q.id), count: 8, topPartyMatches
-    });
-    state.phase = 'diagnostic';
-    state.index = 0;
+  function finishTest() {
+    state.completed = true;
     saveState();
-    showScreen('quiz');
-    renderQuestion();
+    setNavEnabled(true);
+    computeResults();
+    showScreen('results');
   }
 
+  /* ================================================================
+     PALIER : aperçu provisoire + choix des 3 priorités
+     ================================================================ */
   function renderCheckpoint() {
-    const dimResults = Scoring.computeDimensionResults(state.answers, state.importances, QUESTIONS);
+    const dimResults = mainDimResults();
     const overall = Scoring.computeOverall(dimResults);
     const root = document.getElementById('checkpointContent');
-    let html = `<p class="eyebrow-note">Étape 1 sur 2 — terminée</p>
+    let html = `<p class="eyebrow-note">Étape 1 sur 2 : terminée</p>
       <h1>Premier aperçu</h1>
-      <p class="lede">Voici une lecture encore <strong>provisoire</strong> de votre profil, fondée sur vos 21 premières réponses.</p>`;
+      <p class="lede">Voici une lecture encore <strong>provisoire</strong> de votre profil, fondée sur vos ${QUESTIONS.length} premières réponses.</p>`;
 
     if (overall.determined) {
       html += `<div class="spectrum">
@@ -277,88 +336,139 @@
         <div class="spectrum-labels"><span>Gauche</span><span>Droite</span></div>
       </div>`;
     } else {
-      html += `<div class="undetermined-box"><p style="margin-bottom:0">Vos réponses jusqu’ici ne suffisent pas encore à dégager une tendance fiable — les questions suivantes devraient aider à clarifier cela.</p></div>`;
+      html += `<div class="undetermined-box"><p style="margin-bottom:0">Vos réponses jusqu’ici ne suffisent pas encore à dégager une tendance fiable : les questions concrètes qui suivent peuvent aider à clarifier cela.</p></div>`;
     }
+
+    html += `<div class="prio-box">
+      <h2>Vos 3 priorités</h2>
+      <p class="lede">Touchez les sujets qui comptent le plus pour votre vote, <strong>dans l’ordre</strong> : le premier touché pèse le plus (3 au maximum). Facultatif : sans choix, tous les thèmes comptent autant.</p>
+      <div class="prio-grid" id="prioGrid"></div>
+    </div>`;
 
     // Volontairement AUCUN nom de parti ni pourcentage avant les questions de
     // précision : les afficher permettrait d'orienter ses réponses vers un
-    // résultat espéré, ce qui fausserait précisément la mesure qu'on veut
-    // affiner. On dit seulement, sans les nommer, si plusieurs partis sont
-    // proches, et que les questions cibleront ce qui les distingue.
-    let nextExplainer = 'L’application a repéré les thèmes où votre position reste encore incertaine et va vous poser 8 questions ciblées sur ces points précis.';
-    if (overall.determined) {
-      if (Scoring.findNearTie(Scoring.computePartyMatches(dimResults, PARTIES))) {
-        nextExplainer = 'Pour l’instant, <strong>plusieurs partis se rapprochent de vous à peu près autant</strong>. Les 8 questions suivantes portent surtout sur les sujets où ces partis diffèrent réellement, pour voir de qui vous êtes le plus proche. Leurs noms restent volontairement cachés jusqu’à la fin, pour ne pas influencer vos réponses.';
-      }
+    // résultat espéré, ce qui fausserait la mesure qu'on veut affiner.
+    let explainer = 'L’application va maintenant vous poser des questions <strong>concrètes</strong> (retraites, nucléaire, OTAN, impôt sur les grandes fortunes…), choisies une à une pour départager les partis qui vous correspondent le plus.';
+    if (overall.determined && Scoring.findNearTie(Scoring.computePartyMatches(dimResults, PARTIES, { priorities: state.priorities }))) {
+      explainer = 'Pour l’instant, <strong>plusieurs partis se rapprochent de vous à peu près autant</strong>. Les questions suivantes sont concrètes et portent sur les sujets où ces partis diffèrent réellement. Leurs noms restent volontairement cachés jusqu’à la fin, pour ne pas influencer vos réponses.';
     }
-
     html += `<div class="checkpoint-next">
-      <h2>8 questions pour affiner — puis vos partis</h2>
-      <p class="lede">${nextExplainer}</p>
+      <h2>Jusqu’à ${Scoring.MAX_DEPARTAGE} questions pour départager</h2>
+      <p class="lede">${explainer} Le test s’arrête dès qu’un parti ressort nettement.</p>
       <div class="btn-row">
-        <button class="btn btn-brass" id="btnContinueDiag">Continuer (8 questions)</button>
+        <button class="btn btn-brass" id="btnContinueDiag">Continuer</button>
         <button class="btn btn-ghost" id="btnBackToMain">Revoir mes réponses précédentes</button>
       </div>
       <button class="btn-link-skip" id="btnSkipDiag" type="button">Voir un résultat préliminaire sans ces questions</button>
     </div>`;
     root.innerHTML = html;
+    renderPriorityGrid();
 
     document.getElementById('btnContinueDiag').addEventListener('click', beginDiagnosticPhase);
     document.getElementById('btnBackToMain').addEventListener('click', () => {
       state.phase = 'main'; state.index = QUESTIONS.length - 1; saveState(); showScreen('quiz'); renderQuestion();
     });
     document.getElementById('btnSkipDiag').addEventListener('click', () => {
-      state.diagnosticQuestions = [];
-      state.completed = true;
-      saveState();
-      document.getElementById('navResults').disabled = false;
-      document.getElementById('navParties').disabled = false;
-      computeResults();
-      showScreen('results');
+      state.dp = []; state.dpAnswers = {}; state.dpOrders = {}; state.dpSignature = null;
+      finishTest();
     });
+  }
+
+  function renderPriorityGrid() {
+    const grid = document.getElementById('prioGrid');
+    if (!grid) return;
+    grid.innerHTML = DIM_KEYS.map(k => {
+      const rank = state.priorities.indexOf(k);
+      return `<button class="prio-card${rank >= 0 ? ' sel' : ''}" type="button" data-dim="${k}" aria-pressed="${rank >= 0 ? 'true' : 'false'}">
+        ${rank >= 0 ? `<span class="prio-rank" aria-label="Priorité ${rank + 1}">${rank + 1}</span>` : ''}
+        <strong>${DIMENSIONS[k].name}</strong>
+        <span class="prio-def">${DIMENSIONS[k].plain}</span>
+      </button>`;
+    }).join('');
+    grid.querySelectorAll('.prio-card').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.dim;
+        const i = state.priorities.indexOf(k);
+        if (i >= 0) state.priorities.splice(i, 1);
+        else if (state.priorities.length >= Scoring.MAX_PRIORITIES) { showToast('3 priorités au maximum : retirez-en une d’abord'); return; }
+        else state.priorities.push(k);
+        saveState();
+        renderPriorityGrid();
+        const again = document.querySelector('#prioGrid .prio-card[data-dim="' + k + '"]');
+        if (again) again.focus();
+      });
+    });
+  }
+
+  function beginDiagnosticPhase() {
+    const sig = signature();
+    // Les questions déjà choisies ne sont conservées que si ni vos réponses
+    // générales ni vos priorités n'ont changé depuis : sinon leur choix, qui
+    // en dépendait, serait périmé.
+    if (!state.dp.length || state.dpSignature !== sig) {
+      state.dp = []; state.dpAnswers = {}; state.dpOrders = {}; state.dpSignature = sig;
+      const first = pickNextDepartage();
+      if (!first) { finishTest(); return; }
+      state.dp.push(first.id);
+    }
+    state.phase = 'diagnostic';
+    state.index = 0;
+    saveState();
+    showScreen('quiz');
+    renderQuestion();
   }
 
   /* ================================================================
      RÉSULTATS
      ================================================================ */
+  function importanceFor(dimKey) {
+    const i = state.priorities.indexOf(dimKey);
+    return i >= 0 ? 'C’est l’une de vos priorités (n° ' + (i + 1) + ').' : '';
+  }
 
-  /* ================================================================
-     DÉPARTAGE — quand les deux premiers partis sont à quasi-égalité
-     ================================================================ */
-  function importanceLabel(imp) { return imp >= 0.75 ? 'essentiel' : imp >= 0.35 ? 'important' : 'peu important'; }
-
-  function departagerHTML(pair, dimResults) {
+  // Quasi-égalité : on montre ce qui distingue réellement les deux partis,
+  // thème par thème et proposition par proposition, plutôt qu'un gagnant.
+  function departagerHTML(pair) {
     const a = pair[0], b = pair[1];
     const rows = [];
     DIM_KEYS.forEach(k => {
       const pa = a.perDim.find(p => p.dim === k), pb = b.perDim.find(p => p.dim === k);
       if (!pa.available || !pb.available) return;
-      const gapBetweenParties = Math.abs(pa.partyScore - pb.partyScore);
-      rows.push({ k, pa, pb, gapBetweenParties });
+      rows.push({
+        title: DIMENSIONS[k].name, dim: k, gap: Math.abs(pa.partyScore - pb.partyScore) / 4,
+        dA: pa.distance / 4, dB: pb.distance / 4,
+        user: positionLabel(k, pa.userScore), la: positionLabel(k, pa.partyScore), lb: positionLabel(k, pb.partyScore)
+      });
     });
-    const distinguishing = rows.filter(r => r.gapBetweenParties >= 0.5).sort((x, y) => y.gapBetweenParties - x.gapBetweenParties).slice(0, 3);
+    a.perQuestion.forEach(qa => {
+      const qb = b.perQuestion.find(x => x.id === qa.id);
+      if (!qa.available || !qb || !qb.available) return;
+      rows.push({
+        title: qa.q.topic, dim: qa.q.dim, gap: Math.abs(qa.partyPos - qb.partyPos) / Scoring.optionRange(qa.q),
+        dA: 1 - qa.proximity, dB: 1 - qb.proximity,
+        user: Scoring.stanceLabel(qa.q, qa.userPos).label, la: Scoring.stanceLabel(qa.q, qa.partyPos).label, lb: Scoring.stanceLabel(qa.q, qb.partyPos).label
+      });
+    });
+    const distinguishing = rows.filter(r => r.gap >= 0.15).sort((x, y) => y.gap - x.gap).slice(0, 3);
 
     let html = `<div class="depart-box">
       <h2>Départager vos deux partis les plus proches</h2>
-      <p class="lede"><strong>${a.party.name}</strong> (${a.matchPercent} %) et <strong>${b.party.name}</strong> (${b.matchPercent} %) sont à quasi-égalité pour vous : l’écart est plus petit que la marge d’incertitude de ces estimations, il ne suffit donc pas pour trancher. Voici ce qui les distingue réellement, sujet par sujet.</p>`;
-
+      <p class="lede"><strong>${a.party.name}</strong> (${a.matchPercent} %) et <strong>${b.party.name}</strong> (${b.matchPercent} %) sont à quasi-égalité pour vous : l’écart est plus petit que la marge d’incertitude de ces estimations, il ne suffit donc pas pour trancher. Voici ce qui les distingue réellement.</p>`;
     if (!distinguishing.length) {
-      html += `<p class="confidence-note">Sur les 6 thèmes mesurés ici, ces deux partis ont des positions quasi identiques : seule la lecture de leurs programmes détaillés permet de les distinguer.</p>`;
+      html += `<p class="confidence-note">Sur les sujets abordés ici, ces deux partis ont des positions quasi identiques : seule la lecture de leurs programmes détaillés permet de les distinguer.</p>`;
     } else {
       html += '<div class="depart-list">';
       distinguishing.forEach(r => {
-        const dim = DIMENSIONS[r.k];
-        const dA = r.pa.distance, dB = r.pb.distance;
-        let tag;
-        if (Math.abs(dA - dB) < 0.25) tag = 'À égale distance de vous';
-        else tag = 'Plus proche de vous : ' + (dA < dB ? a.party.short : b.party.short);
+        const equal = Math.abs(r.dA - r.dB) < 0.06;
+        const tag = equal ? 'À égale distance de vous' : 'Plus proche de vous : ' + (r.dA < r.dB ? a.party.short : b.party.short);
+        const imp = importanceFor(r.dim);
         html += `<div class="depart-item">
-          <div class="depart-item-head"><h3>${dim.name}</h3><span class="dc-tag ${Math.abs(dA - dB) < 0.25 ? 'assez-proche' : 'proche'}">${tag}</span></div>
-          <p class="dc-detail">Vous : ${positionLabel(r.k, r.pa.userScore)}<br>${a.party.short} : ${positionLabel(r.k, r.pa.partyScore)}<br>${b.party.short} : ${positionLabel(r.k, r.pb.partyScore)}</p>
-          <p class="depart-imp">Ce sujet compte pour vous : <strong>${importanceLabel(dimResults[r.k].importance)}</strong></p>
+          <div class="depart-item-head"><h3>${r.title}</h3><span class="dc-tag ${equal ? 'assez-proche' : 'proche'}">${tag}</span></div>
+          <p class="dc-detail">Vous : ${r.user}<br>${a.party.short} : ${r.la}<br>${b.party.short} : ${r.lb}</p>
+          ${imp ? `<p class="depart-imp">${imp}</p>` : ''}
         </div>`;
       });
-      html += '</div><p class="confidence-note">Si l’un de ces sujets compte particulièrement pour vous, c’est lui qui devrait faire pencher votre choix. Sur les autres sujets, les deux partis sont à peu près aussi proches de vous l’un que l’autre.</p>';
+      html += '</div><p class="confidence-note">Si l’un de ces sujets compte particulièrement pour vous, c’est lui qui devrait faire pencher votre choix.</p>';
     }
     html += `<div class="btn-row" style="margin-top:1rem">
         <button class="btn btn-brass btn-sm" id="btnCompareTie" data-a="${a.party.id}" data-b="${b.party.id}">Comparer côte à côte</button>
@@ -368,7 +478,7 @@
 
   function renderResults() {
     if (!lastDimResults) computeResults();
-    const { dimResults, overall } = { dimResults: lastDimResults, overall: lastOverall };
+    const dimResults = lastDimResults, overall = lastOverall;
     const root = document.getElementById('resultsContent');
     let html = '';
 
@@ -391,17 +501,15 @@
     }
 
     // ---- Vos meilleures correspondances (partis) ----
-    // N'a de sens que si le profil global est déterminé : sur un profil
-    // "non déterminé", la plupart des partis afficheraient de toute façon
-    // un anneau vide (pas assez de dimensions comparables) — inutile et
-    // potentiellement trompeur à montrer en avant de page dans ce cas.
     if (overall.determined) {
-      const matches = Scoring.computePartyMatches(dimResults, PARTIES);
-      const top = matches.slice(0, 3);
+      const matches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
+      const ranked = matches.filter(m => m.matchPercent !== null);
+      const top = ranked.slice(0, 3);
       const tiePair = Scoring.findNearTie(matches);
+      const nQ = Object.keys(state.dpAnswers).filter(id => typeof state.dpAnswers[id] === 'number').length;
       html += `<div class="best-matches">
         <h2>Vos meilleures correspondances</h2>
-        <p class="lede">Le pourcentage compare, thème par thème, votre position à celle de chaque parti, en donnant plus de poids à ce qui compte le plus pour vous — jamais un thème auquel vous n’avez pas répondu. Le détail complet, avec les points communs et les différences, est à un clic.</p>
+        <p class="lede">Calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Le pourcentage compare votre position à celle de chaque parti, en donnant plus de poids à vos priorités — jamais un point auquel vous n’avez pas répondu. Le détail complet, avec les points communs et les différences, est à un clic.</p>
         <div class="match-grid">`;
       top.forEach((m, i) => {
         html += `<button class="match-card${i === 0 ? ' top' : ''}" style="--card-accent:${m.party.color}" data-party="${m.party.id}">
@@ -410,8 +518,8 @@
           <div class="match-card-name"><h3>${m.party.name}</h3><span class="party-family">${m.party.family}</span></div>
         </button>`;
       });
-      html += `</div><div class="btn-row" style="margin-top:1rem"><button class="btn btn-ghost btn-sm" id="btnSeeAllParties">Voir les 16 formations et leur détail</button></div></div>`;
-      if (tiePair) html += departagerHTML(tiePair, dimResults);
+      html += `</div><div class="btn-row" style="margin-top:1rem"><button class="btn btn-ghost btn-sm" id="btnSeeAllParties">Voir les ${PARTIES.length} formations et leur détail</button></div></div>`;
+      if (tiePair) html += departagerHTML(tiePair);
     }
 
     html += '<div class="dim-list">';
@@ -432,11 +540,14 @@
     });
     html += '</div>';
 
-    const topics = Scoring.priorityTopics(state.importances, fullQuestionSet()).slice(0, 5);
-    if (topics.length) {
-      html += `<div class="priorities-box"><h2>Vos priorités</h2><p class="lede">Les sujets que vous avez déclarés les plus importants — indépendamment de votre position dessus.</p>
-        <div class="chip-list">${topics.map(t => `<span class="chip">${t.topic}</span>`).join('')}</div></div>`;
+    html += `<div class="priorities-box"><h2>Vos priorités</h2>`;
+    if (state.priorities.length) {
+      html += `<p class="lede">Les thèmes que vous avez désignés comme les plus importants, dans l’ordre — indépendamment de votre position dessus.</p>
+        <div class="chip-list">${state.priorities.map((k, i) => `<span class="chip">${i + 1}. ${DIMENSIONS[k].name}</span>`).join('')}</div>`;
+    } else {
+      html += `<p class="lede">Vous n’avez pas désigné de priorité : tous les thèmes comptent autant dans la comparaison aux partis.</p>`;
     }
+    html += '</div>';
 
     html += `<div class="share-row">
       <button class="btn btn-brass" id="btnGoParties">Explorer les partis qui s’en rapprochent</button>
@@ -458,9 +569,8 @@
     if (shareBtn) shareBtn.addEventListener('click', shareResults);
     const redoBtn = document.getElementById('btnRedo');
     if (redoBtn) redoBtn.addEventListener('click', () => {
-      clearState(); state = freshState(); lastDimResults = null; lastOverall = null;
-      document.getElementById('navResults').disabled = true;
-      document.getElementById('navParties').disabled = true;
+      clearState(); state = freshState(); lastDimResults = null; lastOverall = null; compareSelection = [];
+      setNavEnabled(false);
       showScreen('home'); refreshResumeBanner();
     });
   }
@@ -487,7 +597,7 @@
      ================================================================ */
   function renderParties() {
     if (!lastDimResults) computeResults();
-    const matches = Scoring.computePartyMatches(lastDimResults, PARTIES);
+    const matches = Scoring.computePartyMatches(lastDimResults, PARTIES, matchOpts());
 
     const families = Array.from(new Set(PARTIES.map(p => p.family)));
     const filterWrap = document.getElementById('familyFilters');
@@ -533,16 +643,23 @@
   function openPartyDrawer(partyId) {
     const party = PARTIES.find(p => p.id === partyId);
     if (!party || !lastDimResults) return;
-    const match = Scoring.computePartyMatch(lastDimResults, party);
+    const match = Scoring.computePartyMatch(lastDimResults, party, matchOpts());
     lastFocusedEl = document.activeElement;
+
+    let intro;
+    if (match.matchPercent !== null) {
+      intro = 'Correspondance calculée sur ' + match.comparableCount + ' des ' + DIM_KEYS.length + ' thèmes' + (match.questionComparableCount ? ' et ' + match.questionComparableCount + ' questions de précision' : '') + ' (ceux où vous avez répondu et où ce parti a une position codée), en donnant plus de poids à vos priorités.';
+    } else {
+      intro = captionFor(match) + '.';
+    }
 
     let html = `<div class="drawer-top">
       ${matchRingHTML(match.matchPercent, 60)}
       <div><h2 style="margin-bottom:.2rem">${party.name}</h2><p class="party-family" style="margin:0">${party.family}</p></div>
       <button class="drawer-close" id="drawerCloseBtn" aria-label="Fermer">✕ Fermer</button></div>
-      <p class="confidence-note" style="margin-top:.6rem">${match.matchPercent !== null ? ('Correspondance calculée sur ' + match.comparableCount + ' des 6 thèmes (ceux où vous avez répondu et où ce parti a une position établie), pondérée par l’importance que vous leur avez donnée.') : captionFor(match) + '.'}</p>
+      <p class="confidence-note" style="margin-top:.6rem">${intro}</p>
       <p style="margin-top:1rem">${party.status}</p>
-      <p class="confidence-note">Positions estimées à partir des programmes publics, situation arrêtée en ${formatStatusDate(party.statusDate)}.</p>
+      <p class="confidence-note">Positions estimées à partir des programmes et déclarations publics, situation arrêtée en ${formatStatusDate(party.statusDate)}. Estimations à vérifier : voir la page Méthode.</p>
       <div class="source-row">
         <a class="btn btn-ghost btn-sm" href="${party.site}" target="_blank" rel="noopener">Site officiel</a>
         <a class="btn btn-ghost btn-sm" href="${party.program}" target="_blank" rel="noopener">Programme</a>
@@ -553,15 +670,28 @@
     match.perDim.forEach(p => {
       const dim = DIMENSIONS[p.dim];
       const userLabel = p.userScore !== null ? positionLabel(p.dim, p.userScore) : 'Non renseigné par vous';
-      const partyLabel = positionLabel(p.dim, p.partyScore);
       html += `<div class="dc-item">
         <div class="dc-head"><span>${dim.name}</span><span class="dc-tag ${p.category.key}">${p.category.label}</span></div>
-        <div class="dc-detail">Vous : ${userLabel}<br>${party.short} : ${partyLabel}</div>
+        <div class="dc-detail">Vous : ${userLabel}<br>${party.short} : ${positionLabel(p.dim, p.partyScore)}</div>
       </div>`;
     });
     html += '</div>';
     if (match.perDim.some(p => !p.available)) {
-      html += '<p class="dim-note" style="margin-top:1rem">Les thèmes marqués « non renseigné » ou « non comparable » ne comptent ni comme rapprochement ni comme opposition : soit vous n’y avez pas assez répondu, soit ce parti n’y a pas de position établie.</p>';
+      html += '<p class="dim-note" style="margin-top:1rem">Les thèmes marqués « non renseigné » ou « non comparable » ne comptent ni comme rapprochement ni comme opposition : soit vous n’y avez pas assez répondu, soit la position de ce parti n’y est pas codée.</p>';
+    }
+
+    if (match.perQuestion.length) {
+      html += `<h3 style="margin-top:1.8rem">Vos réponses aux questions de précision</h3><div class="dim-compare">`;
+      match.perQuestion.forEach(p => {
+        const you = p.userPos !== null ? Scoring.stanceLabel(p.q, p.userPos).label : 'Vous n’avez pas tranché';
+        const them = Scoring.stanceLabel(p.q, p.partyPos);
+        const tag = p.available ? `<span class="dc-tag ${p.category.key}">${p.category.label}</span>` : `<span class="dc-tag non-renseigne">${p.reason === 'party-unknown' ? 'Position non codée' : 'Non tranché'}</span>`;
+        html += `<div class="dc-item">
+          <div class="dc-head"><span>${p.q.topic}</span>${tag}</div>
+          <div class="dc-detail">Vous : ${you}<br>${party.short} : ${them.label}</div>
+        </div>`;
+      });
+      html += '</div>';
     }
 
     const drawer = document.getElementById('partyDrawer');
@@ -580,13 +710,6 @@
   }
   document.getElementById('drawerBackdrop').addEventListener('click', closePartyDrawer);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePartyDrawer(); });
-
-  function formatStatusDate(ym) {
-    if (!ym) return 'date inconnue';
-    const [y, m] = ym.split('-');
-    const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-    return mois[parseInt(m, 10) - 1] + ' ' + y;
-  }
 
   /* ================================================================
      COMPARER
@@ -609,6 +732,14 @@
       parties.forEach(p => { html += `<td>${positionLabel(k, p.positions[k])}</td>`; });
       html += '</tr>';
     });
+    Object.keys(state.dpAnswers).forEach(id => {
+      const q = qById[id];
+      const ans = state.dpAnswers[id];
+      if (!q || typeof ans !== 'number') return;
+      html += `<tr><td>${q.topic}</td><td>${Scoring.stanceLabel(q, ans).label}</td>`;
+      parties.forEach(p => { html += `<td>${Scoring.stanceLabel(q, q.stances[p.id]).label}</td>`; });
+      html += '</tr>';
+    });
     html += '</tbody></table></div>';
     html += '<div class="btn-row" style="margin-top:1.2rem"><button class="btn btn-ghost" id="btnClearCompare">Vider la comparaison</button></div>';
     root.innerHTML = html;
@@ -620,12 +751,18 @@
      ================================================================ */
   function renderMethod() {
     const ul = document.getElementById('methodDims');
-    if (ul.dataset.filled) return;
-    ul.innerHTML = DIM_KEYS.map(k => {
-      const d = DIMENSIONS[k];
-      return `<li><strong>${d.name}</strong> — de « ${d.labelLeft} » (score négatif) à « ${d.labelRight} » (score positif)</li>`;
-    }).join('');
-    ul.dataset.filled = '1';
+    if (!ul.dataset.filled) {
+      ul.innerHTML = DIM_KEYS.map(k => {
+        const d = DIMENSIONS[k];
+        return `<li><strong>${d.name}</strong> — de « ${d.labelLeft} » (score négatif) à « ${d.labelRight} » (score positif)</li>`;
+      }).join('');
+      ul.dataset.filled = '1';
+    }
+    const src = document.getElementById('methodSources');
+    if (src && !src.dataset.filled) {
+      src.innerHTML = SOURCES.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.label}</a></li>`).join('');
+      src.dataset.filled = '1';
+    }
   }
 
   /* ================================================================
@@ -649,8 +786,7 @@
     const stored = loadState();
     if (stored && stored.completed) {
       state = stored;
-      document.getElementById('navResults').disabled = false;
-      document.getElementById('navParties').disabled = false;
+      setNavEnabled(true);
       computeResults();
     }
     showScreen('home');
@@ -661,10 +797,4 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
-
-  // exposé pour les tests d'intégration (jsdom) uniquement — n'affecte pas
-  // le fonctionnement normal dans le navigateur.
-  if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { _internalsForTests: () => ({ state, computeResults, freshState }) };
-  }
 })();

@@ -198,168 +198,328 @@ const QUESTIONS = [
 ];
 
 /* ----------------------------------------------------------------------
-   BANQUE DIAGNOSTIQUE — 36 questions (6 par dimension), utilisée pour la
-   phase de précision (voir PARTIE 6). Jamais posées à tout le monde :
-   scoring.js en sélectionne 8, sur les dimensions les plus
-   incertaines et/ou jugées importantes par la personne. Sujets choisis
-   pour ne jamais reformuler une question déjà posée dans QUESTIONS.
+   BANQUE DE DÉPARTAGE — questions concrètes à plusieurs options, utilisées
+   dans la seconde phase pour séparer les partis qui restent proches après
+   les 21 questions (jusqu’à 8 questions, choisies une par une selon les
+   partis encore en course : voir selectNextDepartage dans scoring.js).
+
+   Différence essentielle avec les 21 questions : ici les options ne
+   s’échelonnent PAS de « la gauche » à « la droite ». Elles décrivent des
+   choix de politique précis, ordonnés sur un seul axe (pos = 0, 1, 2…),
+   entre lesquels des partis d’un même camp se séparent réellement
+   (ex. retraites à 60 ans / 62 ans / 64 ans, nucléaire, taxe sur les très
+   grandes fortunes, OTAN, Ukraine…).
+
+   Chaque `stances` donne, pour un parti, la position (sur la même échelle
+   que `pos`, décimales admises : 1,5 = entre l’option 1 et l’option 2) ou
+   est ABSENTE quand la position n’est pas codée : une position absente est
+   exclue du calcul, jamais lue comme « au milieu ». Voir README :
+   « Mettre à jour les positions ».
+
+   STATUT : positions PROVISOIRES, codées à partir des propositions
+   déclarées des candidats et des programmes de partis à la date de
+   septembre 2026, recoupées avec plusieurs sources de presse et de
+   comparaison (liste dans SOURCES et dans le README). La plupart des
+   programmes 2027 ne sont pas encore publiés : à revérifier avant toute
+   publication, puis à mesure que la campagne avance. Pour les partis dont
+   la position publique se confond avec celle de leur candidat, c’est la
+   position du candidat déclaré qui est codée (PS : Olivier Faure ; Place
+   publique : Raphaël Glucksmann ; etc.).
    ------------------------------------------------------------------- */
-const BANK = [
-  // — Économie (6) —
-  { id:'bk-eco-1', dim:'eco', topic:'Succession', plain:'Une succession, ce sont les biens (argent, logement…) transmis aux héritiers après un décès.',
-    a:'Il faut renforcer la taxation des successions les plus importantes.',
-    b:'Il faut alléger la taxation des transmissions, y compris importantes.',
-    why:'Cette question précise votre position sur la taxation du patrimoine transmis.' },
-  { id:'bk-eco-2', dim:'eco', topic:'Salaire minimum',
-    a:'Il faut revaloriser fortement le salaire minimum.',
-    b:'Il faut limiter les hausses du salaire minimum pour ne pas freiner l’emploi.',
-    why:'Cette question précise votre position sur le niveau du salaire minimum.' },
-  { id:'bk-eco-3', dim:'eco', topic:'Aides aux entreprises',
-    a:'Les aides publiques aux entreprises doivent être conditionnées à des engagements sociaux ou environnementaux.',
-    b:'Les aides publiques aux entreprises doivent surtout soutenir l’investissement et l’emploi, sans condition supplémentaire.',
-    why:'Cette question précise l’usage que vous privilégiez pour l’argent public versé aux entreprises.' },
-  { id:'bk-eco-4', dim:'eco', topic:'Retraites', plain:'La durée de cotisation, c’est le nombre d’années de travail cotisées nécessaires pour toucher une retraite à taux plein.',
-    a:'Pour financer les retraites, il faut d’abord chercher de nouvelles recettes plutôt que reculer l’âge de départ.',
-    b:'Pour financer les retraites, il faut d’abord ajuster l’âge de départ ou la durée de cotisation.',
-    why:'Cette question compare deux manières différentes de financer durablement les retraites.' },
-  { id:'bk-eco-5', dim:'eco', topic:'Logement', plain:'Encadrer les loyers, c’est limiter par la loi le montant des loyers dans certaines zones. Le logement social est un logement à loyer réduit, réservé sous conditions de ressources.',
-    a:'L’État doit renforcer la régulation du logement (encadrement des loyers, logement social).',
-    b:'Il faut surtout faciliter la construction et l’investissement privés dans le logement.',
-    why:'Cette question précise le rôle que vous voulez donner à l’État dans le logement.' },
-  { id:'bk-eco-6', dim:'eco', topic:'Dette publique', plain:'La dette publique, c’est l’argent que l’État a emprunté. Le déficit, c’est quand il dépense plus qu’il ne reçoit sur une année.',
-    a:'Il est acceptable d’augmenter temporairement la dette publique pour financer des priorités sociales ou d’investissement.',
-    b:'Il faut réduire en priorité la dette et le déficit publics, même si cela limite certaines dépenses.',
-    why:'Cette question précise votre arbitrage entre dette publique et priorités de dépense.' },
+const DEPARTAGE = [
+  { id:'dp-retraites', dim:'eco', group:'eco-social', topic:'Retraites',
+    q:'Quel âge de départ à la retraite faut-il viser ?',
+    plain:'L’âge légal est l’âge à partir duquel on peut prendre sa retraite ; il monte progressivement à 64 ans depuis la réforme de 2023. La durée de cotisation est le nombre d’années de travail exigé pour toucher une pension complète.',
+    options:[
+      { pos:0, short:'60 ans', text:'Revenir à 60 ans, avec 40 ans de cotisation.' },
+      { pos:1, short:'62 ans', text:'Revenir à 62 ans, en annulant le passage à 64 ans.' },
+      { pos:2, short:'64 ans, ou durée de cotisation seule', text:'Garder 64 ans, ou supprimer l’âge légal et ne regarder que la durée de cotisation.' },
+      { pos:3, short:'65 ans ou plus', text:'Reculer l’âge de départ vers 65 ans ou plus, ou l’indexer sur l’espérance de vie.' }
+    ],
+    stances:{ lfi:0.25, pcf:0, lo:0, ecolo:0.75, ps:1, pp:1.5, rn:1, renaissance:2, reconquete:2, horizons:3, lr:3, dlf:0.5 },
+    basis:'Propositions déclarées des candidats (JDD, 20 Minutes, septembre 2026).' },
 
-  // — Société (6) —
-  { id:'bk-soc-1', dim:'soc', topic:'Laïcité', plain:'La laïcité, c’est la séparation de l’État et des religions : l’État est neutre et garantit à chacun la liberté de croire ou de ne pas croire.',
-    a:'Dans l’espace public, la liberté de conscience doit primer, dans le respect de la loi.',
-    b:'Certaines règles communes de neutralité doivent être renforcées dans l’espace public.',
-    why:'Cette question précise votre rapport entre liberté de conscience et règles communes.' },
-  { id:'bk-soc-2', dim:'soc', topic:'Fin de vie', plain:'Soins palliatifs : soins qui soulagent la douleur des personnes gravement malades en fin de vie. Aide active à mourir : permettre, sous conditions strictes, à une personne d’être aidée à mettre fin à sa vie.',
-    a:'La loi doit permettre un accès plus large à une aide active à mourir, sous conditions strictes.',
-    b:'La priorité doit d’abord aller au développement des soins palliatifs, avant d’élargir toute aide à mourir.',
-    why:'Ce sujet fait l’objet d’un débat législatif actuel en France ; cette question mesure votre position sur cet équilibre.' },
-  { id:'bk-soc-3', dim:'soc', topic:'Égalité femmes-hommes',
-    a:'Il faut des mesures contraignantes (quotas, sanctions) pour accélérer l’égalité femmes-hommes.',
-    b:'Il faut surtout garantir l’égalité des droits, sans mesures contraignantes supplémentaires.',
-    why:'Cette question précise les moyens que vous privilégiez pour l’égalité femmes-hommes.' },
-  { id:'bk-soc-4', dim:'soc', topic:'École', plain:'La carte scolaire affecte chaque élève à l’école, au collège ou au lycée de son secteur d’habitation. La mixité sociale, c’est la présence d’élèves de milieux différents dans une même classe.',
-    a:'Il faut renforcer la mixité sociale dans les établissements scolaires, y compris en régulant davantage la carte scolaire.',
-    b:'Il faut surtout laisser plus de liberté de choix aux familles dans l’orientation scolaire.',
-    why:'Cette question précise votre position sur la mixité sociale à l’école.' },
-  { id:'bk-soc-5', dim:'soc', topic:'Médias', plain:'Concentration des médias : quelques grands groupes possèdent une grande partie des journaux, chaînes de télévision et radios.',
-    a:'Il faut renforcer les règles limitant la concentration des médias dans quelques grands groupes.',
-    b:'Il faut surtout laisser le marché des médias s’organiser librement.',
-    why:'Cette question précise votre position sur la régulation de la propriété des médias.' },
-  { id:'bk-soc-6', dim:'soc', topic:'Discriminations', plain:'Le testing consiste à envoyer des candidatures identiques sous des noms ou profils différents pour repérer des discriminations.',
-    a:'Il faut renforcer les dispositifs de lutte contre les discriminations (testing, sanctions).',
-    b:'Les règles existantes contre les discriminations sont suffisantes.',
-    why:'Cette question précise votre position sur les moyens de lutte contre les discriminations.' },
+  { id:'dp-fortune', dim:'eco', group:'fiscal', topic:'Très grandes fortunes',
+    q:'Faut-il taxer davantage les très grandes fortunes ?',
+    plain:'Aujourd’hui, l’impôt sur la fortune ne porte que sur l’immobilier (IFI) et les revenus du capital sont taxés à taux fixe (« flat tax »). La « taxe Zucman » est une proposition d’impôt minimal de 2 % par an sur les patrimoines de plus de 100 millions d’euros.',
+    options:[
+      { pos:0, short:'Cadre actuel', text:'Garder le cadre actuel, sans impôt supplémentaire sur les très grandes fortunes.' },
+      { pos:1, short:'Impôt sur la fortune financière', text:'Remplacer l’impôt sur la fortune immobilière par un impôt sur la fortune financière (actions, placements), sans toucher à l’immobilier.' },
+      { pos:2, short:'Impôt minimal de 2 % (taxe Zucman)', text:'Créer un impôt minimal de 2 % sur les patrimoines de plus de 100 millions d’euros (« taxe Zucman »).' },
+      { pos:3, short:'ISF progressif et plafond', text:'Rétablir un impôt sur la fortune progressif et plafonner les très gros héritages.' }
+    ],
+    stances:{ lfi:3, lo:3, pcf:2.5, ecolo:2.25, ps:2, pp:2, rn:1, renaissance:0, horizons:0, lr:0, reconquete:0 },
+    basis:'LaFacture2027, Contribuables associés (septembre 2026), débat sur la taxe Zucman (octobre 2025).' },
 
-  // — Autorité (6) —
-  { id:'bk-auth-1', dim:'auth', topic:'École & autorité',
-    a:'L’autorité à l’école doit reposer d’abord sur le dialogue et l’accompagnement.',
-    b:'L’autorité à l’école doit reposer d’abord sur des règles claires et des sanctions prévisibles.',
-    why:'Cette question précise votre vision de l’autorité dans le cadre scolaire.' },
-  { id:'bk-auth-2', dim:'auth', topic:'Vidéosurveillance', plain:'Vidéosurveillance algorithmique : des caméras dont les images sont analysées automatiquement par un logiciel (repérer un comportement, reconnaître un visage…).',
-    a:'Il faut limiter le recours à la vidéosurveillance algorithmique et à la reconnaissance faciale dans l’espace public.',
-    b:'Il faut développer ces outils pour renforcer la sécurité, sous contrôle des autorités.',
-    why:'Cette question précise votre position sur les technologies de surveillance.' },
-  { id:'bk-auth-3', dim:'auth', topic:'Détention', plain:'La détention provisoire, c’est l’emprisonnement d’une personne avant son jugement.',
-    a:'Il faut réduire le recours à la détention provisoire et développer les alternatives à l’incarcération.',
-    b:'Il faut construire davantage de places de prison et faciliter l’incarcération.',
-    why:'Cette question précise votre position sur la politique carcérale.' },
-  { id:'bk-auth-4', dim:'auth', topic:'Contrôles de police', plain:'Un récépissé est un document remis à la personne contrôlée, qui prouve qu’un contrôle a eu lieu.',
-    a:'Il faut mieux encadrer les contrôles de police (récépissé, traçabilité) pour prévenir les abus.',
-    b:'Il ne faut pas complexifier le travail des forces de l’ordre par des procédures supplémentaires.',
-    why:'Cette question précise votre position sur l’encadrement des contrôles de police.' },
-  { id:'bk-auth-5', dim:'auth', topic:'Pouvoirs exceptionnels', plain:'L’état d’urgence est un régime exceptionnel qui donne davantage de pouvoirs aux autorités (perquisitions, restrictions de circulation…) en cas de menace grave.',
-    a:'Le recours à des pouvoirs exceptionnels ou à l’état d’urgence doit rester limité et strictement contrôlé par le Parlement.',
-    b:'L’exécutif doit pouvoir recourir plus facilement à des pouvoirs exceptionnels face aux menaces.',
-    why:'Cette question précise votre position sur l’équilibre des pouvoirs en temps de crise.' },
-  { id:'bk-auth-6', dim:'auth', topic:'Drogues',
-    a:'Il faut privilégier la prévention et le soin dans la lutte contre les drogues, plutôt que la seule répression.',
-    b:'Il faut d’abord renforcer la répression du trafic et de la consommation de drogues.',
-    why:'Cette question précise votre position sur la politique en matière de stupéfiants.' },
+  { id:'dp-invest', dim:'eco', group:'fiscal', topic:'Investissement et déficit',
+    q:'Comment concilier investissements publics et finances de l’État ?',
+    plain:'Le déficit public, c’est quand l’État dépense plus qu’il ne reçoit sur une année ; la dette publique, c’est l’ensemble de ce qu’il a emprunté et doit rembourser.',
+    options:[
+      { pos:0, short:'Plan d’investissement, déficit assumé', text:'Lancer un grand plan d’investissement public (écoles, hôpitaux, climat), quitte à accepter un déficit plus élevé.' },
+      { pos:1, short:'Investir en taxant les plus riches', text:'Investir davantage en finançant l’effort par de nouveaux impôts sur les plus riches et les grandes entreprises, sans creuser le déficit.' },
+      { pos:2, short:'Réduire le déficit, effort partagé', text:'Réduire le déficit en partageant l’effort entre économies et impôts.' },
+      { pos:3, short:'Réduire fortement la dépense', text:'Réduire fortement la dépense publique, sans augmenter les impôts.' }
+    ],
+    stances:{ lfi:0, pcf:0, ecolo:0.75, ps:1, pp:1, dlf:1, renaissance:2.5, horizons:2.5, rn:2.5, lr:3, reconquete:3 },
+    basis:'Positions déclarées des candidats sur l’investissement public et la réduction du déficit (septembre 2026).' },
 
-  // — Europe (6) —
-  { id:'bk-europe-1', dim:'europe', topic:'Élargissement UE', plain:'Élargir l’Union européenne, c’est faire entrer de nouveaux pays (par exemple l’Ukraine ou des pays des Balkans).',
-    a:'La France doit soutenir l’élargissement de l’Union européenne à de nouveaux pays.',
-    b:'La France doit être prudente, voire s’opposer à de nouveaux élargissements de l’Union européenne.',
-    why:'Cette question précise votre position sur l’élargissement de l’UE.' },
-  { id:'bk-europe-2', dim:'europe', topic:'Zone euro', plain:'La zone euro, ce sont les pays qui utilisent l’euro. Une dette commune, c’est emprunter ensemble, au nom de plusieurs pays, plutôt que chacun de son côté.',
-    a:'Il faut renforcer l’intégration budgétaire de la zone euro (budget commun, dette commune).',
-    b:'Il faut limiter la mutualisation budgétaire entre pays de la zone euro.',
-    why:'Cette question précise votre position sur l’intégration budgétaire européenne.' },
-  { id:'bk-europe-3', dim:'europe', topic:'Commerce', plain:'Un accord commercial fixe les règles d’échanges (droits de douane, normes) entre des pays ou des groupes de pays.',
-    a:'L’Union européenne doit négocier les accords commerciaux au nom de l’ensemble de ses membres.',
-    b:'La France doit pouvoir peser davantage sur ses propres choix commerciaux, hors du cadre européen commun.',
-    why:'Cette question précise votre position sur la politique commerciale.' },
-  { id:'bk-europe-4', dim:'europe', topic:'Défense européenne',
-    a:'Il faut construire une défense européenne commune, y compris une armée intégrée à terme.',
-    b:'La défense doit rester d’abord une compétence nationale, articulée à des alliances choisies au cas par cas.',
-    why:'Cette question précise votre position sur la construction d’une défense européenne commune.' },
-  { id:'bk-europe-5', dim:'europe', topic:'Justice européenne', plain:'CJUE : la Cour de justice de l’Union européenne, qui interprète le droit de l’UE. CEDH : la Cour européenne des droits de l’homme (Conseil de l’Europe), qui juge le respect des droits fondamentaux.',
-    a:'Les décisions des juridictions européennes (CJUE, CEDH) doivent continuer à s’imposer au droit français.',
-    b:'La France doit pouvoir s’écarter des décisions des juridictions européennes lorsqu’elles contredisent des choix nationaux majeurs.',
-    why:'Cette question précise votre position sur l’articulation entre droit français et droit européen.' },
-  { id:'bk-europe-6', dim:'europe', topic:'Frontières Schengen', plain:'L’espace Schengen, c’est l’ensemble des pays européens où l’on franchit les frontières sans contrôle systématique.',
-    a:'Il faut renforcer la gestion commune des frontières extérieures de l’Union européenne.',
-    b:'Chaque pays doit retrouver un contrôle plus complet de ses propres frontières, y compris au sein de l’espace Schengen.',
-    why:'Cette question précise votre position sur la gestion commune des frontières européennes.' },
+  { id:'dp-propriete', dim:'eco', group:'fiscal', topic:'Entreprises publiques',
+    q:'Quel rôle pour l’État dans la propriété des entreprises ?',
+    plain:'Nationaliser, c’est faire passer une entreprise sous propriété de l’État ; privatiser, c’est l’inverse. Les autoroutes, par exemple, sont confiées à des sociétés privées par des concessions qui s’achèvent entre 2031 et 2036.',
+    options:[
+      { pos:0, short:'Privatiser davantage', text:'Confier davantage d’activités et de services publics au secteur privé.' },
+      { pos:1, short:'Équilibre actuel', text:'Garder l’équilibre actuel entre public et privé.' },
+      { pos:2, short:'Reprendre quelques secteurs clés', text:'Reprendre en main publique quelques secteurs clés (par exemple les autoroutes, une partie de l’énergie).' },
+      { pos:3, short:'Nationaliser largement', text:'Nationaliser largement les secteurs stratégiques (énergie, transports, banques…).' }
+    ],
+    stances:{ lfi:3, pcf:3, lo:3, dlf:2.5, ecolo:2, ps:2, rn:2, pp:1, reconquete:1, renaissance:0.75, horizons:0.75, lr:0 },
+    basis:'Positions déclarées des candidats sur les nationalisations et les privatisations (septembre 2026).' },
 
-  // — Immigration (6) —
-  { id:'bk-immig-1', dim:'immig', topic:'Regroupement familial', plain:'Le regroupement familial permet à une personne étrangère installée légalement en France de faire venir son conjoint et ses enfants mineurs.',
-    a:'Les conditions du regroupement familial doivent rester comme aujourd’hui, ou être assouplies.',
-    b:'Les conditions du regroupement familial doivent être significativement durcies.',
-    why:'Cette question précise votre position sur le regroupement familial.' },
-  { id:'bk-immig-2', dim:'immig', topic:'Immigration de travail', plain:'Les secteurs en tension sont les métiers où les entreprises peinent à recruter.',
-    a:'Il faut faciliter l’immigration de travail dans les secteurs qui manquent de main-d’œuvre.',
-    b:'Il faut limiter l’immigration de travail même dans les secteurs en tension.',
-    why:'Cette question précise votre position sur l’immigration liée à l’emploi.' },
-  { id:'bk-immig-3', dim:'immig', topic:'Régularisations', plain:'Régulariser, c’est accorder un titre de séjour à une personne qui vit en France sans autorisation officielle (« sans-papiers »).',
-    a:'Il faut permettre la régularisation des personnes sans papiers durablement installées et insérées.',
-    b:'Il ne faut pas faciliter la régularisation des personnes en situation irrégulière.',
-    why:'Cette question précise votre position sur la régularisation des personnes sans titre de séjour.' },
-  { id:'bk-immig-4', dim:'immig', topic:'Expulsions', plain:'Une obligation de quitter le territoire est une décision administrative qui ordonne à une personne en situation irrégulière de partir de France.',
-    a:'Les décisions d’expulsion doivent rester encadrées par des garanties individuelles fortes.',
-    b:'Il faut faciliter et accélérer l’exécution des décisions d’expulsion.',
-    why:'Cette question précise votre position sur l’exécution des obligations de quitter le territoire.' },
-  { id:'bk-immig-5', dim:'immig', topic:'Droit du sol',
-    a:'Le droit du sol (nationalité liée à la naissance en France) doit être maintenu tel quel.',
-    b:'Le droit du sol doit être restreint ou davantage conditionné.',
-    why:'Cette question précise votre position sur les règles d’accès à la nationalité par la naissance.' },
-  { id:'bk-immig-6', dim:'immig', topic:'Étudiants étrangers', plain:'Frais différenciés : des frais d’inscription plus élevés pour les étudiants qui viennent de pays hors Union européenne.',
-    a:'Il faut faciliter l’accueil des étudiants étrangers dans l’enseignement supérieur français.',
-    b:'Il faut restreindre l’accès des étudiants étrangers, notamment via des frais différenciés plus élevés.',
-    why:'Cette question précise votre position sur l’accueil des étudiants internationaux.' },
+  { id:'dp-rsa', dim:'eco', group:'eco-social', topic:'RSA',
+    q:'Faut-il demander une contrepartie pour toucher le RSA ?',
+    plain:'Le RSA (revenu de solidarité active) est une aide versée aux personnes sans ressources suffisantes. Une loi de 2023 généralise, pour une partie des bénéficiaires, une activité d’environ 15 heures par semaine (formation, insertion, emploi).',
+    options:[
+      { pos:0, short:'Sans contrepartie', text:'Verser le RSA sans contrepartie obligatoire.' },
+      { pos:1, short:'Accompagnement, sans obligation d’heures', text:'Renforcer l’accompagnement et la formation, sans imposer un nombre d’heures.' },
+      { pos:2, short:'Contrepartie en heures d’activité', text:'Conditionner le RSA à un nombre d’heures d’activité (emploi, formation ou bénévolat).' }
+    ],
+    stances:{ lfi:0, pcf:0, lo:0, ecolo:0, ps:0, pp:0.75, horizons:1.75, rn:1.75, renaissance:2, lr:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur la conditionnalité du RSA (septembre 2026).' },
 
-  // — Écologie (6) —
-  { id:'bk-ecology-1', dim:'ecology', topic:'Énergie', plain:'Le mix énergétique, c’est la répartition des sources qui produisent l’électricité : nucléaire, éolien, solaire, hydraulique…',
-    a:'Il faut donner la priorité au développement des énergies renouvelables plutôt qu’au nucléaire.',
-    b:'Il faut donner au nucléaire une place centrale dans la stratégie énergétique française.',
-    why:'Cette question précise votre position sur le choix du mix énergétique.' },
-  { id:'bk-ecology-2', dim:'ecology', topic:'Pesticides',
-    a:'Il faut interdire ou restreindre davantage les pesticides les plus controversés, même si cela complique certaines productions.',
-    b:'Il faut éviter de nouvelles interdictions de pesticides tant que des solutions de remplacement ne sont pas prêtes.',
-    why:'Cette question précise votre position sur la réglementation des pesticides.' },
-  { id:'bk-ecology-3', dim:'ecology', topic:'Élevage',
-    a:'Il faut renforcer fortement les règles de protection animale dans l’élevage, même si certaines pratiques doivent changer.',
-    b:'Il faut privilégier des évolutions progressives pour limiter les contraintes sur les filières d’élevage.',
-    why:'Cette question précise votre position sur la protection animale dans l’élevage.' },
-  { id:'bk-ecology-4', dim:'ecology', topic:'Artificialisation des sols', plain:'Artificialiser un sol, c’est transformer une terre agricole ou naturelle en surface construite ou bétonnée (routes, lotissements, entrepôts…).',
-    a:'Il faut limiter fortement l’artificialisation des sols, même si cela freine certains projets économiques.',
-    b:'Il ne faut pas trop contraindre les projets économiques et de logement au nom de la limitation de l’artificialisation.',
-    why:'Cette question précise votre position sur la limitation de l’artificialisation des sols.' },
-  { id:'bk-ecology-5', dim:'ecology', topic:'Fiscalité carbone', plain:'Les gaz à effet de serre (CO₂, méthane…) sont les gaz qui contribuent au réchauffement climatique.',
-    a:'Il faut renforcer la fiscalité sur les activités les plus émettrices de gaz à effet de serre.',
-    b:'Il faut éviter d’alourdir la fiscalité environnementale sur les entreprises et les ménages.',
-    why:'Cette question précise votre position sur la fiscalité environnementale.' },
-  { id:'bk-ecology-6', dim:'ecology', topic:'Croissance', plain:'La croissance, c’est l’augmentation, d’une année sur l’autre, de la richesse produite par le pays (le PIB).',
-    a:'Il faut accepter de repenser certains objectifs de croissance économique pour respecter les limites écologiques.',
-    b:'La croissance économique doit rester un objectif prioritaire, à concilier avec les enjeux écologiques sans la remettre en cause.',
-    why:'Cette question précise votre position sur le rapport entre croissance économique et limites écologiques.' }
+  { id:'dp-revenu', dim:'eco', group:'eco-social', topic:'Revenu de base',
+    q:'Quelle forme donner aux aides pour les personnes sans ressources ?',
+    plain:'Un revenu universel serait versé à tous les adultes, sans condition de ressources ni d’activité. Un revenu minimum garanti n’est versé qu’à ceux dont les ressources sont sous un seuil.',
+    options:[
+      { pos:0, short:'Revenu universel', text:'Verser à tous les adultes un revenu de base, sans condition de ressources.' },
+      { pos:1, short:'Revenu minimum garanti', text:'Garantir à chacun un revenu minimum, versé à ceux qui en ont besoin, en regroupant les aides existantes.' },
+      { pos:2, short:'Garder les minima actuels', text:'Garder le système actuel (RSA, aides au logement, etc.).' }
+    ],
+    stances:{ ecolo:0, lfi:0.75, ps:1.5, pp:1.5, renaissance:1.5, pcf:2, lo:2, horizons:2, rn:2, lr:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur le revenu universel (septembre 2026).' },
+
+  { id:'dp-nucleaire', dim:'ecology', group:'ecologie', topic:'Nucléaire',
+    q:'Quelle place pour le nucléaire dans la production d’électricité ?',
+    plain:'Environ 70 % de l’électricité française vient aujourd’hui du nucléaire. Les « EPR2 » sont les nouveaux réacteurs prévus par l’État.',
+    options:[
+      { pos:0, short:'Sortir du nucléaire', text:'Sortir du nucléaire à terme, en visant 100 % d’énergies renouvelables.' },
+      { pos:1, short:'Garder l’existant, sans nouveau réacteur', text:'Garder les réacteurs actuels, sans en construire de nouveaux, et développer les renouvelables.' },
+      { pos:2, short:'Garder, en construire, et renouvelables', text:'Garder les réacteurs actuels, en construire quelques nouveaux et développer aussi les renouvelables.' },
+      { pos:3, short:'Miser avant tout sur le nucléaire', text:'Miser avant tout sur le nucléaire (beaucoup de nouveaux réacteurs) et cesser de soutenir l’éolien et le solaire.' }
+    ],
+    stances:{ lfi:0, ecolo:0.5, ps:1.5, pp:2, renaissance:2, horizons:2, lr:2.5, pcf:2.5, dlf:2.5, rn:3, reconquete:3 },
+    basis:'Colloque UFE (Sfen, juillet 2026), Révolution énergétique et ECOinfos (juin et août 2026), programme LFI (septembre 2026).' },
+
+  { id:'dp-carbone', dim:'ecology', group:'ecologie', topic:'Taxe carbone',
+    q:'Que faire de la taxe carbone ?',
+    plain:'La taxe carbone est une taxe sur les énergies fossiles (essence, gaz, fioul) qui vise à réduire les émissions de CO₂. Sa hausse est gelée depuis 2018, après la crise des « gilets jaunes ».',
+    options:[
+      { pos:0, short:'L’augmenter, en redistribuant', text:'L’augmenter progressivement, en redistribuant le produit aux ménages et aux entreprises.' },
+      { pos:1, short:'La garder telle quelle', text:'La garder à son niveau actuel.' },
+      { pos:2, short:'La supprimer', text:'La supprimer.' }
+    ],
+    stances:{ ecolo:0.25, pp:0.25, ps:1, horizons:1, lfi:1.5, renaissance:1.5, lr:1.75, pcf:2, rn:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur la fiscalité carbone (septembre 2026).' },
+
+  { id:'dp-thermique', dim:'ecology', group:'ecologie', topic:'Voitures thermiques',
+    q:'Faut-il maintenir l’interdiction de vendre des voitures thermiques neuves en 2035 ?',
+    plain:'L’Union européenne a décidé d’interdire, à partir de 2035, la vente de voitures neuves à moteur essence ou diesel ; une exception est prévue pour les carburants de synthèse.',
+    options:[
+      { pos:0, short:'La maintenir', text:'Maintenir l’interdiction en 2035.' },
+      { pos:1, short:'L’assouplir', text:'L’assouplir (hybrides, carburants de synthèse, report de la date).' },
+      { pos:2, short:'La supprimer', text:'La supprimer.' }
+    ],
+    stances:{ ecolo:0, pp:0, lfi:0, ps:0.5, pcf:0.5, renaissance:0.5, horizons:1.5, lr:2, rn:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur l’échéance de 2035 (septembre 2026).' },
+
+  { id:'dp-pesticides', dim:'ecology', group:'ecologie', topic:'Pesticides',
+    q:'Quelle politique pour les pesticides ?',
+    plain:'Les pesticides de synthèse protègent les cultures mais ont des effets sur la santé et l’environnement. Exemple de débat récent : l’acétamipride, un insecticide interdit en France dont la réautorisation a été débattue en 2025.',
+    options:[
+      { pos:0, short:'Interdire progressivement', text:'Interdire progressivement les pesticides de synthèse.' },
+      { pos:1, short:'Interdire les plus dangereux', text:'Interdire les plus dangereux et aider les agriculteurs à s’en passer.' },
+      { pos:2, short:'Pas sans alternative', text:'Ne pas interdire de nouvelles substances tant qu’aucune alternative n’est prête.' },
+      { pos:3, short:'Assouplir les normes', text:'Assouplir les normes françaises pour les aligner sur celles des autres pays.' }
+    ],
+    stances:{ ecolo:0, lfi:0, ps:0.75, pp:0.75, pcf:0.75, renaissance:2, horizons:2, dlf:2.25, lr:2.5, reconquete:2.5, rn:3 },
+    basis:'Positions déclarées des candidats sur les pesticides (septembre 2026).' },
+
+  { id:'dp-europe', dim:'europe', group:'europe', topic:'Place de l’Union européenne',
+    q:'Quelle place pour l’Union européenne ?',
+    plain:'Aujourd’hui, le droit européen s’impose au droit français dans les domaines où l’Union a compétence (concurrence, monnaie, commerce, règles budgétaires…).',
+    options:[
+      { pos:0, short:'Approfondir l’UE', text:'Approfondir l’Union européenne (budget commun, défense commune, plus de décisions prises à plusieurs).' },
+      { pos:1, short:'Désobéir à certaines règles', text:'Rester dans l’Union, mais pouvoir désobéir à certaines règles quand elles empêchent d’appliquer notre politique.' },
+      { pos:2, short:'La Constitution avant le droit européen', text:'Rester dans l’Union, mais faire passer la Constitution française avant le droit européen.' },
+      { pos:3, short:'Quitter l’UE', text:'Quitter l’Union européenne.' }
+    ],
+    stances:{ pp:0, renaissance:0, modem:0, udi:0.25, ecolo:0.25, ps:0.5, horizons:0.5, lfi:1.25, pcf:1.25, lr:2, rn:2, reconquete:2, dlf:3, upr:3 },
+    basis:'Programme LFI 2027 (« désobéir »), ÉlyséeScope (juillet 2026), propositions Retailleau (septembre 2026).' },
+
+  { id:'dp-otan', dim:'europe', group:'defense', topic:'OTAN',
+    q:'Quelle place pour la France dans l’OTAN ?',
+    plain:'L’OTAN est une alliance militaire entre pays d’Amérique du Nord et d’Europe, créée en 1949. La France en avait quitté le commandement militaire intégré en 1966 et l’a réintégré en 2009.',
+    options:[
+      { pos:0, short:'Quitter l’OTAN', text:'Quitter l’OTAN.' },
+      { pos:1, short:'Sortir du commandement intégré', text:'Rester dans l’alliance, mais sortir de son commandement militaire intégré.' },
+      { pos:2, short:'Rester comme aujourd’hui', text:'Rester dans l’OTAN comme aujourd’hui.' }
+    ],
+    stances:{ lfi:0, pcf:0, upr:0, dlf:1, reconquete:1.25, rn:1.5, ecolo:1.75, ps:2, pp:2, renaissance:2, horizons:2, lr:2 },
+    basis:'Positions déclarées des candidats sur l’OTAN (septembre 2026), ÉlyséeScope (juillet 2026).' },
+
+  { id:'dp-ukraine', dim:'europe', group:'defense', topic:'Ukraine',
+    q:'Quelle politique à l’égard de l’Ukraine et de la Russie ?',
+    plain:'Depuis l’invasion russe de février 2022, la France livre des armes à l’Ukraine et finance son soutien.',
+    options:[
+      { pos:0, short:'Limiter les armes, négocier', text:'Arrêter ou limiter fortement les livraisons d’armes et privilégier la négociation avec la Russie.' },
+      { pos:1, short:'Maintenir l’aide actuelle', text:'Maintenir l’aide actuelle, sans l’augmenter et sans envoyer de soldats français.' },
+      { pos:2, short:'Augmenter l’aide militaire', text:'Augmenter l’aide militaire (y compris armements lourds) et garantir durablement la sécurité de l’Ukraine.' }
+    ],
+    stances:{ lfi:0.25, reconquete:0, dlf:0, upr:0, rn:0.75, pcf:0.75, ecolo:1.75, ps:2, pp:2, renaissance:2, horizons:2, lr:2 },
+    basis:'Positions déclarées des candidats sur le soutien militaire à l’Ukraine (septembre 2026).' },
+
+  { id:'dp-defense', dim:'europe', group:'defense', topic:'Budget de la défense',
+    q:'Quel budget pour l’armée ?',
+    plain:'Le budget de la défense représente aujourd’hui environ 2 % de la richesse produite par le pays (le PIB).',
+    options:[
+      { pos:0, short:'Réduire ou geler', text:'Réduire ou geler le budget militaire.' },
+      { pos:1, short:'Maintenir environ 2 %', text:'Le maintenir à peu près au niveau actuel (environ 2 % du PIB).' },
+      { pos:2, short:'Augmenter modérément', text:'L’augmenter modérément.' },
+      { pos:3, short:'3 % du PIB ou plus', text:'Le porter à 3 % du PIB ou plus.' }
+    ],
+    stances:{ lfi:0, lo:0, pcf:0.75, ecolo:0.75, ps:1.5, pp:2.5, horizons:2.75, dlf:2.75, renaissance:3, lr:3, rn:3, reconquete:3 },
+    basis:'Positions déclarées des candidats sur l’objectif de 3 % du PIB (septembre 2026).' },
+
+  { id:'dp-armee', dim:'europe', group:'defense', topic:'Défense européenne',
+    q:'Faut-il une armée européenne ?',
+    plain:'Une armée européenne aurait un commandement commun aux pays de l’Union, distinct de l’OTAN.',
+    options:[
+      { pos:0, short:'Armée européenne commune', text:'Créer une armée européenne commune, avec un commandement unique.' },
+      { pos:1, short:'Coopération renforcée', text:'Renforcer la coopération entre armées nationales (achats communs, industrie, commandement coordonné), sans armée unique.' },
+      { pos:2, short:'Chaque pays garde sa défense', text:'Garder une défense nationale, avec une coopération au cas par cas.' }
+    ],
+    stances:{ pp:0, renaissance:0, ecolo:0.5, ps:0.5, horizons:0.5, lr:1.5, lfi:2, pcf:2, rn:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur la défense européenne (septembre 2026), ÉlyséeScope (juillet 2026).' },
+
+  { id:'dp-dissuasion', dim:'europe', group:'defense', topic:'Armes nucléaires',
+    q:'Que faire de la dissuasion nucléaire française ?',
+    plain:'La dissuasion nucléaire désigne les armes nucléaires de la France, censées décourager toute attaque contre elle. Le traité d’interdiction des armes nucléaires (TIAN, 2021) n’a pas été signé par la France.',
+    options:[
+      { pos:0, short:'S’engager vers le désarmement', text:'S’engager vers un désarmement nucléaire (signer le traité d’interdiction).' },
+      { pos:1, short:'Garder, et viser un désarmement multilatéral', text:'Garder la dissuasion tout en œuvrant pour un désarmement négocié avec les autres pays.' },
+      { pos:2, short:'Garder et moderniser', text:'Garder et moderniser la dissuasion nationale.' }
+    ],
+    stances:{ ecolo:0, lfi:0.75, pcf:1, ps:1, pp:2, renaissance:2, horizons:2, lr:2, rn:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur le désarmement nucléaire (septembre 2026).' },
+
+  { id:'dp-regul', dim:'immig', group:'immigration', topic:'Personnes en situation irrégulière',
+    q:'Que faire des personnes étrangères en situation irrégulière ?',
+    plain:'Une personne en situation irrégulière vit en France sans titre de séjour. Une OQTF (obligation de quitter le territoire français) est la décision administrative qui lui ordonne de partir. Régulariser, c’est lui accorder un titre de séjour.',
+    options:[
+      { pos:0, short:'Régulariser largement', text:'Régulariser largement les personnes installées durablement, sans expulsions systématiques.' },
+      { pos:1, short:'Au cas par cas', text:'Régulariser au cas par cas et expulser en priorité les personnes condamnées.' },
+      { pos:2, short:'Expulser la plupart', text:'Expulser la plupart des personnes en situation irrégulière, en ne régularisant qu’exceptionnellement.' },
+      { pos:3, short:'Expulser systématiquement', text:'Expulser systématiquement toute personne en situation irrégulière.' }
+    ],
+    stances:{ lfi:0, ecolo:0, lo:0, ps:0.5, pcf:1, pp:2.25, renaissance:2.25, horizons:2.25, lr:3, rn:3, reconquete:3, dlf:3 },
+    basis:'Positions déclarées des candidats sur les expulsions et les régularisations (septembre 2026).' },
+
+  { id:'dp-sol', dim:'immig', group:'immigration', topic:'Droit du sol',
+    q:'Que faire du droit du sol ?',
+    plain:'Le droit du sol permet à un enfant né en France de parents étrangers d’acquérir la nationalité française, sous conditions de résidence.',
+    options:[
+      { pos:0, short:'Le maintenir', text:'Le maintenir tel qu’il est.' },
+      { pos:1, short:'Ajouter des conditions', text:'Le garder en ajoutant des conditions (par exemple sur la situation des parents).' },
+      { pos:2, short:'Le supprimer ou le limiter fortement', text:'Le supprimer ou le limiter fortement : naître en France ne donnerait plus accès automatiquement à la nationalité.' }
+    ],
+    stances:{ lfi:0, pcf:0, lo:0, ecolo:0, ps:0, pp:0, renaissance:0.5, horizons:1, lr:2, rn:2, reconquete:2, dlf:2 },
+    basis:'Positions déclarées des candidats sur le droit du sol (septembre 2026).' },
+
+  { id:'dp-preference', dim:'immig', group:'immigration', topic:'Aides sociales et nationalité',
+    q:'Les étrangers en situation régulière doivent-ils avoir les mêmes droits aux aides sociales ?',
+    plain:'La « préférence nationale » (ou « priorité nationale ») consiste à réserver en priorité certaines aides ou certains logements aux citoyens français.',
+    options:[
+      { pos:0, short:'Mêmes règles pour tous', text:'Mêmes règles pour tous les résidents en situation régulière.' },
+      { pos:1, short:'Délai de résidence plus long', text:'Exiger une durée de résidence ou de cotisation plus longue avant certaines aides (par exemple 5 ans).' },
+      { pos:2, short:'Priorité aux Français', text:'Réserver en priorité aux Français les aides sociales et les logements sociaux (préférence nationale).' }
+    ],
+    stances:{ lfi:0, pcf:0, lo:0, ecolo:0, ps:0, pp:0, renaissance:0.5, horizons:1, lr:1.25, dlf:1.5, rn:2, reconquete:2 },
+    basis:'Positions déclarées des candidats sur le délai de carence et la priorité nationale (septembre 2026).' },
+
+  { id:'dp-laicite', dim:'soc', group:'societe', topic:'Laïcité',
+    q:'Quelles règles pour les signes religieux ?',
+    plain:'La laïcité, c’est la séparation de l’État et des religions : l’État est neutre. Aujourd’hui, les agents publics doivent être neutres et les élèves ne peuvent pas porter de signe religieux ostensible à l’école publique (loi de 2004).',
+    options:[
+      { pos:0, short:'Liberté pour les usagers', text:'Laisser les usagers libres d’afficher leurs convictions : la neutralité ne s’impose qu’aux agents publics.' },
+      { pos:1, short:'Règles actuelles', text:'Garder les règles actuelles, sans les étendre.' },
+      { pos:2, short:'Étendre à d’autres lieux', text:'Étendre l’interdiction des signes religieux ostensibles à d’autres lieux (université, sorties scolaires, compétitions sportives).' },
+      { pos:3, short:'Interdire pour tous dans les services publics', text:'Interdire les signes religieux ostensibles à tous dans les services publics (agents comme usagers).' }
+    ],
+    stances:{ lfi:0, ecolo:0, ps:1, pp:1, pcf:1, horizons:1.25, renaissance:2.25, lr:3, rn:3, reconquete:3, dlf:3 },
+    basis:'Positions déclarées des candidats sur la laïcité et les signes religieux (septembre 2026).' },
+
+  { id:'dp-cannabis', dim:'auth', group:'societe', topic:'Cannabis',
+    q:'Quelle politique pour le cannabis ?',
+    plain:'Aujourd’hui, l’usage de cannabis est interdit en France et passible d’une amende forfaitaire. Dépénaliser, c’est ne plus sanctionner l’usage sans autoriser la vente ; légaliser, c’est autoriser et encadrer la vente.',
+    options:[
+      { pos:0, short:'Légaliser et encadrer', text:'Légaliser et encadrer la production et la vente, sous contrôle de l’État.' },
+      { pos:1, short:'Dépénaliser l’usage', text:'Dépénaliser l’usage sans légaliser la vente.' },
+      { pos:2, short:'Maintenir l’interdiction', text:'Maintenir l’interdiction et les amendes actuelles.' },
+      { pos:3, short:'Durcir la répression', text:'Durcir la répression, y compris contre les usagers.' }
+    ],
+    stances:{ lfi:0, ecolo:0, ps:0.5, pp:0.5, lo:1, pcf:2, renaissance:2, horizons:2, reconquete:2.25, lr:3, rn:3, dlf:3 },
+    basis:'Positions déclarées des candidats sur la légalisation du cannabis (septembre 2026).' },
+
+  { id:'dp-scrutin', dim:'auth', group:'institutions', topic:'Mode de scrutin',
+    q:'Comment élire les députés ?',
+    plain:'Aujourd’hui, chaque député est élu dans sa circonscription au scrutin majoritaire à deux tours. À la proportionnelle, les sièges sont répartis selon la part des voix obtenue par chaque parti.',
+    options:[
+      { pos:0, short:'Proportionnelle intégrale', text:'Élire tous les députés à la proportionnelle.' },
+      { pos:1, short:'Une part de proportionnelle', text:'Garder des circonscriptions et ajouter une part de proportionnelle.' },
+      { pos:2, short:'Scrutin actuel', text:'Garder le scrutin actuel.' }
+    ],
+    stances:{ lfi:0, rn:0, ecolo:0.5, pp:0.5, ps:0.75, reconquete:1.75, lr:2 },
+    basis:'Positions déclarées des candidats sur la proportionnelle (septembre 2026). Horizons, Renaissance et DLF : sources divergentes, non codés.' },
+
+  { id:'dp-republique', dim:'auth', group:'institutions', topic:'Institutions',
+    q:'Faut-il changer les institutions ?',
+    plain:'La Ve République (1958) donne de grands pouvoirs au président. L’article 49.3 permet au gouvernement de faire adopter un texte sans vote, sauf motion de censure. Une VIe République supposerait une nouvelle Constitution.',
+    options:[
+      { pos:0, short:'Nouvelle République', text:'Changer de République : élire une Assemblée constituante pour écrire une nouvelle Constitution.' },
+      { pos:1, short:'Rééquilibrer la Ve', text:'Rééquilibrer la Ve République : plus de pouvoirs pour le Parlement, moins pour le président, fin du 49.3.' },
+      { pos:2, short:'Garder les institutions', text:'Garder les institutions actuelles.' }
+    ],
+    stances:{ lfi:0, pcf:0, ecolo:0, pp:0.5, ps:1, dlf:1, renaissance:1.5, horizons:1.75, lr:2, rn:2, reconquete:2 },
+    basis:'Positions déclarées des candidats sur la VIe République, le 49.3 et les pouvoirs du Parlement (septembre 2026).' },
+
+  { id:'dp-snu', dim:'auth', group:'societe', topic:'Service national',
+    q:'Faut-il un service national obligatoire ?',
+    plain:'Le Service national universel (SNU) est un dispositif de quelques semaines (cohésion, engagement, découverte de la défense) proposé aux jeunes de 15 à 17 ans.',
+    options:[
+      { pos:0, short:'Volontariat seulement', text:'Garder uniquement le volontariat (service civique).' },
+      { pos:1, short:'SNU obligatoire', text:'Rendre obligatoire un service national universel de quelques semaines.' },
+      { pos:2, short:'Service militaire', text:'Rétablir un service militaire obligatoire.' }
+    ],
+    stances:{ lfi:0, pcf:0, lo:0, ps:0, ecolo:0.25, lr:0.25, horizons:0.5, pp:1, renaissance:1, rn:1.25, dlf:1.25, reconquete:1.5 },
+    basis:'Positions déclarées des candidats sur le SNU obligatoire (septembre 2026).' }
+];
+
+/* Sources consultées pour recouper les positions ci-dessus (septembre 2026).
+   Aucune n’est reproduite : elles servent de contrôle. MonVote2027 est un
+   outil citoyen indépendant ; sa licence d’utilisation n’étant pas précisée,
+   ses données n’ont PAS été copiées, seulement consultées pour vérifier la
+   cohérence des codages ci-dessus, qui restent un travail éditorial propre. */
+const SOURCES = [
+  { label:'Retraites : positions des candidats (BDOR)', url:'https://www.bdor.fr/actualites-or/presidentielle-2027-age-retraite-candidats' },
+  { label:'Retraites : ce que proposent les candidats (JDD)', url:'https://www.lejdd.fr/politique/retraites-ce-que-proposent-les-candidats-a-la-presidentielle-184728' },
+  { label:'Nucléaire : positions des grands partis (Sfen, juillet 2026)', url:'https://www.sfen.org/rgn/presidentielle-2027-au-colloque-de-lufe-les-grands-partis-listent-leurs-positions-sur-le-nucleaire/' },
+  { label:'Énergie : qui dit quoi parmi les candidats (Révolution énergétique)', url:'https://www.revolution-energetique.com/actus/qui-dit-quoi-sur-lenergie-parmi-les-candidats-declares-a-la-presidentielle/' },
+  { label:'Impôt sur la fortune : position de chaque candidat (LaFacture2027)', url:'https://lafacture2027.fr/isf-2027-candidats' },
+  { label:'Fiscalité : suivi des propositions (Contribuables associés)', url:'https://contribuablesassocies.org/2026/09/09/presidentielle-2027-a-quelle-sauce-fiscale-serez-vous-assaisonnes/' },
+  { label:'Europe : candidats favorables ou hostiles à l’UE (ÉlyséeScope)', url:'https://www.elyseescope.com/le-radar/europe-2027-les-candidats-favorables-ou-hostiles-a-l-ue' },
+  { label:'Programme LFI 2027, chapitre Europe', url:'https://melenchon2027.fr/programme2025/livre/chapitre17/s2/' },
+  { label:'Attal et Philippe : comparatif sur 40 propositions (France-Vote)', url:'https://www.france-vote.fr/comparateur/gabriel-attal-vs-edouard-philippe' },
+  { label:'Attal, Retailleau et Philippe : sept différences (Contexte)', url:'https://www.contexte.com/fr/article/pouvoirs/finances-publiques-travail-retraites-institutions-le-jeu-des-sept-differences-entre-gabriel-attal-bruno-retailleau-et-edouard-philippe_272575' },
+  { label:'Positions des candidats en données ouvertes (MonVote2027), consultées pour recoupement uniquement', url:'https://monvote2027.fr/donnees' }
 ];
 
 /* ----------------------------------------------------------------------
@@ -455,7 +615,7 @@ const PARTIES = [
     positions:{ eco:0.5, soc:0.8, auth:1.3, europe:2, immig:1.5, ecology:0.5 } },
   { id:'upr', name:'Union populaire républicaine', short:'UPR', family:'Souverainiste', color:'#25518a',
     site:'https://upr.fr/', program:'https://upr.fr/notre-programme',
-    status:'Parti structuré presque exclusivement autour de la sortie de l’Union européenne, de l’euro et de l’OTAN ; pas de position établie sur les autres sujets. Il n’est donc comparé que sur l’Europe, et n’affiche pas de pourcentage.',
+    status:'Parti structuré presque exclusivement autour de la sortie de l’Union européenne, de l’euro et de l’OTAN ; ses positions sur les autres thèmes ne sont pas codées dans cette version. Il n’est donc comparé que sur l’Europe et l’OTAN, et n’affiche pas de pourcentage.',
     statusDate:'2026-09',
     positions:{ eco:null, soc:null, auth:null, europe:2, immig:null, ecology:null } },
   { id:'lo', name:'Lutte Ouvrière', short:'LO', family:'Extrême gauche', color:'#c81f1f',
@@ -466,14 +626,15 @@ const PARTIES = [
 ];
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { DIMENSIONS, DIM_KEYS, QUESTIONS, BANK, PARTIES };
+  module.exports = { DIMENSIONS, DIM_KEYS, QUESTIONS, DEPARTAGE, PARTIES, SOURCES };
 } else if (typeof window !== 'undefined') {
   // Dans le navigateur, ces `const` de haut niveau sont bien visibles par
   // nom depuis les balises <script> suivantes (portée lexicale partagée),
   // mais ne deviennent PAS des propriétés de `window` (contrairement à
   // `var`). scoring.js y accède via `window.DIMENSIONS` etc. : on les y
   // attache donc explicitement pour que ce module reste indépendant de
-  // l'ordre exact d'exécution et inspectable facilement (console/débogage).
+  // l’ordre exact d’exécution et inspectable facilement (console/débogage).
   window.DIMENSIONS = DIMENSIONS; window.DIM_KEYS = DIM_KEYS;
-  window.QUESTIONS = QUESTIONS; window.BANK = BANK; window.PARTIES = PARTIES;
+  window.QUESTIONS = QUESTIONS; window.DEPARTAGE = DEPARTAGE;
+  window.PARTIES = PARTIES; window.SOURCES = SOURCES;
 }
