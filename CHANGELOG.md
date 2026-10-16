@@ -17,7 +17,8 @@
 - Actualisation des statuts de candidature au 14 octobre 2026 : Raphaël
   Glucksmann est affiché pour le PS et Place publique après sa victoire à la
   primaire ; Olivier Faure n’est plus présenté comme candidat.
-- Cache PWA passé à V7.4.0.
+- Cache PWA passé à V7.4.2 : version en ligne en priorité, cache utilisé hors
+  connexion.
 
 ## V7.3 — nouvel emblème citoyen tricolore
 

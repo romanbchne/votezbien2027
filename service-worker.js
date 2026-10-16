@@ -8,14 +8,10 @@
    2) Un gestionnaire 'activate' supprime les anciens caches. La V5.1 n'en
       avait pas : chaque nouvelle version s'ajoutait au stockage du
       navigateur sans jamais nettoyer les précédentes.
-   3) Stratégie "stale-while-revalidate" au lieu de cache-first pur : sert la
-      version en cache immédiatement (rapide, fonctionne hors-ligne), tout
-      en allant chercher une version à jour en arrière-plan pour la
-      prochaine visite. Avec un cache-first pur, une personne qui garde
-      l'app installée pouvait ne jamais voir les positions de partis mises
-      à jour, même après republication.
+   3) Stratégie "network-first" : les visites connectées reçoivent la
+      dernière version publiée ; le cache prend le relais en cas de coupure.
    ========================================================================= */
-const CACHE_VERSION = 'v7.4.1';
+const CACHE_VERSION = 'v7.4.2';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
   './index.html',
@@ -51,15 +47,12 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
-      cache.match(event.request).then((cached) => {
-        const network = fetch(event.request)
+      fetch(event.request)
           .then((response) => {
             if (response && response.ok) cache.put(event.request, response.clone());
             return response;
           })
-          .catch(() => cached); // hors-ligne : on retombe sur le cache s'il existe
-        return cached || network;
-      })
+          .catch(() => cache.match(event.request, { ignoreSearch: true })) // hors-ligne : le cache prend le relais
     )
   );
 });
