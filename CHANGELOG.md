@@ -7,7 +7,7 @@
 - « Mon profil » reste accessible avant d’avoir répondu et explique comment
   commencer. Le rappel de reprise dépend toujours d’une progression réelle et
   inachevée.
-- La page Programmes détaille les 21 tendances thématiques et les 25 questions
+- La page Programmes détaille les 21 tendances thématiques et les 24 questions
   de précision, avec un filtre par formation, les points non documentés et
   les liens de sources/programmes. Elle distingue les estimations de parti
   d’une réponse officielle de candidat.
@@ -462,3 +462,4 @@ absence de test visuel réel sur différents appareils (aucun navigateur
 graphique n’était disponible pendant cette refonte : le rendu a été validé
 par un DOM simulé — fonctionnel, pas visuel — et par une relecture
 attentive du CSS responsive, pas par une capture d’écran).
+

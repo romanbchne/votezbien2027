@@ -906,7 +906,7 @@
     const isDepartage = programPhase === 'departage';
     const questions = isDepartage ? DEPARTAGE : QUESTIONS;
     phaseIntro.textContent = isDepartage
-      ? 'La banque contient 25 questions ; le quiz en pose jusqu’à 15 (environ 4 min), choisies selon les formations encore proches. Les positions sont des estimations sur des choix concrets. « Non documentée » signifie qu’aucune position assez précise n’est codée.'
+      ? `La banque contient ${DEPARTAGE.length} questions ; le quiz en pose jusqu’à 15 (environ 4 min), choisies selon les formations encore proches. Les positions sont des estimations sur des choix concrets. « Non documentée » signifie qu’aucune position assez précise n’est codée.`
       : 'Chaque repère rapproche le profil thématique d’une formation de la proposition A ou B. Il ne signifie pas que la personne citée a répondu mot pour mot à la question.';
 
     list.innerHTML = questions.map((question, index) => {
@@ -982,3 +982,4 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
