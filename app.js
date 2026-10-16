@@ -20,6 +20,8 @@
   let compareSelection = [];
   let familyFilter = null;
   let lastFocusedEl = null;
+  let programPhase = 'main';
+  let programPartyFilter = 'all';
 
   function freshState() {
     return {
@@ -129,8 +131,10 @@
     if (el) el.classList.add('active');
     document.querySelectorAll('.navlink[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
     if (name === 'home') refreshResumeBanner();
+    if (name === 'quizStart') refreshQuizStart();
     window.scrollTo({ top: 0, behavior: 'auto' });
     if (name === 'results') renderResults();
+    if (name === 'programs') renderPrograms();
     if (name === 'parties') renderParties();
     if (name === 'compare') renderCompare();
     if (name === 'method') renderMethod();
@@ -140,15 +144,15 @@
   document.querySelectorAll('[data-nav]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.nav;
-      if (target === 'results' && !state.completed) return;
       if (target === 'compare' && !state.completed) { showScreen('parties'); return; }
       showScreen(target);
     });
   });
 
   function setNavEnabled(enabled) {
-    document.getElementById('navResults').disabled = !enabled;
+    document.getElementById('navResults').disabled = false;
     document.getElementById('navParties').disabled = false;
+    document.getElementById('navPrograms').disabled = false;
   }
 
   /* ================================================================
@@ -160,11 +164,37 @@
     banner.hidden = !hasProgress(stored);
   }
 
+  function refreshQuizStart() {
+    const stored = loadState();
+    const resume = hasProgress(stored);
+    const stateBox = document.getElementById('quizStartState');
+    const resumeButton = document.getElementById('btnQuizResume');
+    const startButton = document.getElementById('btnQuizStart');
+    if (!stateBox || !resumeButton || !startButton) return;
+    stateBox.innerHTML = resume
+      ? '<strong>Un quiz est resté inachevé.</strong><span>Vous pouvez le reprendre ou recommencer depuis le début.</span>'
+      : '<strong>Prêt quand vous l’êtes.</strong><span>Vos résultats apparaîtront dans « Mon profil » à la fin du questionnaire.</span>';
+    resumeButton.hidden = !resume;
+    startButton.textContent = resume ? 'Recommencer depuis le début' : 'Commencer le quiz 1 →';
+  }
+
   document.getElementById('btnStart').addEventListener('click', () => {
+    if (hasProgress(loadState())) { showScreen('quizStart'); return; }
     state = freshState();
     lastDimResults = null; lastOverall = null; compareSelection = [];
     saveState();
     beginQuiz();
+  });
+  document.getElementById('btnQuizStart').addEventListener('click', () => {
+    state = freshState();
+    lastDimResults = null; lastOverall = null; compareSelection = [];
+    saveState();
+    beginQuiz();
+  });
+  document.getElementById('btnQuizResume').addEventListener('click', () => {
+    const stored = loadState();
+    if (stored && hasProgress(stored)) { state = stored; beginQuiz(); }
+    else refreshQuizStart();
   });
   document.getElementById('btnResume').addEventListener('click', () => {
     const stored = loadState();
@@ -480,9 +510,14 @@
   }
 
   function renderResults() {
+    const root = document.getElementById('resultsContent');
+    if (!state.completed) {
+      root.innerHTML = `<div class="profile-empty"><span class="profile-empty-icon" aria-hidden="true">✦</span><p class="section-kicker">Mon profil</p><h1>Votre profil reste à découvrir</h1><p class="lede">Vos réponses dessineront vos tendances sur six thèmes et les formations politiques dont les positions s’en rapprochent.</p><div class="profile-empty-steps"><span>21 questions · 5 min</span><span>Jusqu’à 15 précisions · 4 min</span></div><button class="btn btn-brass" id="btnStartFromProfile">Commencer le quiz <span aria-hidden="true">→</span></button></div>`;
+      document.getElementById('btnStartFromProfile').addEventListener('click', () => showScreen('quizStart'));
+      return;
+    }
     if (!lastDimResults) computeResults();
     const dimResults = lastDimResults, overall = lastOverall;
-    const root = document.getElementById('resultsContent');
     let html = '';
 
     if (!overall.determined) {
@@ -554,6 +589,7 @@
 
     html += `<div class="share-row">
       <button class="btn btn-brass" id="btnGoParties">Explorer les partis qui s’en rapprochent</button>
+      <button class="btn btn-ghost" id="btnGoPrograms">Voir les positions par question</button>
       <button class="btn btn-ghost" id="btnShare">Copier un résumé</button>
       <button class="btn btn-ghost" id="btnRedo">Refaire le test</button>
     </div>`;
@@ -561,6 +597,8 @@
     root.innerHTML = html;
     const goParties = document.getElementById('btnGoParties');
     if (goParties) goParties.addEventListener('click', () => showScreen('parties'));
+    const goPrograms = document.getElementById('btnGoPrograms');
+    if (goPrograms) goPrograms.addEventListener('click', () => showScreen('programs'));
     const seeAll = document.getElementById('btnSeeAllParties');
     if (seeAll) seeAll.addEventListener('click', () => showScreen('parties'));
     root.querySelectorAll('.match-card').forEach(card => {
@@ -708,8 +746,8 @@
       <button class="drawer-close" id="drawerCloseBtn" aria-label="Fermer">✕ Fermer</button></div>
       ${hasResults ? matchRingHTML(match.matchPercent, 60) : ''}
       <p class="confidence-note" style="margin-top:.6rem">${intro}</p>
-      <p style="margin-top:1rem">${party.status}</p>
-      <p class="confidence-note">Positions estimées à partir des programmes et déclarations publics, situation arrêtée en ${formatStatusDate(party.statusDate)}. Estimations à vérifier : voir la page Méthode.</p>
+      <p style="margin-top:1rem">${party.status}${party.statusSource ? ` <a href="${party.statusSource}" target="_blank" rel="noopener">Source du statut</a>` : ''}</p>
+      <p class="confidence-note">Le statut de cette personne est actualisé en ${formatStatusDate(party.statusDate)}. Les positions politiques utilisées pour le calcul sont des estimations de la formation, codées à partir de sources publiques disponibles en septembre 2026 ; elles ne sont pas toutes des réponses de la personne citée. Voir la page Méthode.</p>
       <div class="source-row">
         <a class="btn btn-ghost btn-sm" href="${party.site}" target="_blank" rel="noopener">Site officiel</a>
         <a class="btn btn-ghost btn-sm" href="${party.program}" target="_blank" rel="noopener">Programme</a>
@@ -796,6 +834,104 @@
   }
 
   /* ================================================================
+     PROGRAMMES — lecture des positions utilisées par les deux quiz
+     ================================================================ */
+  function generalPosition(score) {
+    if (typeof score !== 'number') return { label: 'Position non documentée', className: 'unknown' };
+    if (score <= -1.25) return { label: 'Plutôt vers A', className: 'toward-a' };
+    if (score < -0.35) return { label: 'Tendance vers A', className: 'toward-a' };
+    if (score >= 1.25) return { label: 'Plutôt vers B', className: 'toward-b' };
+    if (score > 0.35) return { label: 'Tendance vers B', className: 'toward-b' };
+    return { label: 'Nuancée entre les deux', className: 'balanced' };
+  }
+
+  function programPartyRows(question, isDepartage, parties) {
+    return parties.map(party => {
+      const position = isDepartage
+        ? (Object.prototype.hasOwnProperty.call(question.stances || {}, party.id) ? question.stances[party.id] : undefined)
+        : party.positions[question.dim];
+      let label, description, className;
+      if (isDepartage) {
+        const stance = Scoring.stanceLabel(question, position);
+        label = stance.known ? stance.label : 'Position non documentée';
+        if (stance.exact) {
+          const option = question.options.find(o => o.pos === Math.round(position));
+          description = option ? option.text : '';
+        } else if (stance.known) {
+          const low = question.options.find(o => o.pos === Math.floor(position));
+          const high = question.options.find(o => o.pos === Math.ceil(position));
+          description = low && high ? `${low.text} / ${high.text}` : '';
+        } else description = 'Aucune position suffisamment établie dans cette version.';
+        className = stance.known ? 'documented' : 'unknown';
+      } else {
+        const orientation = generalPosition(position);
+        label = orientation.label;
+        className = orientation.className;
+        description = typeof position === 'number'
+          ? `Orientation générale du parti sur « ${DIMENSIONS[question.dim].labelLeft} » ↔ « ${DIMENSIONS[question.dim].labelRight} », rapprochée de cette question.`
+          : 'Aucune orientation générale n’est codée pour ce thème.';
+      }
+      return `<article class="program-answer ${className}">
+        <div class="program-answer-head"><strong>${party.name}</strong><span>${party.personName} · ${party.personRole}</span></div>
+        <span class="program-answer-label">${label}</span>
+        <p>${description}</p>
+      </article>`;
+    }).join('');
+  }
+
+  function renderPrograms() {
+    const list = document.getElementById('programQuestions');
+    const phaseIntro = document.getElementById('programPhaseIntro');
+    const filter = document.getElementById('programPartyFilter');
+    if (!list || !phaseIntro || !filter) return;
+    if (!filter.dataset.ready) {
+      filter.innerHTML = '<option value="all">Toutes les formations</option>' + PARTIES.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+      filter.value = programPartyFilter;
+      filter.addEventListener('change', () => { programPartyFilter = filter.value; renderPrograms(); });
+      document.querySelectorAll('[data-program-phase]').forEach(button => {
+        button.addEventListener('click', () => { programPhase = button.dataset.programPhase; renderPrograms(); });
+      });
+      filter.dataset.ready = '1';
+    }
+    filter.value = programPartyFilter;
+    document.querySelectorAll('[data-program-phase]').forEach(button => {
+      const active = button.dataset.programPhase === programPhase;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+
+    const selectedParties = programPartyFilter === 'all'
+      ? PARTIES
+      : PARTIES.filter(p => p.id === programPartyFilter);
+    const isDepartage = programPhase === 'departage';
+    const questions = isDepartage ? DEPARTAGE : QUESTIONS;
+    phaseIntro.textContent = isDepartage
+      ? 'La banque contient 25 questions ; le quiz en pose jusqu’à 15 (environ 4 min), choisies selon les formations encore proches. Les positions sont des estimations sur des choix concrets. « Non documentée » signifie qu’aucune position assez précise n’est codée.'
+      : 'Chaque repère rapproche le profil thématique d’une formation de la proposition A ou B. Il ne signifie pas que la personne citée a répondu mot pour mot à la question.';
+
+    list.innerHTML = questions.map((question, index) => {
+      const title = isDepartage ? question.q : question.topic;
+      const body = isDepartage
+        ? `<p class="program-question-plain">${question.plain || ''}</p>
+          <div class="program-options">${question.options.map((option, i) => `<div><span>${i + 1}</span><p>${option.text}</p></div>`).join('')}</div>
+          <p class="program-basis"><strong>Repère documentaire :</strong> ${question.basis || 'Pas de source détaillée enregistrée pour cette question.'}</p>`
+        : `<p class="program-question-plain">${question.plain || ''}</p>
+          <div class="program-options"><div><span>A</span><p>${question.a}</p></div><div><span>B</span><p>${question.b}</p></div></div>
+          <p class="program-basis">La tendance affichée est une estimation du parti à l’échelle du thème « ${DIMENSIONS[question.dim].name} » ; ce n’est pas une réponse officielle à cette formulation.</p>`;
+      return `<details class="program-question">
+        <summary><span class="program-question-count">${String(index + 1).padStart(2, '0')}</span><span class="program-question-title">${title}</span><span class="program-question-topic">${isDepartage ? question.topic : DIMENSIONS[question.dim].short}</span></summary>
+        <div class="program-question-content">${body}<div class="program-answer-list">${programPartyRows(question, isDepartage, selectedParties)}</div></div>
+      </details>`;
+    }).join('');
+
+    const programSources = document.getElementById('programSources');
+    if (programSources && !programSources.dataset.filled) {
+      programSources.innerHTML = `<li class="source-subheading">Sources de recoupement</li>${SOURCES.map(source => `<li><a href="${source.url}" target="_blank" rel="noopener">${source.label}</a></li>`).join('')}<li class="source-subheading">Sites et programmes des formations</li>${PARTIES.map(party => `<li><a href="${party.program}" target="_blank" rel="noopener">${party.name} — site ou programme officiel</a></li>`).join('')}`;
+      programSources.dataset.filled = '1';
+    }
+  }
+
+  /* ================================================================
      MÉTHODE
      ================================================================ */
   function renderMethod() {
@@ -846,4 +982,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-

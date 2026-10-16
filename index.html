@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Votez bien ! — Comprendre où vous vous situez avant 2027</title>
-<meta name="description" content="Un questionnaire politique gratuit et sans jargon : 21 questions en 5 min, puis jusqu’à 15 questions de précision en 4 min. Explorez 16 partis et leurs positions.">
+<meta name="description" content="Un quiz politique gratuit : 21 questions en 5 min, puis jusqu’à 15 questions concrètes en 4 min. Découvrez votre profil et comparez les positions de 16 formations.">
 <meta name="theme-color" content="#14213D">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./embleme-citoyen-192.png" type="image/png" sizes="192x192">
@@ -22,7 +22,9 @@
     </button>
     <nav aria-label="Navigation principale">
       <button class="navlink" data-nav="home" id="navHome">Accueil</button>
-      <button class="navlink" data-nav="results" id="navResults" disabled>Mon profil</button>
+      <button class="navlink" data-nav="quizStart" id="navQuiz">Quiz</button>
+      <button class="navlink" data-nav="results" id="navResults">Mon profil</button>
+      <button class="navlink" data-nav="programs" id="navPrograms">Les programmes</button>
       <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="method">Méthode</button>
     </nav>
@@ -44,25 +46,22 @@
         <div class="hero">
           <div class="hero-text">
             <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> gratuit, anonyme, sans compte</p>
-            <h1>Trouvez d’abord <span class="accent">votre position</span>. Regardez ensuite qui s’en approche.</h1>
-            <p class="lede">Un questionnaire clair pour situer vos idées sur les grands sujets du pays, puis explorer les partis qui s’en rapprochent. Aucun jargon, aucune réponse forcée : vous choisissez ce qui vous parle le plus — ou vous dites que vous ne savez pas.</p>
+            <h1>Vos idées. Les enjeux. <span class="accent">Les partis.</span></h1>
+            <p class="lede">Répondez à des questions concrètes, découvrez les thèmes qui comptent pour vous et comparez vos réponses aux positions publiques des formations politiques.</p>
             <div class="duration-grid" aria-label="Durée estimée du questionnaire">
               <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small>21 questions · 5 min</small></span></div>
               <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Jusqu’à 15 questions · 4 min</small></span></div>
             </div>
             <p class="duration-total">Environ 9 min au total. La seconde partie s’arrête plus tôt si les réponses font déjà ressortir une formation.</p>
             <div class="hero-actions btn-row">
-              <button class="btn btn-brass" id="btnStart">Commencer le questionnaire <span aria-hidden="true">→</span></button>
-              <button class="btn btn-ghost" data-nav="method">Voir la méthode</button>
+              <button class="btn btn-brass" id="btnStart">Faire le quiz <span aria-hidden="true">→</span></button>
+              <button class="btn btn-ghost" data-nav="programs">Explorer les programmes</button>
             </div>
             <div class="trust-row">
               <div><strong>21</strong>questions principales</div>
               <div><strong>6</strong>grands thèmes politiques</div>
-              <div><strong>16</strong>partis comparés, sourcés</div>
+              <div><strong>16</strong>formations à explorer</div>
             </div>
-          </div>
-          <div class="hero-visual" aria-hidden="true">
-            <img class="hero-emblem" src="./embleme-citoyen-512.jpg" alt="" width="310" height="310" decoding="async">
           </div>
         </div>
 
@@ -75,6 +74,23 @@
             <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Vos partis les plus proches</h3><p>Un pourcentage de proximité par parti, thème par thème, expliqué et sourcé — jamais un chiffre sans détail derrière.</p></div></div>
           </div>
         </div>
+      </section>
+
+      <!-- ============ ENTRÉE DU QUIZ ============ -->
+      <section class="screen" id="screen-quizStart">
+        <div class="section-kicker">Le questionnaire</div>
+        <h1>Vos idées, en deux étapes</h1>
+        <p class="lede">Un premier quiz dessine votre profil sur six grands thèmes. Un second pose des questions concrètes pour départager les formations encore proches.</p>
+        <div class="quiz-intro-grid">
+          <article class="quiz-intro-card"><span class="quiz-intro-number">01</span><div><h2>Votre profil</h2><p>21 questions · environ 5 min</p><small>Économie, libertés, sécurité, Europe, immigration et écologie.</small></div></article>
+          <article class="quiz-intro-card"><span class="quiz-intro-number">02</span><div><h2>Les points qui départagent</h2><p>Jusqu’à 15 questions · environ 4 min</p><small>Retraites, nucléaire, institutions et autres choix de politique publique.</small></div></article>
+        </div>
+        <div class="quiz-start-state" id="quizStartState"></div>
+        <div class="btn-row" style="margin-top:1rem">
+          <button class="btn btn-brass" id="btnQuizStart">Commencer le quiz 1 <span aria-hidden="true">→</span></button>
+          <button class="btn btn-primary" id="btnQuizResume" hidden>Reprendre là où j’en étais</button>
+        </div>
+        <p class="quiz-intro-note">Vos réponses restent enregistrées dans ce navigateur. Vous pouvez répondre « je ne sais pas » et interrompre le questionnaire à tout moment.</p>
       </section>
 
       <!-- ============ QUIZ ============ -->
@@ -121,6 +137,26 @@
       <!-- ============ RÉSULTATS ============ -->
       <section class="screen" id="screen-results">
         <div id="resultsContent"></div>
+      </section>
+
+      <!-- ============ PROGRAMMES ============ -->
+      <section class="screen" id="screen-programs">
+        <div class="section-kicker">Comprendre les positions</div>
+        <h1>Les programmes, question par question</h1>
+        <p class="lede">Comparez les positions politiques utilisées dans les deux quiz, avec les nuances et les points encore non documentés.</p>
+        <div class="programs-note"><strong>Comment lire cette page</strong><p>Les 21 premières questions indiquent une tendance générale par thème : elles ne sont pas des réponses mot pour mot des candidats. Pour les questions de précision, une position n’apparaît que lorsqu’elle a été codée à partir d’une prise de position publique ; sinon, elle est indiquée comme non documentée. La comparaison porte sur les formations, et non sur une promesse officielle de chaque personne citée.</p><p>Les candidatures évoluent : la liste officielle de l’élection sera publiée au plus tard le 26 mars 2027. <a href="https://www.info.gouv.fr/actualite/election-presidentielle-2027" target="_blank" rel="noopener">Calendrier officiel</a></p></div>
+        <div class="programs-controls">
+          <div class="program-tabs" role="tablist" aria-label="Choisir un questionnaire">
+            <button class="program-tab active" type="button" data-program-phase="main" role="tab" aria-selected="true">Quiz 1 · 21 thèmes</button>
+            <button class="program-tab" type="button" data-program-phase="departage" role="tab" aria-selected="false">Quiz 2 · banque de 25 questions</button>
+          </div>
+          <label class="program-filter">Afficher
+            <select id="programPartyFilter" aria-label="Filtrer par formation"><option value="all">Toutes les formations</option></select>
+          </label>
+        </div>
+        <p id="programPhaseIntro" class="program-phase-intro"></p>
+        <div id="programQuestions" class="program-question-list"></div>
+        <div class="program-source-list"><details><summary>Sources et programmes consultés</summary><ul id="programSources"></ul></details></div>
       </section>
 
       <!-- ============ PARTIS ============ -->
@@ -192,7 +228,7 @@
 
         <div class="method-section">
           <h2>Comparaison aux partis</h2>
-          <p>Les positions attribuées à chaque parti sont des <strong>estimations que nous avons construites nous-mêmes</strong>, à partir des programmes et des propositions déclarées de leurs candidats à la date indiquée sur chaque fiche — ce ne sont pas des scores donnés par les partis eux-mêmes, elles sont <strong>provisoires</strong> (la plupart des programmes 2027 ne sont pas encore publiés) et elles peuvent être discutées. Quand la position d’un parti se confond avec celle de son candidat, c’est celle du candidat déclaré qui est retenue.</p>
+          <p>Les positions attribuées aux formations sont des <strong>estimations éditoriales</strong> à partir de leurs programmes et prises de position publiques. Ce ne sont ni des scores donnés par les partis ni des réponses officielles aux formulations du quiz. Elles restent <strong>provisoires</strong> : la plupart des programmes présidentiels 2027 ne sont pas encore publiés. Les statuts des personnes associées aux partis sont actualisés séparément ; une personnalité de référence n’est pas nécessairement candidate.</p>
           <p>Le pourcentage affiché mesure la proximité moyenne entre vos positions et celles d’un parti, sur les 6 thèmes et sur les questions concrètes, en donnant plus de poids à vos 3 priorités. Un point auquel vous n’avez pas répondu, ou une position non codée pour un parti, est <strong>exclu</strong> du calcul : ni compté pour, ni compté contre, et jamais pris pour un « centre ». Le pourcentage n’est jamais affiché seul : la fiche de chaque parti détaille le calcul, avec les points communs et les différences, et renvoie vers son programme.</p>
           <p><strong>Comparaison partielle.</strong> Certains partis (par exemple MoDem, UDI, UDR) n’ont presque aucune position codée sur les questions concrètes. Comparés seulement sur les 6 thèmes, ils auraient mécaniquement l’air plus proches de tout le monde que les partis confrontés à des propositions précises. Dès que vous avez répondu à quelques questions concrètes, ils ne sont donc plus classés avec les autres : leur fiche l’indique, et donne leur proximité sur les seuls thèmes.</p>
         </div>
@@ -205,7 +241,7 @@
 
         <div class="method-section">
           <h2>Partis retenus</h2>
-          <p>16 formations actives, de l’extrême gauche à l’extrême droite en passant par le bloc central, retenues pour leur présence institutionnelle (Assemblée, Sénat, Parlement européen) ou leur rôle déclaré dans la présidentielle de 2027. Existence et dénomination vérifiées début 2026 ; la liste officielle des partis agréés est tenue par la <a href="https://www.cnccfp.fr/" target="_blank" rel="noopener">CNCCFP</a> (Commission nationale des comptes de campagne et des financements politiques). Cette sélection n’est pas exhaustive et sera mise à jour à mesure que la campagne avance.</p>
+          <p>Les 16 formations de cette sélection sont présentées de façon non exhaustive. Les statuts de candidature sont vérifiés au 14 octobre 2026 ; la liste officielle des candidats à l’élection ne sera publiée qu’en mars 2027. La liste officielle des partis agréés est tenue par la <a href="https://www.cnccfp.fr/" target="_blank" rel="noopener">CNCCFP</a> (Commission nationale des comptes de campagne et des financements politiques). Voir les sources datées sur la page « Les programmes ».</p>
         </div>
 
         <div class="method-section">
@@ -236,4 +272,3 @@
 <script src="./app.js"></script>
 </body>
 </html>
-

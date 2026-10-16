@@ -137,12 +137,15 @@ Les tests peuvent donc bien échouer.
 ## Limites connues
 
 - **Ce n’est pas un instrument scientifique validé.** 21 questions générales et
-  8 concrètes ne capturent pas toute la complexité d’une position politique.
+  jusqu’à 15 questions concrètes ne capturent pas toute la complexité d’une
+  position politique.
 - **Les positions des partis sont des estimations provisoires**, construites à
-  partir des propositions déclarées des candidats et des programmes à la date
-  de septembre 2026 ; la plupart des programmes 2027 ne sont pas publiés. Pour
-  plusieurs partis, c’est la position du candidat déclaré qui est codée. À
-  revérifier avant toute publication, puis à mesure que la campagne avance.
+  partir de prises de position publiques et des programmes disponibles en
+  septembre 2026 ; la plupart des programmes présidentiels 2027 ne sont pas
+  publiés. Elles sont présentées comme des estimations de formation, pas comme
+  des réponses mot pour mot des personnes associées. Les statuts de candidature
+  sont mis à jour séparément au 14 octobre 2026 ; voir les sources dans
+  `data.js` et sur la page « Les programmes ».
   Sources de recoupement : voir `SOURCES` dans `data.js` et la page Méthode.
   MonVote2027 (outil citoyen) n’a été que consulté pour recouper : sa licence
   n’étant pas précisée, ses données n’ont pas été copiées.
@@ -152,8 +155,8 @@ Les tests peuvent donc bien échouer.
   seulement, jamais classés avec les autres une fois les questions concrètes
   répondues), au lieu de paraître mécaniquement proches de tout le monde.
 - **Renaissance et Horizons se distinguent peu** : la banque ne les sépare que
-  sur 3 sujets, et leurs candidats divergent réellement peu. Ces profils vont
-  jusqu’à 15 questions sans toujours se détacher ; l’application l’affiche
+  sur 3 sujets et les positions codées sont proches sur les autres. Ces profils
+  vont jusqu’à 15 questions sans toujours se détacher ; l’application l’affiche
   honnêtement (quasi-égalité) plutôt que de forcer un gagnant.
 - **Sur le mode de scrutin**, les sources divergent pour Horizons, Renaissance
   et DLF : leur position n’est pas codée.
@@ -162,4 +165,3 @@ Les tests peuvent donc bien échouer.
   DOM simulé et une relecture du CSS responsive, pas par une capture d’écran
   sur appareil réel.
 - La liste de 16 partis est un choix éditorial de couverture du spectre.
-

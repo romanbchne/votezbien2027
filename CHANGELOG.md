@@ -1,5 +1,24 @@
 # Changelog — Audit V5.1 → refonte V6
 
+## V7.4 — accueil compact, quiz et positions détaillées
+
+- Accueil resserré autour du quiz, sans grande illustration ; ajout d’une page
+  d’entrée dédiée au questionnaire et d’un onglet « Les programmes ».
+- « Mon profil » reste accessible avant d’avoir répondu et explique comment
+  commencer. Le rappel de reprise dépend toujours d’une progression réelle et
+  inachevée.
+- La page Programmes détaille les 21 tendances thématiques et les 25 questions
+  de précision, avec un filtre par formation, les points non documentés et
+  les liens de sources/programmes. Elle distingue les estimations de parti
+  d’une réponse officielle de candidat.
+- Questions retravaillées sur le financement des services publics, l’égalité,
+  le contrôle de l’exécutif, l’agriculture et les transports pour expliciter
+  les choix proposés.
+- Actualisation des statuts de candidature au 14 octobre 2026 : Raphaël
+  Glucksmann est affiché pour le PS et Place publique après sa victoire à la
+  primaire ; Olivier Faure n’est plus présenté comme candidat.
+- Cache PWA passé à V7.4.0.
+
 ## V7.3 — nouvel emblème citoyen tricolore
 
 - Remplacement de l’ancienne boussole par l’emblème fourni, dans l’en-tête,
@@ -443,4 +462,3 @@ absence de test visuel réel sur différents appareils (aucun navigateur
 graphique n’était disponible pendant cette refonte : le rendu a été validé
 par un DOM simulé — fonctionnel, pas visuel — et par une relecture
 attentive du CSS responsive, pas par une capture d’écran).
-

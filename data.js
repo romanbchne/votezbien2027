@@ -109,9 +109,9 @@ const QUESTIONS = [
     b:'Il faut plutôt limiter les prélèvements, y compris pour les plus hauts revenus.',
     why:'Cette question mesure votre préférence entre plus de redistribution et des impôts plus limités.' },
   { id:'eco-2', dim:'eco', topic:'Services publics', plain:'La dépense publique, c’est l’argent dépensé par l’État et les collectivités : santé, école, police, aides…',
-    a:'Il faut augmenter les moyens des services publics (santé, école…), même si cela coûte plus cher.',
-    b:'Il faut d’abord maîtriser la dépense publique et rechercher plus d’efficacité.',
-    why:'Cette question mesure l’arbitrage entre renforcer les services publics et maîtriser la dépense.' },
+    a:'Il faut augmenter les moyens des services publics (santé, école…), même si cela demande de nouvelles recettes ou davantage de dette.',
+    b:'Il faut éviter d’augmenter les dépenses et les prélèvements, quitte à réorganiser ou réduire certains services publics.',
+    why:'Les deux propositions opposent des choix de financement quand les ressources publiques sont limitées.' },
   { id:'eco-3', dim:'eco', topic:'Travail', plain:'Protéger les salariés : par exemple des contrats stables et des règles de licenciement. Plus de souplesse : des règles plus légères pour embaucher ou licencier.',
     a:'Il faut mieux protéger les salariés, même si cela crée davantage de règles pour les entreprises.',
     b:'Il faut donner plus de souplesse aux entreprises pour faciliter l’embauche.',
@@ -122,9 +122,9 @@ const QUESTIONS = [
     why:'Cette question mesure la place que vous donnez à l’intervention publique dans l’économie.' },
 
   { id:'soc-1', dim:'soc', topic:'Égalité', plain:'Les territoires : quartiers, campagnes, villes moyennes, outre-mer…',
-    a:'L’action publique doit réduire les écarts réels entre les groupes sociaux et les territoires.',
-    b:'Elle doit surtout garantir les mêmes règles et les mêmes chances à chacun, sans viser un résultat précis.',
-    why:'Il existe plusieurs façons de concevoir l’égalité : agir sur les résultats, ou garantir des règles communes.' },
+    a:'Les politiques publiques doivent réduire les écarts de résultats entre les groupes sociaux et les territoires, même si les moyens sont ciblés différemment.',
+    b:'Les politiques publiques doivent garantir les mêmes règles et les mêmes chances à chacun, sans objectif de réduire les écarts de résultats.',
+    why:'Les deux objectifs peuvent se compléter. La question vous demande lequel doit guider en premier l’action publique.' },
   { id:'soc-2', dim:'soc', topic:'Société',
     a:'Les lois doivent pouvoir évoluer rapidement quand les modes de vie et les mentalités changent.',
     b:'Il vaut mieux préserver les repères et les traditions déjà établis.',
@@ -147,10 +147,10 @@ const QUESTIONS = [
     b:'Une peine doit d’abord sanctionner l’acte commis et dissuader fermement.',
     why:'Cette question distingue deux priorités possibles pour la politique pénale.' },
   { id:'auth-4', dim:'auth', topic:'Institutions',
-    a:'Il faut renforcer les contre-pouvoirs (Parlement, justice, médias) face à l’exécutif, même si cela ralentit les décisions.',
-    b:'Il faut permettre à un pouvoir exécutif élu de décider et d’agir plus rapidement, avec moins de contraintes.',
-    why:'Cette question mesure votre préférence entre plus de contrôle sur l’exécutif et plus de rapidité d’action.',
-    clarifyA:'« Contre-pouvoirs » : les institutions qui peuvent limiter ou contrôler l’action du gouvernement (Parlement, justice, presse…).' },
+    a:'Le gouvernement doit rendre davantage de comptes au Parlement et aux contre-pouvoirs, même si certaines décisions prennent plus de temps.',
+    b:'Le gouvernement doit pouvoir appliquer plus rapidement son programme, même si le contrôle du Parlement est moins contraignant.',
+    why:'La question porte sur le contrôle démocratique de l’exécutif : davantage de vérifications, ou davantage de marge pour agir vite.',
+    clarifyA:'Les contre-pouvoirs sont les institutions qui peuvent contrôler l’action du gouvernement, notamment le Parlement et la justice.' },
 
   { id:'europe-1', dim:'europe', topic:'Europe', plain:'Aujourd’hui, certaines décisions se prennent à Paris et d’autres à Bruxelles (règles de concurrence, monnaie, commerce…).',
     a:'Il faut transférer davantage de décisions et de moyens au niveau européen pour les sujets qui dépassent les frontières.',
@@ -188,13 +188,13 @@ const QUESTIONS = [
     b:'Il faut limiter les nouvelles contraintes environnementales pour préserver la compétitivité.',
     why:'Cette question mesure l’arbitrage entre régulation environnementale et compétitivité économique.' },
   { id:'ecology-3', dim:'ecology', topic:'Agriculture',
-    a:'Il faut accélérer la transformation des pratiques agricoles pour réduire leur impact environnemental.',
-    b:'Il faut d’abord préserver la production et le revenu agricoles en limitant les nouvelles contraintes.',
-    why:'Cette question mesure l’arbitrage entre transition écologique et continuité de la production agricole.' },
-  { id:'ecology-4', dim:'ecology', topic:'Énergie & mobilités', plain:'La sobriété énergétique, c’est consommer moins d’énergie (chauffage, transports, appareils…).',
-    a:'Il faut donner la priorité aux transports collectifs, au vélo et à la sobriété énergétique.',
-    b:'Il faut d’abord garantir la liberté de déplacement individuel et un accès large à l’énergie.',
-    why:'Cette question mesure votre priorité entre sobriété collective et liberté individuelle de déplacement.' }
+    a:'Il faut accélérer les changements de pratiques agricoles pour réduire les pollutions et les émissions, avec un accompagnement des agriculteurs.',
+    b:'Il faut faire évoluer les pratiques plus progressivement pour préserver la production et le revenu agricoles.',
+    why:'La question compare deux rythmes de transition et demande quelle priorité guiderait les décisions.' },
+  { id:'ecology-4', dim:'ecology', topic:'Transports du quotidien', plain:'Selon le lieu où l’on vit, les transports collectifs ne sont pas toujours une solution de remplacement à la voiture.',
+    a:'Il faut investir d’abord dans des transports collectifs fréquents et abordables, même si la voiture prend moins de place dans certaines zones.',
+    b:'Il faut préserver la liberté de se déplacer en voiture, notamment là où les transports collectifs sont peu pratiques.',
+    why:'Cette question porte sur les priorités de transport et les solutions proposées au quotidien, pas sur la production d’énergie.' }
 ];
 
 /* ----------------------------------------------------------------------
@@ -217,14 +217,13 @@ const QUESTIONS = [
    « Mettre à jour les positions ».
 
    STATUT : positions PROVISOIRES, codées à partir des propositions
-   déclarées des candidats et des programmes de partis à la date de
-   septembre 2026, recoupées avec plusieurs sources de presse et de
-   comparaison (liste dans SOURCES et dans le README). La plupart des
+   publiques et des programmes de partis à la date de septembre 2026,
+   recoupées avec plusieurs sources de presse et de comparaison (liste dans
+   SOURCES et dans le README). La plupart des
    programmes 2027 ne sont pas encore publiés : à revérifier avant toute
-   publication, puis à mesure que la campagne avance. Pour les partis dont
-   la position publique se confond avec celle de leur candidat, c’est la
-   position du candidat déclaré qui est codée (PS : Olivier Faure ; Place
-   publique : Raphaël Glucksmann ; etc.).
+   publication, puis à mesure que la campagne avance. Les tendances générales
+   par formation ne sont pas des réponses officielles aux formulations
+   exactes du premier quiz.
    ------------------------------------------------------------------- */
 const DEPARTAGE = [
   { id:'dp-retraites', dim:'eco', group:'eco-social', topic:'Retraites',
@@ -519,7 +518,10 @@ const SOURCES = [
   { label:'Programme LFI 2027, chapitre Europe', url:'https://melenchon2027.fr/programme2025/livre/chapitre17/s2/' },
   { label:'Attal et Philippe : comparatif sur 40 propositions (France-Vote)', url:'https://www.france-vote.fr/comparateur/gabriel-attal-vs-edouard-philippe' },
   { label:'Attal, Retailleau et Philippe : sept différences (Contexte)', url:'https://www.contexte.com/fr/article/pouvoirs/finances-publiques-travail-retraites-institutions-le-jeu-des-sept-differences-entre-gabriel-attal-bruno-retailleau-et-edouard-philippe_272575' },
-  { label:'Positions des candidats en données ouvertes (MonVote2027), consultées pour recoupement uniquement', url:'https://monvote2027.fr/donnees' }
+  { label:'Positions des candidats en données ouvertes (MonVote2027), consultées pour recoupement uniquement', url:'https://monvote2027.fr/donnees' },
+  { label:'Suivi des candidatures à la présidentielle (LCP, mis à jour le 14 octobre 2026)', url:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373' },
+  { label:'Résultat de la primaire PS–Place publique (LCP, 11 octobre 2026)', url:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la' },
+  { label:'Calendrier officiel de la présidentielle 2027 (Gouvernement)', url:'https://www.info.gouv.fr/actualite/election-presidentielle-2027' }
 ];
 
 /* ----------------------------------------------------------------------
@@ -528,8 +530,9 @@ const SOURCES = [
    partir des programmes et prises de position publiques identifiées,
    PAS des scores auto-déclarés par les partis. Voir la fiche de chaque
    parti dans l’application et la méthodologie pour le détail et les
-   limites. Situation politique arrêtée en septembre 2026 (voir
-   CHANGELOG / README pour les sources) : à vérifier avant toute
+   limites. Codage des positions arrêté en septembre 2026 ; statuts des
+   candidatures vérifiés au 14 octobre 2026 (sources dans SOURCES). Ces
+   données restent à vérifier avant toute
    publication, notamment les liens, à l’approche de la présidentielle
    d’avril 2027.
 
@@ -545,98 +548,98 @@ const SOURCES = [
 const PARTIES = [
   { id:'lfi', name:'La France insoumise', short:'LFI', family:'Gauche', color:'#7b5dc8',
     site:'https://lafranceinsoumise.fr/', program:'https://lafranceinsoumise.fr/programme/',
-    status:'Candidature pressentie de Jean-Luc Mélenchon. Programme de référence : « L’Avenir en commun ». Positions actualisées par les votes et déclarations du mouvement en 2025-2026.',
-    statusDate:'2026-09',
-    personName:'Jean-Luc Mélenchon', personRole:'Candidature pressentie', portraitFile:'Jean-Luc Mélenchon en 2026.png', portraitCredit:'jlm2017.fr', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
+    status:'Jean-Luc Mélenchon a confirmé sa candidature à la présidentielle. Programme de référence du mouvement : « L’Avenir en commun ».',
+    statusDate:'2026-10',
+    personName:'Jean-Luc Mélenchon', personRole:'Candidat déclaré', portraitFile:'Jean-Luc Mélenchon en 2026.png', portraitCredit:'jlm2017.fr', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:-2, soc:-1.5, auth:-1, europe:0.8, immig:-1.5, ecology:-2 } },
   { id:'pcf', name:'Parti communiste français', short:'PCF', family:'Gauche', color:'#b5193f',
     site:'https://www.pcf.fr/', program:'https://www.pcf.fr/nos_propositions',
-    status:'Fabien Roussel, candidat déclaré (annoncé le 6 septembre 2026). 40ᵉ congrès du parti en cours en 2026.',
-    statusDate:'2026-09',
-    personName:'Fabien Roussel', personRole:'Candidat proposé par les adhérents', portraitFile:'Fabien Roussel 2022.jpg', portraitCredit:'Zouhair Nakara', portraitLicense:'CC BY-SA 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/4.0/',
+    status:'Fabien Roussel a officialisé sa candidature le 6 septembre 2026 après un vote des adhérents du PCF.',
+    statusDate:'2026-10',
+    personName:'Fabien Roussel', personRole:'Candidat désigné par les adhérents', portraitFile:'Fabien Roussel 2022.jpg', portraitCredit:'Zouhair Nakara', portraitLicense:'CC BY-SA 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/4.0/',
     positions:{ eco:-1.8, soc:-1, auth:-0.5, europe:0.5, immig:-1, ecology:-1 } },
   { id:'ps', name:'Parti socialiste', short:'PS', family:'Centre-gauche', color:'#df2160',
     site:'https://parti-socialiste.fr/', program:'https://parti-socialiste.fr/',
-    status:'Olivier Faure, candidat à la primaire « Choisir 2027 » organisée avec Place publique (octobre 2026), aux côtés de Jérôme Guedj, Emmanuel Maurel et Ségolène Royal.',
-    statusDate:'2026-09',
-    personName:'Olivier Faure', personRole:'Candidat à la primaire annoncée', portraitFile:'Olivier Faure PSE-CARCA--1194 (cropped).jpg', portraitCredit:'PES Group Committee of the Regions', portraitLicense:'CC BY 2.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/2.0/',
+    status:'Le Parti socialiste soutient Raphaël Glucksmann, vainqueur de la primaire sociale-démocrate du 11 octobre 2026.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la',
+    personName:'Raphaël Glucksmann', personRole:'Candidat commun désigné par la primaire PS–Place publique', portraitFile:'2024-03-03 - Congrès du PSE- 105 - Raphael Glucksmann.jpg', portraitCredit:'Mathieu Delmestre', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:-1, soc:-1.2, auth:-0.3, europe:-1.3, immig:-0.5, ecology:-0.8 } },
   { id:'pp', name:'Place publique', short:'PP', family:'Centre-gauche européen', color:'#6c53a4',
     site:'https://place-publique.eu/', program:'https://place-publique.eu/',
-    status:'Raphaël Glucksmann, candidat à la primaire « Choisir 2027 » organisée avec le Parti socialiste (octobre 2026).',
-    statusDate:'2026-09',
-    personName:'Raphaël Glucksmann', personRole:'Candidat à la primaire annoncée', portraitFile:'2024-03-03 - Congrès du PSE- 105 - Raphael Glucksmann.jpg', portraitCredit:'Mathieu Delmestre', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
+    status:'Raphaël Glucksmann, fondateur de Place publique, a remporté la primaire sociale-démocrate le 11 octobre 2026. Il est le candidat commun soutenu par Place publique et le Parti socialiste.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la',
+    personName:'Raphaël Glucksmann', personRole:'Candidat commun désigné par la primaire PS–Place publique', portraitFile:'2024-03-03 - Congrès du PSE- 105 - Raphael Glucksmann.jpg', portraitCredit:'Mathieu Delmestre', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:-0.8, soc:-1.2, auth:-0.3, europe:-1.8, immig:-0.5, ecology:-1.3 } },
   { id:'ecolo', name:'Les Écologistes', short:'LE', family:'Écologie', color:'#1e9b58',
     site:'https://lesecologistes.fr/', program:'https://lesecologistes.fr/',
-    status:'Marine Tondelier, secrétaire nationale (réélue en avril 2025) et candidate déclarée depuis octobre 2025 ; maintient sa candidature hors des primaires en cours (position réaffirmée en août 2026).',
-    statusDate:'2026-09',
-    personName:'Marine Tondelier', personRole:'Secrétaire nationale · candidate déclarée selon le statut indiqué', portraitFile:'Huma2023MarineTondelier (cropped).jpg', portraitCredit:'Selbymay', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
+    status:'Marine Tondelier maintient sa candidature, mais un nouveau vote des adhérents du parti est prévu en décembre 2026.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
+    personName:'Marine Tondelier', personRole:'Secrétaire nationale · candidature à confirmer par un vote interne', portraitFile:'Huma2023MarineTondelier (cropped).jpg', portraitCredit:'Selbymay', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:-1.2, soc:-1.5, auth:-0.5, europe:-1.3, immig:-1, ecology:-2 } },
   { id:'renaissance', name:'Renaissance', short:'RE', family:'Centre', color:'#0b2d4f',
     site:'https://parti-renaissance.fr/', program:'https://parti-renaissance.fr/',
-    status:'Gabriel Attal, secrétaire général depuis décembre 2024, candidature officialisée le 22 mai 2026.',
-    statusDate:'2026-09',
+    status:'Gabriel Attal a officialisé sa candidature le 22 mai 2026.',
+    statusDate:'2026-10',
     personName:'Gabriel Attal', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Gabriel Attal 2025 (close crop).jpg', portraitCredit:'Ismail Aissoub', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.8, soc:-0.3, auth:0.3, europe:-1.5, immig:0.3, ecology:0 } },
   { id:'modem', name:'Mouvement Démocrate', short:'MD', family:'Centre', color:'#4c67c7',
     site:'https://www.mouvementdemocrate.fr/', program:'https://www.mouvementdemocrate.fr/',
-    status:'Membre du « comité de liaison » du bloc central (Renaissance, Horizons, MoDem, UDI) constitué en 2026 en vue de la présidentielle.',
-    statusDate:'2026-09',
-    personName:'François Bayrou', personRole:'Figure du Mouvement Démocrate', portraitFile:'François Bayrou - 2025 (cropped).jpg', portraitCredit:'Nicolas Kovarik / Commission européenne', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
+    status:'Aucune candidature présidentielle du MoDem n’est annoncée dans le suivi du 14 octobre 2026. François Bayrou reste la personnalité de référence de cette fiche.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
+    personName:'François Bayrou', personRole:'Personnalité de référence · pas de candidat annoncé', portraitFile:'François Bayrou - 2025 (cropped).jpg', portraitCredit:'Nicolas Kovarik / Commission européenne', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.3, soc:-0.5, auth:0, europe:-1.8, immig:0, ecology:-0.3 } },
   { id:'udi', name:'Union des Démocrates et Indépendants', short:'UDI', family:'Centre-droit', color:'#0b5fae',
     site:'https://www.parti-udi.fr/', program:'https://www.parti-udi.fr/',
-    status:'Membre du « comité de liaison » du bloc central constitué en 2026.',
-    statusDate:'2026-09',
-    personName:'Hervé Marseille', personRole:'Président de l’UDI', portraitFile:'Herve Marseille-IMG 4093.jpg', portraitCredit:'Rama', portraitLicense:'CC BY-SA 2.0 France', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/2.0/fr/',
+    status:'Aucune candidature présidentielle de l’UDI n’est annoncée dans le suivi du 14 octobre 2026. Hervé Marseille est présenté comme personnalité de référence du parti.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
+    personName:'Hervé Marseille', personRole:'Président de l’UDI · pas de candidat annoncé', portraitFile:'Herve Marseille-IMG 4093.jpg', portraitCredit:'Rama', portraitLicense:'CC BY-SA 2.0 France', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/2.0/fr/',
     positions:{ eco:0.8, soc:-0.2, auth:0.3, europe:-1.3, immig:0.3, ecology:-0.2 } },
   { id:'horizons', name:'Horizons', short:'H', family:'Centre-droit', color:'#111827',
     site:'https://horizonsleparti.fr/', program:'https://horizonsleparti.fr/le-manifeste/',
-    status:'Édouard Philippe, président du parti et candidat déclaré, réélu maire du Havre en mars 2026.',
-    statusDate:'2026-09',
+    status:'Édouard Philippe, président d’Horizons, est candidat déclaré à la présidentielle.',
+    statusDate:'2026-10',
     personName:'Édouard Philippe', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Édouard Philippe MSC 2018 (cropped).jpg', portraitCredit:'Mueller / MSC', portraitLicense:'CC BY 3.0 Allemagne', portraitLicenseUrl:'https://creativecommons.org/licenses/by/3.0/de/',
     positions:{ eco:1, soc:-0.2, auth:0.5, europe:-1, immig:0.5, ecology:-0.2 } },
   { id:'lr', name:'Les Républicains', short:'LR', family:'Droite', color:'#1d4f91',
     site:'https://republicains.fr/', program:'https://republicains.fr/nos-propositions/',
-    status:'Bruno Retailleau, président du parti depuis mai 2025, désigné candidat par un vote des adhérents (environ 74 %) en février 2026. Tension interne persistante avec Laurent Wauquiez.',
-    statusDate:'2026-09',
+    status:'Bruno Retailleau a été désigné candidat des Républicains par un vote des adhérents en avril 2026.',
+    statusDate:'2026-10',
     personName:'Bruno Retailleau', personRole:'Candidat désigné par les adhérents selon le statut indiqué', portraitFile:"Bruno Retailleau - Ministre de l'Intérieur français (3x4 cropped).jpg", portraitCredit:'Anthony Montardy', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:1.5, soc:0.8, auth:1.3, europe:0.3, immig:1.5, ecology:1 } },
   { id:'udr', name:'Union des droites pour la République', short:'UDR', family:'Droite nationale', color:'#203552',
     site:'https://www.udr.fr/', program:'https://www.udr.fr/',
-    status:'Éric Ciotti, parti fondé en 2024 après sa rupture avec Les Républicains ; groupe parlementaire (UDDPLR) formé en septembre 2025, allié du Rassemblement national.',
-    statusDate:'2026-09',
-    personName:'Éric Ciotti', personRole:'Président et figure de l’UDR', portraitFile:'Éric Ciotti, EPP Summit, 23 March, Brussels (52765298047) (cropped).jpg', portraitCredit:'European People’s Party', portraitLicense:'CC BY 2.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/2.0/',
+    status:'Éric Ciotti est la personnalité de référence de l’UDR. Le suivi du 14 octobre 2026 ne fait pas état d’une candidature présidentielle du parti.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
+    personName:'Éric Ciotti', personRole:'Président et figure de l’UDR · pas de candidat annoncé', portraitFile:'Éric Ciotti, EPP Summit, 23 March, Brussels (52765298047) (cropped).jpg', portraitCredit:'European People’s Party', portraitLicense:'CC BY 2.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/2.0/',
     positions:{ eco:1.3, soc:1.3, auth:1.8, europe:1.3, immig:1.8, ecology:1.3 } },
   { id:'rn', name:'Rassemblement National', short:'RN', family:'Droite nationale', color:'#173f70',
     site:'https://rassemblementnational.fr/', program:'https://rassemblementnational.fr/programme/',
-    status:'Marine Le Pen, candidature officialisée le 7 juillet 2026 après réduction en appel de sa peine d’inéligibilité (pourvoi en cassation en cours). Jordan Bardella, président du parti, pressenti pour Matignon en cas de victoire.',
-    statusDate:'2026-09',
+    status:'Marine Le Pen a confirmé sa candidature le 7 juillet 2026. La possibilité de se présenter reste liée à l’issue de sa procédure judiciaire.',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
     personName:'Marine Le Pen', personRole:'Candidate déclarée selon le statut indiqué', portraitFile:'Marine Le Pen in 2026.jpg', portraitCredit:'Elekes Andor', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.3, soc:1.3, auth:1.8, europe:1.3, immig:2, ecology:0.8 } },
   { id:'reconquete', name:'Reconquête', short:'R', family:'Droite nationale', color:'#a93f4b',
     site:'https://www.parti-reconquete.fr/', program:'https://www.parti-reconquete.fr/programme',
-    status:'Éric Zemmour, président et candidat déclaré (annoncé le 17 septembre 2026).',
-    statusDate:'2026-09',
+    status:'Éric Zemmour a officialisé sa candidature le 17 septembre 2026.',
+    statusDate:'2026-10',
     personName:'Éric Zemmour', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Portrait Éric Zemmour, avril 2022 cropped.jpg', portraitCredit:'Anh De France', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:1, soc:1.8, auth:2, europe:1.8, immig:2, ecology:0.8 } },
   { id:'dlf', name:'Debout la France', short:'DLF', family:'Droite souverainiste', color:'#1683b5',
     site:'https://www.debout-la-france.fr/', program:'https://www.debout-la-france.fr/notre-projet/',
-    status:'Nicolas Dupont-Aignan, président et candidat déclaré (officialisé le 19 septembre 2026), campagne centrée sur la sortie de l’Union européenne (« Frexit »).',
-    statusDate:'2026-09',
+    status:'Nicolas Dupont-Aignan est candidat déclaré à la présidentielle.',
+    statusDate:'2026-10',
     personName:'Nicolas Dupont-Aignan', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Nicolas Dupont-Aignan in 2014.jpg', portraitCredit:'Laurence de Terline', portraitLicense:'CC BY-SA 2.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/2.0/',
     positions:{ eco:0.5, soc:0.8, auth:1.3, europe:2, immig:1.5, ecology:0.5 } },
   { id:'upr', name:'Union populaire républicaine', short:'UPR', family:'Souverainiste', color:'#25518a',
     site:'https://upr.fr/', program:'https://upr.fr/notre-programme',
-    status:'Parti structuré presque exclusivement autour de la sortie de l’Union européenne, de l’euro et de l’OTAN ; ses positions sur les autres thèmes ne sont pas codées dans cette version. Il n’est donc comparé que sur l’Europe et l’OTAN, et n’affiche pas de pourcentage.',
-    statusDate:'2026-09',
+    status:'François Asselineau et l’UPR sont candidats déclarés à la présidentielle. Les positions du parti sur certains thèmes ne sont pas codées dans cette version ; la comparaison peut donc être partielle.',
+    statusDate:'2026-10',
     personName:'François Asselineau', personRole:'Président de l’UPR', portraitFile:'François ASSELINEAU.jpg', portraitCredit:'Union Populaire Républicaine', portraitLicense:'CC BY-SA 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/4.0/',
     positions:{ eco:null, soc:null, auth:null, europe:2, immig:null, ecology:null } },
   { id:'lo', name:'Lutte Ouvrière', short:'LO', family:'Extrême gauche', color:'#c81f1f',
     site:'https://www.lutte-ouvriere.org/', program:'https://www.lutte-ouvriere.org/',
-    status:'Nathalie Arthaud, porte-parole historique, testée dans les enquêtes d’intentions de vote pour 2027. Parti internationaliste : sa position ne se lit pas sur l’axe « intégration européenne / souveraineté nationale », cette dimension n’est donc pas comparée.',
-    statusDate:'2026-09',
+    status:'Nathalie Arthaud est candidate pour Lutte ouvrière. Le parti se définit comme internationaliste ; sa position ne se lit pas sur l’axe « intégration européenne / souveraineté nationale ».',
+    statusDate:'2026-10',
     personName:'Nathalie Arthaud', personRole:'Porte-parole de Lutte Ouvrière', portraitFile:'Nathalie Arthaud.png', portraitCredit:'Minamonoch', portraitLicense:'CC BY-SA 3.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/3.0/',
     positions:{ eco:-2, soc:-1, auth:-1, europe:null, immig:-1.5, ecology:-0.5 } }
 ];
@@ -654,4 +657,3 @@ if (typeof module !== 'undefined' && module.exports) {
   window.QUESTIONS = QUESTIONS; window.DEPARTAGE = DEPARTAGE;
   window.PARTIES = PARTIES; window.SOURCES = SOURCES;
 }
-
