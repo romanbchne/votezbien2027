@@ -1,5 +1,12 @@
 # Changelog — Audit V5.1 → refonte V6
 
+## V7.3 — nouvel emblème citoyen tricolore
+
+- Remplacement de l’ancienne boussole par l’emblème fourni, dans l’en-tête,
+  l’illustration de l’accueil, le favicon et les icônes PWA.
+- Mise à jour du manifeste et du cache hors ligne pour distribuer les nouveaux
+  fichiers d’icône aux personnes qui ont déjà visité ou installé le site.
+
 ## V7.1 — accueil tricolore, durée claire et annuaire des partis
 
 - Refonte de l’accueil et de la navigation autour d’une identité républicaine

@@ -14,8 +14,9 @@ Voir `CHANGELOG.md` pour l’historique et le détail de ce qui a changé.
 
 1. Placez tous les fichiers de ce dossier (`index.html`, `styles.css`,
    `data.js`, `scoring.js`, `app.js`, `manifest.json`, `service-worker.js`,
-   `icon.svg`) à la racine du dépôt (ou dans `/docs` si vous configurez
-   GitHub Pages sur ce dossier).
+   `embleme-citoyen-180.png`, `embleme-citoyen-192.png` et
+   `embleme-citoyen-512.jpg`) à la racine du dépôt (ou dans `/docs` si vous
+   configurez GitHub Pages sur ce dossier).
 2. `index.html` est le point d’entrée. Aucune étape de build : JavaScript
    natif, sans framework.
 3. Tous les chemins sont relatifs : le site fonctionne à la racine d’un

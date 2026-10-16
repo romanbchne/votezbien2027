@@ -15,7 +15,7 @@
       l'app installée pouvait ne jamais voir les positions de partis mises
       à jour, même après republication.
    ========================================================================= */
-const CACHE_VERSION = 'v7.1.0';
+const CACHE_VERSION = 'v7.3.0';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
   './index.html',
@@ -24,7 +24,9 @@ const ASSETS = [
   './scoring.js',
   './app.js',
   './manifest.json',
-  './icon.svg'
+  './embleme-citoyen-180.png',
+  './embleme-citoyen-192.png',
+  './embleme-citoyen-512.jpg'
 ];
 
 self.addEventListener('install', (event) => {

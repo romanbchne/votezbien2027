@@ -154,22 +154,6 @@
   /* ================================================================
      ACCUEIL
      ================================================================ */
-  function renderCompassTeaser() {
-    const g = document.getElementById('compassSpokes');
-    if (!g) return;
-    const lengths = [96, 70, 88, 55, 78, 62]; // purement illustratif, pas de données réelles avant le test
-    const cx = 130, cy = 130;
-    let html = '';
-    lengths.forEach((len, i) => {
-      const angle = (Math.PI * 2 * i) / lengths.length - Math.PI / 2;
-      const x2 = cx + Math.cos(angle) * len, y2 = cy + Math.sin(angle) * len;
-      const xf = cx + Math.cos(angle) * 110, yf = cy + Math.sin(angle) * 110;
-      html += `<line class="spoke-track" x1="${cx}" y1="${cy}" x2="${xf}" y2="${yf}"/>`;
-      html += `<line class="spoke-fill" x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}"/>`;
-    });
-    g.innerHTML = html;
-  }
-
   function refreshResumeBanner() {
     const banner = document.getElementById('resumeBanner');
     const stored = loadState();
@@ -846,7 +830,6 @@
      INIT
      ================================================================ */
   function init() {
-    renderCompassTeaser();
     refreshResumeBanner();
     const stored = loadState();
     if (stored && stored.completed) {
