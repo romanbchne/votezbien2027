@@ -1,10 +1,12 @@
 # Votez bien ! — V7
 
 Application indépendante d’aide à la compréhension politique pour l’élection
-présidentielle française de 2027 : 21 questions générales, vos 3 priorités,
-puis jusqu’à 8 questions **concrètes** choisies une à une pour départager les
-partis qui restent proches de vous, un profil sur 6 thèmes et une comparaison
-à 16 partis — sans jargon, sans compte, sans serveur.
+présidentielle française de 2027 : 21 questions générales (environ 5 minutes),
+vos 3 priorités, puis jusqu’à 15 questions **concrètes** de précision (environ
+4 minutes) pour départager les partis qui restent proches de vous. Le site
+propose un profil sur 6 thèmes et une comparaison à 16 partis — sans jargon,
+sans compte. Les réponses restent dans le navigateur ; les portraits sont
+chargés depuis Wikimedia Commons.
 
 Voir `CHANGELOG.md` pour l’historique et le détail de ce qui a changé.
 
@@ -37,7 +39,7 @@ Voir `CHANGELOG.md` pour l’historique et le détail de ce qui a changé.
    parle de grands thèmes, presque tout paraît « essentiel »). Aucun nom de
    parti ni pourcentage n’est affiché à ce stade, pour ne pas orienter les
    réponses suivantes.
-3. **Jusqu’à 8 questions concrètes** (`DEPARTAGE` dans `data.js`), choisies
+3. **Jusqu’à 15 questions concrètes** (`DEPARTAGE` dans `data.js`), choisies
    une par une par `selectNextDepartage` (`scoring.js`) : on estime quels
    partis sont encore les plus proches, et on pose la question sur laquelle
    ces partis-là se séparent le plus. Les options sont de vrais choix de
@@ -91,7 +93,7 @@ modérée », et un parti codé `0` partout où il n’a pas de position ressort
 tête pour tous les profils centristes (bug réel, corrigé).
 
 ### Réglages (`scoring.js`)
-`NEAR_TIE_POINTS` (6), `MAX_DEPARTAGE` (8), `MIN_DEPARTAGE` (4),
+`NEAR_TIE_POINTS` (6), `MAX_DEPARTAGE` (15), `MIN_DEPARTAGE` (4),
 `CLEAR_LEAD_POINTS` (15), `PRIORITY_BOOSTS` (2,0 / 1,6 / 1,3), `MAX_PER_GROUP`
 (2), `PARTIAL_COVERAGE` (0,5). La page « Méthode » cite plusieurs de ces
 valeurs : la mettre à jour en même temps. La clé de sauvegarde locale
@@ -150,7 +152,7 @@ Les tests peuvent donc bien échouer.
   répondues), au lieu de paraître mécaniquement proches de tout le monde.
 - **Renaissance et Horizons se distinguent peu** : la banque ne les sépare que
   sur 3 sujets, et leurs candidats divergent réellement peu. Ces profils vont
-  jusqu’à 8 questions sans toujours se détacher ; l’application l’affiche
+  jusqu’à 15 questions sans toujours se détacher ; l’application l’affiche
   honnêtement (quasi-égalité) plutôt que de forcer un gagnant.
 - **Sur le mode de scrutin**, les sources divergent pour Horizons, Renaissance
   et DLF : leur position n’est pas codée.
@@ -159,3 +161,4 @@ Les tests peuvent donc bien échouer.
   DOM simulé et une relecture du CSS responsive, pas par une capture d’écran
   sur appareil réel.
 - La liste de 16 partis est un choix éditorial de couverture du spectre.
+

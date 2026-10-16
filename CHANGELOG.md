@@ -1,5 +1,21 @@
 # Changelog — Audit V5.1 → refonte V6
 
+## V7.1 — accueil tricolore, durée claire et annuaire des partis
+
+- Refonte de l’accueil et de la navigation autour d’une identité républicaine
+  bleu-blanc-rouge, avec un lien Accueil toujours visible.
+- Correction du rappel de reprise : il apparaît uniquement s’il existe des
+  réponses valides dans un questionnaire non terminé.
+- Les 21 questions principales sont annoncées à environ 5 minutes ; la phase
+  de précision peut aller jusqu’à 15 questions et environ 4 minutes.
+- L’onglet Les partis est consultable avant le test et présente les 16
+  formations, leurs figures politiques associées, les statuts, les liens
+  officiels et les crédits/licences des portraits. Les scores ne s’affichent
+  qu’après la fin du questionnaire.
+- Les réponses et le moteur de calcul n’ont pas été modifiés. Le cache PWA est
+  passé à V7.1.0 pour permettre la mise à jour aux personnes qui ont déjà
+  visité le site.
+
 ## V7.0 — départage réel entre partis du même camp, ordre aléatoire, 3 priorités
 
 Trois demandes, traitées ensemble.
@@ -420,3 +436,4 @@ absence de test visuel réel sur différents appareils (aucun navigateur
 graphique n’était disponible pendant cette refonte : le rendu a été validé
 par un DOM simulé — fonctionnel, pas visuel — et par une relecture
 attentive du CSS responsive, pas par une capture d’écran).
+

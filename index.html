@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Votez bien ! — Comprendre où vous vous situez avant 2027</title>
-<meta name="description" content="Un test politique gratuit, neutre et sourcé pour comprendre vos propres positions avant l'élection présidentielle de 2027, et explorer les partis qui s'en rapprochent — sans jargon.">
-<meta name="theme-color" content="#171B26">
+<meta name="description" content="Un questionnaire politique gratuit et sans jargon : 21 questions en 5 min, puis jusqu’à 15 questions de précision en 4 min. Explorez 16 partis et leurs positions.">
+<meta name="theme-color" content="#14213D">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
@@ -17,12 +17,13 @@
 
   <header class="topbar">
     <button class="brand" data-nav="home" aria-label="Votez bien ! — retour à l'accueil">
-      <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#171B26" stroke-width="2.5"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6" stroke="#171B26" stroke-width="2.5" stroke-linecap="round"/><path d="M24 24 L32 15" stroke="#9C6B2E" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#171B26"/></svg>
+      <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="none" stroke="#244B83" stroke-width="2.5"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6" stroke="#244B83" stroke-width="2.5" stroke-linecap="round"/><path d="M24 24 L32 15" stroke="#C93948" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#244B83"/></svg>
       Votez bien !
     </button>
     <nav aria-label="Navigation principale">
-      <button class="navlink hide-mobile" data-nav="results" id="navResults" disabled>Mon profil</button>
-      <button class="navlink hide-mobile" data-nav="parties" id="navParties" disabled>Les partis</button>
+      <button class="navlink" data-nav="home" id="navHome">Accueil</button>
+      <button class="navlink" data-nav="results" id="navResults" disabled>Mon profil</button>
+      <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="method">Méthode</button>
     </nav>
   </header>
@@ -42,11 +43,16 @@
 
         <div class="hero">
           <div class="hero-text">
-            <p class="eyebrow-note">Présidentielle 2027 · gratuit, anonyme, sans compte</p>
+            <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> gratuit, anonyme, sans compte</p>
             <h1>Trouvez d’abord <span class="accent">votre position</span>. Regardez ensuite qui s’en approche.</h1>
-            <p class="lede">21 questions en langage simple sur les grands sujets qui divisent la France, puis des questions concrètes pour départager les partis qui vous correspondent. Aucun jargon, aucune question piégée : vous choisissez ce qui vous parle le plus — ou vous dites que vous ne savez pas.</p>
+            <p class="lede">Un questionnaire clair pour situer vos idées sur les grands sujets du pays, puis explorer les partis qui s’en rapprochent. Aucun jargon, aucune réponse forcée : vous choisissez ce qui vous parle le plus — ou vous dites que vous ne savez pas.</p>
+            <div class="duration-grid" aria-label="Durée estimée du questionnaire">
+              <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small>21 questions · 5 min</small></span></div>
+              <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Jusqu’à 15 questions · 4 min</small></span></div>
+            </div>
+            <p class="duration-total">Environ 9 min au total. La seconde partie s’arrête plus tôt si les réponses font déjà ressortir une formation.</p>
             <div class="hero-actions btn-row">
-              <button class="btn btn-brass" id="btnStart">Commencer le test</button>
+              <button class="btn btn-brass" id="btnStart">Commencer le questionnaire <span aria-hidden="true">→</span></button>
               <button class="btn btn-ghost" data-nav="method">Voir la méthode</button>
             </div>
             <div class="trust-row">
@@ -70,7 +76,7 @@
           <h2>Comment ça marche</h2>
           <div class="hiw-list">
             <div class="hiw-item"><span class="hiw-num">1</span><div><h3>21 questions</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible — aucune réponse n’est forcée.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Jusqu’à 8 questions concrètes</h3><p>Un premier aperçu provisoire et le choix de vos 3 priorités, puis des questions précises (retraites, nucléaire, OTAN…) choisies une à une pour départager les partis qui restent proches de vous. Le test s’arrête dès qu’un parti ressort nettement.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Jusqu’à 15 questions concrètes · 4 min</h3><p>Après un aperçu provisoire et le choix facultatif de vos 3 priorités, des questions précises (retraites, nucléaire, OTAN…) départagent les partis encore proches. Le test s’arrête dès qu’un parti ressort nettement.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">3</span><div><h3>Votre profil</h3><p>Une orientation générale, le détail sur 6 thèmes avec leur niveau de clarté, et vos priorités personnelles.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Vos partis les plus proches</h3><p>Un pourcentage de proximité par parti, thème par thème, expliqué et sourcé — jamais un chiffre sans détail derrière.</p></div></div>
           </div>
@@ -83,6 +89,7 @@
         <div class="quiz-head">
           <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
           <span class="progress-label" id="progressLabel">1 / 21</span>
+          <span class="quiz-duration" id="quizDurationLabel">Environ 5 min</span>
         </div>
         <div class="q-card">
           <p class="q-topic" id="qTopic"></p>
@@ -124,12 +131,15 @@
 
       <!-- ============ PARTIS ============ -->
       <section class="screen" id="screen-parties">
+        <div class="section-kicker">Les formations politiques</div>
         <h1>Les partis à explorer</h1>
-        <p class="lede">Classés du plus proche au moins proche de vos réponses. Le pourcentage mesure la proximité entre vos positions et celles du parti sur chaque thème, en donnant plus de poids à ce qui compte le plus pour vous — jamais un thème auquel vous n’avez pas répondu. Ouvrez une fiche pour voir le détail, thème par thème, avec les points communs et les différences.</p>
+        <p class="lede" id="partyDirectoryIntro">Explorez les 16 formations, leur personne de référence et leurs liens officiels. Les personnes en photo ne sont pas toutes candidates investies : leur statut est précisé dans chaque fiche.</p>
+        <div class="party-directory-banner"><span class="flag-mark" aria-hidden="true"></span><p><strong>Un repère pour vous informer.</strong> Les portraits identifient des personnalités associées aux partis ; les candidatures évoluent. Consultez le statut daté et les sources de chaque fiche.</p></div>
         <div class="filter-row" id="familyFilters"></div>
         <div class="party-grid" id="partyGrid"></div>
-        <div class="btn-row" style="margin-top:1.8rem">
-          <button class="btn btn-ghost" data-nav="compare">Comparer jusqu’à 3 partis →</button>
+        <div class="btn-row party-directory-actions" style="margin-top:1.8rem">
+          <button class="btn btn-brass" id="btnStartFromParties">Faire le questionnaire</button>
+          <button class="btn btn-ghost" data-nav="compare" id="btnCompareParties" hidden>Comparer jusqu’à 3 partis →</button>
         </div>
       </section>
 
@@ -147,7 +157,7 @@
 
         <div class="method-section">
           <h2>Ce n’est ni scientifique, ni infaillible</h2>
-          <p>Ce test simplifie des sujets complexes en 21 questions principales suivies d’au plus 8 questions concrètes, toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes (que l’application appelle des « dimensions »), pas une vérité psychologique ni un verdict définitif sur qui vous êtes. Deux personnes qui partagent vos réponses peuvent avoir des raisons très différentes de les avoir choisies.</p>
+          <p>Ce test simplifie des sujets complexes en 21 questions principales (environ 5 minutes), suivies d’au plus 15 questions concrètes de précision (environ 4 minutes), toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes (que l’application appelle des « dimensions »), pas une vérité psychologique ni un verdict définitif sur qui vous êtes. Deux personnes qui partagent vos réponses peuvent avoir des raisons très différentes de les avoir choisies.</p>
         </div>
 
         <div class="method-section">
@@ -175,9 +185,9 @@
 
         <div class="method-section">
           <h2>Les questions concrètes pour départager les partis</h2>
-          <p>Les 21 premières questions placent votre profil entre la gauche et la droite, mais elles ne suffisent pas à distinguer deux partis d’un même camp (par exemple Les Écologistes et le Parti socialiste). L’application pose donc ensuite, <strong>une par une et jusqu’à 8</strong>, des questions <strong>concrètes à plusieurs options</strong> (retraites à 60, 62 ou 64 ans ; avenir du nucléaire ; impôt sur les très grandes fortunes ; OTAN…), toutes écrites à l’avance dans une banque de questions et jamais générées à la volée.</p>
+          <p>Les 21 premières questions placent votre profil entre la gauche et la droite, mais elles ne suffisent pas à distinguer deux partis d’un même camp (par exemple Les Écologistes et le Parti socialiste). L’application pose donc ensuite, <strong>une par une et jusqu’à 15</strong>, des questions <strong>concrètes à plusieurs options</strong> (retraites à 60, 62 ou 64 ans ; avenir du nucléaire ; impôt sur les très grandes fortunes ; OTAN…), toutes écrites à l’avance dans une banque de questions et jamais générées à la volée. Cette seconde partie prend environ 4 minutes.</p>
           <p>Chaque question est choisie d’après vos réponses précédentes : on estime quels partis sont encore les plus proches de vous, et on pose la question sur laquelle ces partis-là se séparent le plus. Si vous êtes proche de partis de gauche, elle distingue des partis de gauche ; si vous êtes proche de partis de droite, des partis de droite. Les options ne sont pas rangées de « gauche » à « droite » : ce sont de vrais choix de politique, présentés sans nom de parti.</p>
-          <p><strong>Les noms et pourcentages des partis restent cachés pendant ces questions</strong>, pour ne pas orienter vos réponses vers un résultat espéré. Le test s’arrête dès qu’un parti mène nettement (au moins 4 questions posées) ; il va jusqu’à 8 sinon.</p>
+          <p><strong>Les noms et pourcentages des partis restent cachés pendant ces questions</strong>, pour ne pas orienter vos réponses vers un résultat espéré. Le test s’arrête dès qu’un parti mène nettement (au moins 4 questions posées) ; il peut aller jusqu’à 15 si les positions restent proches.</p>
           <p>Ce choix de questions ne garantit aucun écart final : si vos réponses sincères vous laissent à égalité entre deux partis, c’est le bon résultat, pas un échec à corriger.</p>
         </div>
 
@@ -205,8 +215,13 @@
         </div>
 
         <div class="method-section">
+          <h2>Portraits</h2>
+          <p>Les portraits viennent de Wikimedia Commons. Chaque image porte un crédit, un lien vers sa source et un lien vers sa licence. La personne présentée peut être une figure du parti sans être sa candidature officielle.</p>
+        </div>
+
+        <div class="method-section">
           <h2>Vos réponses restent sur votre appareil</h2>
-          <p>Aucun compte, aucun serveur : vos réponses sont enregistrées uniquement dans le stockage local de votre navigateur, pour vous permettre de reprendre le test plus tard. Rien n’est transmis nulle part. Effacer les données du site ou vider le stockage de votre navigateur supprime définitivement votre progression.</p>
+          <p>Aucun compte : vos réponses sont enregistrées uniquement dans le stockage local de votre navigateur et ne sont pas envoyées au site. Les portraits sont chargés depuis Wikimedia Commons. Effacer les données du site ou vider le stockage de votre navigateur supprime définitivement votre progression.</p>
         </div>
       </section>
 
@@ -227,3 +242,4 @@
 <script src="./app.js"></script>
 </body>
 </html>
+

@@ -22,7 +22,7 @@ section('Palier : aucun nom de parti ni pourcentage avant les questions concrèt
   test('… ni aucun pourcentage', () => assert.ok(!/\d\s?%/.test(log.checkpointText)));
   test('… ni aucun candidat nommé', () => ['Mélenchon', 'Le Pen', 'Retailleau', 'Attal', 'Faure', 'Glucksmann', 'Tondelier', 'Roussel', 'Zemmour', 'Philippe'].forEach(n => assert.ok(!log.checkpointText.includes(n), n)));
   test('pour un électeur partagé entre deux partis, il annonce — sans les nommer — que plusieurs partis sont proches', () => assert.ok(/plusieurs partis se rapprochent de vous à peu près autant/.test(log.checkpointText)));
-  test('il annonce « jusqu’à 8 questions » et qu’un parti qui ressort nettement arrête le test', () => { assert.ok(log.checkpointText.includes('Jusqu’à 8 questions')); assert.ok(log.checkpointText.includes('dès qu’un parti ressort nettement')); });
+  test('il annonce « jusqu’à 15 questions » et qu’un parti qui ressort nettement arrête le test', () => { assert.ok(log.checkpointText.includes('Jusqu’à 15 questions')); assert.ok(log.checkpointText.includes('dès qu’un parti ressort nettement')); });
   test('il propose de choisir 3 priorités (facultatif) et affiche un aperçu provisoire gauche-droite', () => { assert.ok(log.checkpointText.includes('Vos 3 priorités')); assert.ok(/Tendance provisoire/.test(log.checkpointText)); });
 }
 
@@ -36,7 +36,7 @@ section('Les questions concrètes : vue « choix » dédiée');
     const q = readChoice(env); assert.ok(q); const n = env.doc.querySelectorAll('#choiceList .choice-btn').length; assert.ok(n >= 2 && n <= 4);
     assert.ok($(env, 'dkBtnChoice').textContent.includes('Aucune de ces options'));
   });
-  test('la progression indique « Précision 1 (jusqu’à 8) » et un bandeau explique ces questions', () => {
+  test('la progression indique la première question de précision et un bandeau explique ces questions', () => {
     assert.ok($(env, 'progressLabel').textContent.startsWith('Précision 1')); assert.ok($(env, 'phaseChipWrap').textContent.includes('Questions de précision'));
   });
   test('le bloc « En clair » explique les termes de la question', () => { assert.strictEqual($(env, 'plainBox').hidden, false); assert.ok($(env, 'plainText').textContent.length > 40); });
@@ -84,7 +84,7 @@ section('Leader net : un parti est déclaré « le plus proche »');
   const log = drive(env, { scale: persona(k => lr.positions[k]), choice: q => nearestOption(q, q.stances.lr) });
   test('le parti en tête est Les Républicains, déclaré « Le plus proche de vous »', () => { const t = topOf(log.resultsHtml); assert.ok(t); assert.strictEqual(t.badge, 'Le plus proche de vous'); assert.strictEqual(t.name, 'Les Républicains'); });
   test('aucun panneau de départage (rien à départager)', () => assert.ok(!log.resultsText.includes('Départager vos deux partis')));
-  test('le test s’est arrêté avant 8 questions (un leader net ressort : arrêt anticipé)', () => assert.ok(log.choice.length < S.MAX_DEPARTAGE, String(log.choice.length)));
+  test('le test s’est arrêté avant 15 questions (un leader net ressort : arrêt anticipé)', () => assert.ok(log.choice.length < S.MAX_DEPARTAGE, String(log.choice.length)));
   test('le palier de ce profil ne parlait pas de partis proches', () => assert.ok(!/plusieurs partis se rapprochent/.test(log.checkpointText)));
 }
 
@@ -101,3 +101,4 @@ section('Priorités');
 }
 test('aucune erreur JavaScript dans aucun de ces parcours', () => H.assertNoErrors());
 T.done();
+

@@ -22,7 +22,7 @@ test('le parcours se termine sur l’écran des résultats', () => assert.ok(isA
 test('21 questions générales ont été posées, chacune une seule fois', () => {
   assert.strictEqual(log.scale.length, 21); assert.strictEqual(new Set(log.scale.map(x => x.q.id)).size, 21);
 });
-test('entre 4 et 8 questions concrètes ont été posées, sans doublon', () => {
+test('entre 4 et 15 questions concrètes ont été posées, sans doublon', () => {
   assert.ok(log.choice.length >= S.MIN_DEPARTAGE && log.choice.length <= S.MAX_DEPARTAGE, String(log.choice.length));
   assert.strictEqual(new Set(log.choice.map(x => x.q.id)).size, log.choice.length);
 });
@@ -114,3 +114,4 @@ const tick = () => new Promise(r => setTimeout(r, 40));
 
   T.done();
 })();
+

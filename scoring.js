@@ -7,7 +7,7 @@
 
    Deux niveaux de preuve, jamais mélangés :
      1. les 21 questions générales → un score par thème (6), de -2 à +2 ;
-     2. jusqu’à 8 questions de départage concrètes → une position précise sur
+     2. jusqu’à 15 questions de départage concrètes → une position précise sur
         des propositions, comparée à celle de chaque parti.
    ========================================================================= */
 
@@ -39,7 +39,7 @@
 
   // Questions de départage
   const QUESTION_WEIGHT = 1.0;        // poids d'une question de départage, avant boost de priorité
-  const MAX_DEPARTAGE = 8;            // plafond annoncé à la personne
+  const MAX_DEPARTAGE = 15;           // plafond annoncé à la personne
   const MIN_DEPARTAGE = 4;            // minimum avant arrêt anticipé
   const CLEAR_LEAD_POINTS = 15;       // un leader net arrête le test dès MIN_DEPARTAGE questions
   const SOFTMAX_BETA = 14;            // concentration de la probabilité « c'est ce parti » sur les premiers
@@ -425,3 +425,4 @@
 
   if (isNode) module.exports = api; else root.Scoring = api;
 })(typeof window !== 'undefined' ? window : this);
+

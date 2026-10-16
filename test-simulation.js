@@ -6,7 +6,7 @@
         avec un écart réel (venant de vraies différences de position, pas d'un réglage) ;
      3. répondre exactement comme un parti place ce parti en tête (cohérence de
         toute la chaîne) ;
-     4. la sélection reste dans ses bornes (4 à 8 questions, pas de doublon). */
+     4. la sélection reste dans ses bornes (4 à 15 questions, pas de doublon). */
 const assert = require('assert');
 const { D, S, makeAnswerer, nearestOption, runner } = require('./helpers.js');
 const { DIM_KEYS, QUESTIONS, DEPARTAGE, PARTIES } = D;
@@ -79,16 +79,16 @@ section('Bornes de la sélection');
   const runs = PARTIES.filter(p => DIM_KEYS.filter(k => typeof p.positions[k] === 'number').length >= 3).map(p => {
     const lat = {}; DIM_KEYS.forEach(k => { lat[k] = p.positions[k]; }); return simulate(lat, q => q.stances[p.id]);
   });
-  test('toujours entre 4 et 8 questions, jamais de doublon, jamais plus de 2 du même sujet', () => {
+  test('toujours entre 4 et 15 questions, jamais de doublon, jamais plus de 2 du même sujet', () => {
     runs.forEach(r => {
       assert.ok(r.asked.length >= S.MIN_DEPARTAGE && r.asked.length <= S.MAX_DEPARTAGE, String(r.asked.length));
       assert.strictEqual(new Set(r.asked.map(q => q.id)).size, r.asked.length);
       const g = {}; r.asked.forEach(q => { g[q.group] = (g[q.group] || 0) + 1; }); Object.keys(g).forEach(k => assert.ok(g[k] <= S.MAX_PER_GROUP));
     });
   });
-  test('le test s’arrête avant 8 questions pour certains profils (leader net) et va à 8 pour d’autres (partis restés proches)', () => {
+  test('le test s’arrête avant 15 questions pour certains profils (leader net) et va à 15 pour d’autres (partis restés proches)', () => {
     const counts = runs.map(r => r.asked.length);
-    assert.ok(counts.some(c => c < S.MAX_DEPARTAGE), 'aucun arrêt anticipé'); assert.ok(counts.some(c => c === S.MAX_DEPARTAGE), 'jamais 8');
+    assert.ok(counts.some(c => c < S.MAX_DEPARTAGE), 'aucun arrêt anticipé'); assert.ok(counts.some(c => c === S.MAX_DEPARTAGE), 'jamais 15');
   });
 }
 
@@ -109,3 +109,4 @@ section('Équité de la comparaison');
   });
 }
 T.done();
+

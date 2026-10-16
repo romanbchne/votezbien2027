@@ -38,13 +38,28 @@
 
   /* ---------------- Persistance locale (aucun serveur) ---------------- */
   function validState(s) {
-    return !!(s && typeof s === 'object' && typeof s.phase === 'string' && s.answers && s.flips &&
-      Array.isArray(s.priorities) && Array.isArray(s.dp) && s.dpAnswers && s.dpOrders);
+    return !!(s && typeof s === 'object' && ['main', 'checkpoint', 'diagnostic'].includes(s.phase) &&
+      Number.isInteger(s.index) && s.index >= 0 && typeof s.completed === 'boolean' &&
+      s.answers && typeof s.answers === 'object' && s.flips && typeof s.flips === 'object' &&
+      Array.isArray(s.priorities) && Array.isArray(s.dp) && s.dpAnswers && typeof s.dpAnswers === 'object' &&
+      s.dpOrders && typeof s.dpOrders === 'object');
   }
   function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible : l'app continue sans reprise */ } }
   function loadState() { try { const raw = localStorage.getItem(STORAGE_KEY); const s = raw ? JSON.parse(raw) : null; return validState(s) ? s : null; } catch (e) { return null; } }
   function clearState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
-  function hasProgress(s) { return !!(s && Object.keys(s.answers).length > 0); }
+  function hasProgress(s) {
+    if (!validState(s) || s.completed) return false;
+    const mainIds = new Set(QUESTIONS.map(q => q.id));
+    const precisionIds = new Set(DEPARTAGE.map(q => q.id));
+    const answeredMain = Object.entries(s.answers).some(([id, value]) =>
+      mainIds.has(id) && (value === 'dk' || (Number.isInteger(value) && value >= -2 && value <= 2)));
+    const answeredPrecision = Object.entries(s.dpAnswers).some(([id, value]) => {
+      if (!precisionIds.has(id)) return false;
+      const q = qById[id];
+      return value === 'dk' || (Number.isInteger(value) && value >= 0 && value < q.options.length);
+    });
+    return answeredMain || answeredPrecision;
+  }
 
   /* ---------------- Aides ---------------- */
   function currentQuestion() { return state.phase === 'diagnostic' ? qById[state.dp[state.index]] : QUESTIONS[state.index]; }
@@ -113,6 +128,7 @@
     const el = document.getElementById('screen-' + name);
     if (el) el.classList.add('active');
     document.querySelectorAll('.navlink[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+    if (name === 'home') refreshResumeBanner();
     window.scrollTo({ top: 0, behavior: 'auto' });
     if (name === 'results') renderResults();
     if (name === 'parties') renderParties();
@@ -124,14 +140,15 @@
   document.querySelectorAll('[data-nav]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.nav;
-      if ((target === 'results' || target === 'parties') && !state.completed) return;
+      if (target === 'results' && !state.completed) return;
+      if (target === 'compare' && !state.completed) { showScreen('parties'); return; }
       showScreen(target);
     });
   });
 
   function setNavEnabled(enabled) {
     document.getElementById('navResults').disabled = !enabled;
-    document.getElementById('navParties').disabled = !enabled;
+    document.getElementById('navParties').disabled = false;
   }
 
   /* ================================================================
@@ -154,8 +171,9 @@
   }
 
   function refreshResumeBanner() {
+    const banner = document.getElementById('resumeBanner');
     const stored = loadState();
-    document.getElementById('resumeBanner').hidden = !(hasProgress(stored) && !stored.completed);
+    banner.hidden = !hasProgress(stored);
   }
 
   document.getElementById('btnStart').addEventListener('click', () => {
@@ -194,6 +212,7 @@
     document.getElementById('progressLabel').textContent = isDp
       ? 'Précision ' + (state.index + 1) + ' (jusqu’à ' + Scoring.MAX_DEPARTAGE + ')'
       : (state.index + 1) + ' / ' + QUESTIONS.length;
+    document.getElementById('quizDurationLabel').textContent = isDp ? 'Environ 4 min' : 'Environ 5 min';
     document.getElementById('phaseChipWrap').innerHTML = isDp
       ? '<span class="phase-chip">Questions de précision : concrètes, sur les points où vos partis les plus proches se distinguent</span>'
       : '';
@@ -353,7 +372,7 @@
       explainer = 'Pour l’instant, <strong>plusieurs partis se rapprochent de vous à peu près autant</strong>. Les questions suivantes sont concrètes et portent sur les sujets où ces partis diffèrent réellement. Leurs noms restent volontairement cachés jusqu’à la fin, pour ne pas influencer vos réponses.';
     }
     html += `<div class="checkpoint-next">
-      <h2>Jusqu’à ${Scoring.MAX_DEPARTAGE} questions pour départager</h2>
+      <h2>Jusqu’à ${Scoring.MAX_DEPARTAGE} questions pour départager · environ 4 min</h2>
       <p class="lede">${explainer} Le test s’arrête dès qu’un parti ressort nettement.</p>
       <div class="btn-row">
         <button class="btn btn-brass" id="btnContinueDiag">Continuer</button>
@@ -596,8 +615,8 @@
      PARTIS
      ================================================================ */
   function renderParties() {
-    if (!lastDimResults) computeResults();
-    const matches = Scoring.computePartyMatches(lastDimResults, PARTIES, matchOpts());
+    const hasResults = !!(state.completed && lastDimResults);
+    const matches = hasResults ? Scoring.computePartyMatches(lastDimResults, PARTIES, matchOpts()) : null;
 
     const families = Array.from(new Set(PARTIES.map(p => p.family)));
     const filterWrap = document.getElementById('familyFilters');
@@ -608,23 +627,39 @@
     });
 
     const grid = document.getElementById('partyGrid');
-    const list = matches.filter(m => !familyFilter || m.party.family === familyFilter);
-    grid.innerHTML = list.map(m => {
-      const checked = compareSelection.includes(m.party.id) ? ' checked' : '';
-      return `<button class="party-card" style="--card-accent:${m.party.color}" data-party="${m.party.id}">
-        <div class="party-card-body">
-          ${matchRingHTML(m.matchPercent, 56)}
-          <div class="party-card-text">
-            <h3>${m.party.name}</h3><div class="party-family">${m.party.family}</div>
-            <div class="match-caption">${captionFor(m)}</div>
-          </div>
+    const directory = hasResults ? matches.map(m => ({ party: m.party, match: m })) : PARTIES.map(party => ({ party, match: null }));
+    const list = directory.filter(item => !familyFilter || item.party.family === familyFilter);
+    grid.innerHTML = list.map(({ party, match }) => {
+      const checked = compareSelection.includes(party.id) ? ' checked' : '';
+      const portrait = party.portraitFile
+        ? `<img class="party-photo" src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+        : `<div class="party-photo portrait-placeholder" aria-hidden="true">${party.short}</div>`;
+      const photoCredit = party.portraitFile
+        ? `<span class="portrait-credit"><a href="${portraitPageURL(party.portraitFile)}" target="_blank" rel="noopener">Photo : ${party.portraitCredit}</a> · <a href="${party.portraitLicenseUrl}" target="_blank" rel="noopener">${party.portraitLicense}</a></span>`
+        : '';
+      const comparison = match
+        ? `${matchRingHTML(match.matchPercent, 56)}<span class="match-caption">${captionFor(match)}</span>`
+        : '<span class="party-unscored">À comparer après le questionnaire</span>';
+      const comparePick = hasResults
+        ? `<label class="compare-pick"><input type="checkbox" data-compare="${party.id}"${checked}> Ajouter au comparateur</label>`
+        : '';
+      return `<article class="party-card">
+        <div class="party-main">
+          <span class="party-portrait">${portrait}${photoCredit}</span>
+          <button class="party-card-text" data-party="${party.id}" aria-label="Ouvrir la fiche ${party.name}">
+            <span class="party-family">${party.family}</span>
+            <strong class="party-card-title">${party.name}</strong>
+            <span class="party-person">${party.personName}<small>${party.personRole}</small></span>
+            <span class="party-status">${party.status}</span>
+            <span class="party-card-match">${comparison}</span>
+            <span class="party-open-hint">Voir la fiche et le programme <span aria-hidden="true">→</span></span>
+          </button>
         </div>
-        <p class="party-status">${m.party.status}</p>
-        <label class="compare-pick" onclick="event.stopPropagation()"><input type="checkbox" data-compare="${m.party.id}"${checked}> Ajouter au comparateur</label>
-      </button>`;
+        ${comparePick ? `<div class="party-card-actions">${comparePick}</div>` : ''}
+      </article>`;
     }).join('') || '<p>Aucun parti dans cette famille.</p>';
 
-    grid.querySelectorAll('.party-card').forEach(card => {
+    grid.querySelectorAll('.party-card-text').forEach(card => {
       card.addEventListener('click', () => openPartyDrawer(card.dataset.party));
     });
     grid.querySelectorAll('[data-compare]').forEach(cb => {
@@ -638,25 +673,56 @@
         }
       });
     });
+    const intro = document.getElementById('partyDirectoryIntro');
+    if (intro) intro.textContent = hasResults
+      ? 'Voici les formations rapprochées de vos réponses. Le score reste une indication : ouvrez chaque fiche pour voir les points communs, les différences et les sources.'
+      : 'Explorez les 16 formations, leur personne de référence et leurs liens officiels. Les personnes en photo ne sont pas toutes candidates investies : leur statut est précisé dans chaque fiche.';
+    const startButton = document.getElementById('btnStartFromParties');
+    if (startButton) {
+      startButton.hidden = hasResults;
+      const hasSavedProgress = hasProgress(loadState()) || hasProgress(state);
+      startButton.textContent = hasSavedProgress ? 'Reprendre le questionnaire' : 'Faire le questionnaire';
+      startButton.onclick = () => {
+        if (hasSavedProgress) document.getElementById('btnResume').click();
+        else document.getElementById('btnStart').click();
+      };
+    }
+    const compareButton = document.getElementById('btnCompareParties');
+    if (compareButton) compareButton.hidden = !hasResults;
+  }
+
+  function portraitURL(file) {
+    return 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=480';
+  }
+
+  function portraitPageURL(file) {
+    return 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(file.replace(/ /g, '_'));
   }
 
   function openPartyDrawer(partyId) {
     const party = PARTIES.find(p => p.id === partyId);
-    if (!party || !lastDimResults) return;
-    const match = Scoring.computePartyMatch(lastDimResults, party, matchOpts());
+    if (!party) return;
+    const hasResults = !!(state.completed && lastDimResults);
+    const match = hasResults ? Scoring.computePartyMatch(lastDimResults, party, matchOpts()) : null;
     lastFocusedEl = document.activeElement;
 
     let intro;
-    if (match.matchPercent !== null) {
+    if (!hasResults) {
+      intro = 'Terminez le questionnaire pour voir comment vos réponses se rapprochent des positions de cette formation.';
+    } else if (match.matchPercent !== null) {
       intro = 'Correspondance calculée sur ' + match.comparableCount + ' des ' + DIM_KEYS.length + ' thèmes' + (match.questionComparableCount ? ' et ' + match.questionComparableCount + ' questions de précision' : '') + ' (ceux où vous avez répondu et où ce parti a une position codée), en donnant plus de poids à vos priorités.';
     } else {
       intro = captionFor(match) + '.';
     }
 
+    const portrait = party.portraitFile
+      ? `<figure class="drawer-portrait"><img src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}"><figcaption><a href="${portraitPageURL(party.portraitFile)}" target="_blank" rel="noopener">${party.portraitCredit}</a> · <a href="${party.portraitLicenseUrl}" target="_blank" rel="noopener">${party.portraitLicense}</a></figcaption></figure>`
+      : '';
     let html = `<div class="drawer-top">
-      ${matchRingHTML(match.matchPercent, 60)}
-      <div><h2 style="margin-bottom:.2rem">${party.name}</h2><p class="party-family" style="margin:0">${party.family}</p></div>
+      ${portrait}
+      <div><p class="party-family" style="margin:0">${party.family}</p><h2 style="margin-bottom:.2rem">${party.name}</h2><strong>${party.personName}</strong><p class="party-person-role">${party.personRole}</p></div>
       <button class="drawer-close" id="drawerCloseBtn" aria-label="Fermer">✕ Fermer</button></div>
+      ${hasResults ? matchRingHTML(match.matchPercent, 60) : ''}
       <p class="confidence-note" style="margin-top:.6rem">${intro}</p>
       <p style="margin-top:1rem">${party.status}</p>
       <p class="confidence-note">Positions estimées à partir des programmes et déclarations publics, situation arrêtée en ${formatStatusDate(party.statusDate)}. Estimations à vérifier : voir la page Méthode.</p>
@@ -664,10 +730,9 @@
         <a class="btn btn-ghost btn-sm" href="${party.site}" target="_blank" rel="noopener">Site officiel</a>
         <a class="btn btn-ghost btn-sm" href="${party.program}" target="_blank" rel="noopener">Programme</a>
       </div>
-      <h3 style="margin-top:1.6rem">Thème par thème</h3>
-      <div class="dim-compare">`;
+      ${hasResults ? '<h3 style="margin-top:1.6rem">Thème par thème</h3><div class="dim-compare">' : ''}`;
 
-    match.perDim.forEach(p => {
+    if (hasResults) match.perDim.forEach(p => {
       const dim = DIMENSIONS[p.dim];
       const userLabel = p.userScore !== null ? positionLabel(p.dim, p.userScore) : 'Non renseigné par vous';
       html += `<div class="dc-item">
@@ -675,12 +740,12 @@
         <div class="dc-detail">Vous : ${userLabel}<br>${party.short} : ${positionLabel(p.dim, p.partyScore)}</div>
       </div>`;
     });
-    html += '</div>';
-    if (match.perDim.some(p => !p.available)) {
+    if (hasResults) html += '</div>';
+    if (hasResults && match.perDim.some(p => !p.available)) {
       html += '<p class="dim-note" style="margin-top:1rem">Les thèmes marqués « non renseigné » ou « non comparable » ne comptent ni comme rapprochement ni comme opposition : soit vous n’y avez pas assez répondu, soit la position de ce parti n’y est pas codée.</p>';
     }
 
-    if (match.perQuestion.length) {
+    if (hasResults && match.perQuestion.length) {
       html += `<h3 style="margin-top:1.8rem">Vos réponses aux questions de précision</h3><div class="dim-compare">`;
       match.perQuestion.forEach(p => {
         const you = p.userPos !== null ? Scoring.stanceLabel(p.q, p.userPos).label : 'Vous n’avez pas tranché';
@@ -798,3 +863,4 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
+
