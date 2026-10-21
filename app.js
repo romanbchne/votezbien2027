@@ -1,18 +1,50 @@
 /* ============================================================================
-   VOTEZ BIEN ! — app.js
-   État + rendu. Toute la logique de calcul vit dans scoring.js (testée
-   séparément) : ce fichier ne fait qu'appeler ces fonctions et mettre à
-   jour le DOM.
+   VOTEZ BIEN ! — app.js (Édition V7.5 Refondue)
+   État + rendu + routage SPA hash + accessibilité renforcée + export Canvas.
    ========================================================================= */
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'votezbien:v7:state'; // v7 : nouvelle structure d'état (priorités, départage) — les sauvegardes v6 sont ignorées
+  const STORAGE_KEY = 'votezbien:v7:state';
   const SCALE_LABELS = ['Beaucoup plus A', 'Plutôt A', 'Entre les deux', 'Plutôt B', 'Beaucoup plus B'];
+  const VALID_SCREENS = ['home', 'quizStart', 'quiz', 'checkpoint', 'results', 'themes', 'polls', 'programs', 'parties', 'compare', 'candidatures', 'radar', 'method'];
 
   const qById = {};
   QUESTIONS.forEach(q => { qById[q.id] = q; });
   DEPARTAGE.forEach(q => { qById[q.id] = q; });
+
+  /* Statut de candidature : entièrement porté par les données (champ
+     `candidacyStatus` de chaque formation). Aucune formation n'est
+     présentée ici avec un statut écrit à la main dans le code. */
+  const CANDIDACY_STATUS = {
+    official:    { label: 'Candidature officielle',          hint: 'Candidature désignée par les adhérents ou retenue officiellement par la formation.' },
+    declared:    { label: 'Candidature déclarée',           hint: 'Candidature annoncée publiquement, sans investiture officielle enregistrée à ce jour.' },
+    conditional: { label: 'Candidature à confirmer',         hint: 'Candidature envisagée, encore soumise à une décision interne (vote, convention…).' },
+    reference:   { label: 'Personnalité de référence',       hint: 'Personnalité associée à la formation ; aucun candidat n’est annoncé à ce jour.' }
+  };
+
+  function candidacyBadge(party) {
+    const s = CANDIDACY_STATUS[party.candidacyStatus];
+    if (!s) return '';
+    return '<span class="candidacy-shared-badge" data-status="' + party.candidacyStatus + '" title="' + s.hint + '">' + s.label + '</span>';
+  }
+
+  /* Nombre de formations retenues par le moteur de classement : celles dont
+     la couverture documentaire dans la banque de précision atteint le seuil
+     officiel (Scoring.PARTIAL_COVERAGE). Calculé, jamais écrit en dur. */
+  function comparableParties() {
+    const threshold = Scoring.PARTIAL_COVERAGE;
+    return PARTIES.filter(p => {
+      const coded = DEPARTAGE.filter(q => q.stances && typeof q.stances[p.id] === 'number').length;
+      return DEPARTAGE.length > 0 && (coded / DEPARTAGE.length) >= threshold;
+    });
+  }
+
+  function partyCoverage(party) {
+    const coded = DEPARTAGE.filter(q => q.stances && typeof q.stances[party.id] === 'number').length;
+    const total = DEPARTAGE.length;
+    return { coded: coded, total: total, ratio: total ? coded / total : 0, partial: total ? (coded / total) < Scoring.PARTIAL_COVERAGE : true };
+  }
 
   let state = freshState();
   let lastDimResults = null;
@@ -22,9 +54,8 @@
   let lastFocusedEl = null;
   let programPhase = 'main';
   let programPartyFilter = 'all';
-  let activeThemeId = 'eco';
-  let activePollHyp = 'philippe';
-  let resultsViewMode = 'candidacies';
+  let selectedThemeId = (typeof THEMES !== 'undefined' && THEMES.length) ? THEMES[0].id : null;
+  let pollView = 'first-round';
 
   function freshState() {
     return {
@@ -49,7 +80,7 @@
       Array.isArray(s.priorities) && Array.isArray(s.dp) && s.dpAnswers && typeof s.dpAnswers === 'object' &&
       s.dpOrders && typeof s.dpOrders === 'object');
   }
-  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible : l'app continue sans reprise */ } }
+  function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* stockage indisponible */ } }
   function loadState() { try { const raw = localStorage.getItem(STORAGE_KEY); const s = raw ? JSON.parse(raw) : null; return validState(s) ? s : null; } catch (e) { return null; } }
   function clearState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
   function hasProgress(s) {
@@ -92,9 +123,6 @@
     return Scoring.selectNextDepartage({ dimResults: mainDimResults(), parties: PARTIES, bank: DEPARTAGE, answers: state.dpAnswers, priorities: state.priorities });
   }
 
-  /* Anneau visuel de correspondance : le pourcentage affiché est TOUJOURS la
-     valeur qui sert à classer les partis, et n'est jamais affiché seul —
-     toujours à côté d'une explication et d'un accès au détail. */
   function matchRingHTML(percent, size) {
     size = size || 64;
     const stroke = size < 56 ? 5 : 6;
@@ -102,19 +130,27 @@
     const c = 2 * Math.PI * r;
     const mid = size / 2;
     if (percent === null || percent === undefined) {
-      return `<div class="match-ring match-ring-empty" style="--size:${size}px"><svg viewBox="0 0 ${size} ${size}"><circle class="ring-bg" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}"/></svg><span class="ring-label ring-label-empty">?</span></div>`;
+      return `<div class="match-ring match-ring-empty" style="--size:${size}px" aria-label="Indice non calculé : données insuffisantes"><svg viewBox="0 0 ${size} ${size}"><circle class="ring-bg" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}"/></svg><span class="ring-label ring-label-empty">—</span></div>`;
     }
     const offset = (c * (1 - percent / 100)).toFixed(2);
-    return `<div class="match-ring" style="--size:${size}px"><svg viewBox="0 0 ${size} ${size}"><circle class="ring-bg" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}"/><circle class="ring-fill" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}" style="stroke-dasharray:${c.toFixed(2)};stroke-dashoffset:${offset}"/></svg><span class="ring-label">${percent}%</span></div>`;
+    return `<div class="match-ring" style="--size:${size}px" aria-label="Indice indicatif de proximité : ${percent} sur 100"><svg viewBox="0 0 ${size} ${size}"><circle class="ring-bg" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}"/><circle class="ring-fill" cx="${mid}" cy="${mid}" r="${r}" stroke-width="${stroke}" style="stroke-dasharray:${c.toFixed(2)};stroke-dashoffset:${offset}"/></svg><span class="ring-label">${percent}<small>/100</small></span></div>`;
   }
 
-  // Légende explicative sous chaque pourcentage (jamais un chiffre nu).
   function captionFor(m) {
-    if (m.partial) return 'Comparaison partielle : les positions de ce parti sont peu codées sur les questions de précision' + (m.themePercent !== null ? ' (sur les 6 thèmes seulement : ' + m.themePercent + ' %)' : '');
-    if (m.partyKnownCount < 3) return 'Parti dont seules quelques positions sont codées ici : comparaison trop partielle pour un pourcentage';
-    if (m.comparableCount < 3) return 'Pas encore assez de réponses de votre part pour comparer';
-    let s = 'Rapprochement sur ' + m.rapprochements + ' des ' + m.comparableCount + ' thèmes';
-    if (m.questionComparableCount) s += ' et ' + m.questionCloseCount + ' des ' + m.questionComparableCount + ' questions de précision';
+    if (m.partial) {
+      const coverage = m.databaseKnownCount + '/' + m.databaseTotalCount + ' positions concrètes codées';
+      if (m.questionAnsweredCount >= Scoring.MIN_QUESTIONS_FOR_QUESTION_MODE && m.questionComparableCount < Scoring.MIN_COMPARABLE_QUESTIONS) {
+        return 'Pas de score classé : seulement ' + m.questionComparableCount + ' de vos réponses précises sont comparables ; ' + coverage + ' dans la banque.';
+      }
+      if (m.questionAnsweredCount >= Scoring.MIN_QUESTIONS_FOR_QUESTION_MODE && m.questionCoverage < Scoring.PARTIAL_COVERAGE) {
+        return 'Pas de score classé : données manquantes sur vos réponses précises (' + Math.round(m.questionCoverage * 100) + ' % couvertes) ; ' + coverage + ' dans la banque.';
+      }
+      return 'Pas de score classé : ' + coverage + ' dans la banque de précision. Les thèmes seuls ne suffisent pas à comparer cette formation.';
+    }
+    if (m.partyKnownCount < 4) return 'Données insuffisantes : moins de quatre thèmes renseignés pour cette formation.';
+    if (m.comparableCount < 4) return 'Pas assez de réponses communes pour établir un indice.';
+    let s = 'Indice indicatif ' + m.matchPercent + '/100 · ' + m.rapprochements + ' thèmes proches sur ' + m.comparableCount;
+    if (m.questionComparableCount) s += ' · ' + m.questionComparableCount + ' réponses précises comparées';
     return s;
   }
 
@@ -126,33 +162,44 @@
   }
 
   /* ================================================================
-     NAVIGATION ENTRE ÉCRANS & ROUTING
+     NAVIGATION SPA (HASH ROUTING & HISTORIQUE)
      ================================================================ */
-  function showScreen(name, updateHistory) {
-    if (updateHistory === undefined) updateHistory = true;
+  function showScreen(name, updateHash) {
+    if (updateHash === undefined) updateHash = true;
+    if (!VALID_SCREENS.includes(name)) name = 'home';
+
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
     const el = document.getElementById('screen-' + name);
     if (el) el.classList.add('active');
-    document.querySelectorAll('.navlink[data-nav]').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+
+    document.querySelectorAll('.navlink[data-nav]').forEach(b => {
+      const active = b.dataset.nav === name;
+      b.classList.toggle('active', active);
+      if (active) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
+
+    if (updateHash) {
+      try {
+        if (window.location.hash !== '#' + name) {
+          window.location.hash = '#' + name;
+        }
+      } catch (e) {}
+    }
+
     if (name === 'home') refreshResumeBanner();
     if (name === 'quizStart') refreshQuizStart();
     window.scrollTo({ top: 0, behavior: 'auto' });
     if (name === 'results') renderResults();
     if (name === 'themes') renderThemes();
-    if (name === 'sondages') renderPolls();
+    if (name === 'polls') renderPolls();
     if (name === 'programs') renderPrograms();
     if (name === 'parties') renderParties();
     if (name === 'compare') renderCompare();
+    if (name === 'candidatures') renderCandidatures();
+    if (name === 'radar') renderRadar();
     if (name === 'method') renderMethod();
     if (name === 'checkpoint') renderCheckpoint();
-
-    if (updateHistory) {
-      try {
-        if (window.location.hash !== '#' + name) {
-          history.pushState({ screen: name }, '', '#' + name);
-        }
-      } catch (e) {}
-    }
   }
 
   document.querySelectorAll('[data-nav]').forEach(btn => {
@@ -163,12 +210,16 @@
     });
   });
 
-  function setNavEnabled(enabled) {
-    const resNav = document.getElementById('navResults');
-    if (resNav) {
-      resNav.title = enabled ? 'Consulter votre profil' : 'Votre profil se complétera à la fin du quiz';
-      resNav.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '') || 'home';
+    if (VALID_SCREENS.includes(hash)) {
+      showScreen(hash, false);
     }
+  });
+
+  function setNavEnabled(enabled) {
+    const res = document.getElementById('navResults');
+    if (res) res.disabled = false;
   }
 
   /* ================================================================
@@ -216,13 +267,6 @@
     const stored = loadState();
     if (stored) { state = stored; beginQuiz(); }
   });
-  const btnHeroPrograms = document.getElementById('btnHeroPrograms');
-  if (btnHeroPrograms) btnHeroPrograms.addEventListener('click', () => showScreen('programs'));
-  const btnHeroThemes = document.getElementById('btnHeroThemes');
-  if (btnHeroThemes) btnHeroThemes.addEventListener('click', () => showScreen('themes'));
-  const btnHeroPolls = document.getElementById('btnHeroPolls');
-  if (btnHeroPolls) btnHeroPolls.addEventListener('click', () => showScreen('sondages'));
-
   document.getElementById('btnRestart').addEventListener('click', () => {
     clearState();
     state = freshState();
@@ -231,7 +275,9 @@
 
   function beginQuiz() {
     setNavEnabled(state.completed);
-    if (state.phase === 'checkpoint' || (state.phase === 'diagnostic' && !state.dp.length)) { state.phase = 'checkpoint'; showScreen('checkpoint'); return; }
+    if (state.phase === 'checkpoint' || (state.phase === 'diagnostic' && !state.dp.length)) {
+      state.phase = 'checkpoint'; showScreen('checkpoint'); return;
+    }
     showScreen('quiz');
     renderQuestion();
   }
@@ -245,7 +291,13 @@
     const isDp = state.phase === 'diagnostic';
     const total = QUESTIONS.length + Scoring.MAX_DEPARTAGE;
     const done = isDp ? QUESTIONS.length + state.index : state.index;
-    document.getElementById('progressFill').style.width = Math.round((done / total) * 100) + '%';
+    const pctVal = Math.round((done / total) * 100);
+
+    const fill = document.getElementById('progressFill');
+    if (fill) fill.style.width = pctVal + '%';
+    const track = document.getElementById('quizProgressTrack');
+    if (track) track.setAttribute('aria-valuenow', String(pctVal));
+
     document.getElementById('progressLabel').textContent = isDp
       ? 'Précision ' + (state.index + 1) + ' (jusqu’à ' + Scoring.MAX_DEPARTAGE + ')'
       : (state.index + 1) + ' / ' + QUESTIONS.length;
@@ -271,8 +323,6 @@
     document.getElementById('btnBack').disabled = (state.phase === 'main' && state.index === 0);
   }
 
-  // Question générale : A/B éventuellement inversés à l'affichage. La valeur
-  // ENREGISTRÉE reste liée au texte choisi (sémantique), jamais à sa place.
   function renderScaleView(q) {
     const flip = !!state.flips[q.id];
     const first = flip ? 'b' : 'a', second = flip ? 'a' : 'b';
@@ -287,7 +337,7 @@
     if (tB) { clB.textContent = tB; clB.hidden = false; } else clB.hidden = true;
 
     const stored = state.answers[q.id];
-    const shown = typeof stored === 'number' ? (flip ? -stored : stored) : stored; // valeur telle qu'affichée (A = 1er texte)
+    const shown = typeof stored === 'number' ? (flip ? -stored : stored) : stored;
     const wrap = document.getElementById('scaleButtons');
     wrap.innerHTML = '';
     SCALE_LABELS.forEach((label, j) => {
@@ -296,6 +346,7 @@
       const selected = typeof shown === 'number' && shown === v;
       b.type = 'button'; b.className = 'scale-btn' + (selected ? ' sel' : '');
       b.textContent = label;
+      b.setAttribute('data-shortcut', String(j + 1));
       b.setAttribute('aria-pressed', selected ? 'true' : 'false');
       b.addEventListener('click', () => { state.answers[q.id] = (flip ? -v : v) || 0; saveState(); renderQuestion(); });
       wrap.appendChild(b);
@@ -306,11 +357,10 @@
     return typeof stored === 'number' || stored === 'dk';
   }
 
-  // Question de départage : options concrètes, ordre d'affichage aléatoire.
   function renderChoiceView(q) {
     document.getElementById('qTopic').textContent = DIMENSIONS[q.dim].name;
     document.getElementById('qDim').textContent = q.q;
-    document.getElementById('qWhy').textContent = 'Cette question porte sur un point où des partis proches de vos réponses se distinguent réellement. Ses options sont présentées dans un ordre aléatoire, sans lien avec un parti : choisissez celle qui vous ressemble le plus.';
+    document.getElementById('qWhy').textContent = 'Cette question porte sur un point où des partis proches de vos réponses se distinguent réellement. Ses options sont présentées dans un ordre aléatoire : choisissez celle qui vous ressemble le plus.';
     const order = state.dpOrders[q.id] || (state.dpOrders[q.id] = Scoring.makeOptionOrder(q.options.length));
     const stored = state.dpAnswers[q.id];
     const list = document.getElementById('choiceList');
@@ -332,8 +382,6 @@
     return stored !== undefined;
   }
 
-  // Modifier une réponse déjà donnée invalide les questions choisies APRÈS
-  // elle (leur choix dépendait de cette réponse) : elles seront recalculées.
   function setDpAnswer(q, value) {
     if (state.dpAnswers[q.id] !== value && state.index < state.dp.length - 1) {
       state.dp.slice(state.index + 1).forEach(id => { delete state.dpAnswers[id]; delete state.dpOrders[id]; });
@@ -345,7 +393,9 @@
   }
 
   document.getElementById('qWhyToggle').addEventListener('click', () => {
-    document.getElementById('qWhy').classList.toggle('show');
+    const whyEl = document.getElementById('qWhy');
+    const expanded = whyEl.classList.toggle('show');
+    document.getElementById('qWhyToggle').setAttribute('aria-expanded', expanded ? 'true' : 'false');
   });
 
   document.getElementById('btnBack').addEventListener('click', () => {
@@ -359,7 +409,6 @@
       state.phase = 'checkpoint'; saveState(); showScreen('checkpoint');
       return;
     }
-    // phase de départage : question suivante déjà choisie, ou nouvelle sélection
     if (state.index < state.dp.length - 1) { state.index++; saveState(); renderQuestion(); return; }
     const next = pickNextDepartage();
     if (next) { state.dp.push(next.id); state.index++; saveState(); renderQuestion(); return; }
@@ -382,7 +431,7 @@
     const overall = Scoring.computeOverall(dimResults);
     const root = document.getElementById('checkpointContent');
     let html = `<p class="eyebrow-note">Étape 1 sur 2 : terminée</p>
-      <h1>Premier aperçu</h1>
+      <h1 id="checkpointHeading">Premier aperçu</h1>
       <p class="lede">Voici une lecture encore <strong>provisoire</strong> de votre profil, fondée sur vos ${QUESTIONS.length} premières réponses.</p>`;
 
     if (overall.determined) {
@@ -397,14 +446,11 @@
 
     html += `<div class="prio-box">
       <h2>Vos 3 priorités</h2>
-      <p class="lede">Touchez les sujets qui comptent le plus pour votre vote, <strong>dans l’ordre</strong> : le premier touché pèse le plus (3 au maximum). Facultatif : sans choix, tous les thèmes comptent autant.</p>
+      <p class="lede">Touchez les sujets qui comptent le plus pour votre vote, <strong>dans l’ordre</strong> : le premier pèse le plus (×2,0 / ×1,6 / ×1,3). Facultatif : sans choix, tous les thèmes comptent autant.</p>
       <div class="prio-grid" id="prioGrid"></div>
     </div>`;
 
-    // Volontairement AUCUN nom de parti ni pourcentage avant les questions de
-    // précision : les afficher permettrait d'orienter ses réponses vers un
-    // résultat espéré, ce qui fausserait la mesure qu'on veut affiner.
-    let explainer = 'L’application va maintenant vous poser des questions <strong>concrètes</strong> (retraites, nucléaire, OTAN, impôt sur les grandes fortunes…), choisies une à une pour départager les partis qui vous correspondent le plus.';
+    let explainer = 'L’application va maintenant vous poser des questions <strong>concrètes</strong> (retraites, nucléaire, santé, logement, pouvoir d’achat, OTAN…), choisies une à une pour départager les partis qui vous correspondent le plus.';
     if (overall.determined && Scoring.findNearTie(Scoring.computePartyMatches(dimResults, PARTIES, { priorities: state.priorities }))) {
       explainer = 'Pour l’instant, <strong>plusieurs partis se rapprochent de vous à peu près autant</strong>. Les questions suivantes sont concrètes et portent sur les sujets où ces partis diffèrent réellement. Leurs noms restent volontairement cachés jusqu’à la fin, pour ne pas influencer vos réponses.';
     }
@@ -458,9 +504,6 @@
 
   function beginDiagnosticPhase() {
     const sig = signature();
-    // Les questions déjà choisies ne sont conservées que si ni vos réponses
-    // générales ni vos priorités n'ont changé depuis : sinon leur choix, qui
-    // en dépendait, serait périmé.
     if (!state.dp.length || state.dpSignature !== sig) {
       state.dp = []; state.dpAnswers = {}; state.dpOrders = {}; state.dpSignature = sig;
       const first = pickNextDepartage();
@@ -482,8 +525,6 @@
     return i >= 0 ? 'C’est l’une de vos priorités (n° ' + (i + 1) + ').' : '';
   }
 
-  // Quasi-égalité : on montre ce qui distingue réellement les deux partis,
-  // thème par thème et proposition par proposition, plutôt qu'un gagnant.
   function departagerHTML(pair) {
     const a = pair[0], b = pair[1];
     const rows = [];
@@ -509,7 +550,7 @@
 
     let html = `<div class="depart-box">
       <h2>Départager vos deux partis les plus proches</h2>
-      <p class="lede"><strong>${a.party.name}</strong> (${a.matchPercent} %) et <strong>${b.party.name}</strong> (${b.matchPercent} %) sont à quasi-égalité pour vous : l’écart est plus petit que la marge d’incertitude de ces estimations, il ne suffit donc pas pour trancher. Voici ce qui les distingue réellement.</p>`;
+      <p class="lede"><strong>${a.party.name}</strong> (indice ${a.matchPercent}/100) et <strong>${b.party.name}</strong> (indice ${b.matchPercent}/100) sont presque à égalité. Cet indice éditorial n’est ni une probabilité ni une prédiction de vote : l’écart est inférieur à la marge d’incertitude de ces estimations et ne permet pas de trancher. Voici les différences visibles dans les réponses comparables.</p>`;
     if (!distinguishing.length) {
       html += `<p class="confidence-note">Sur les sujets abordés ici, ces deux partis ont des positions quasi identiques : seule la lecture de leurs programmes détaillés permet de les distinguer.</p>`;
     } else {
@@ -535,7 +576,7 @@
   function renderResults() {
     const root = document.getElementById('resultsContent');
     if (!state.completed) {
-      root.innerHTML = `<div class="profile-empty"><span class="profile-empty-icon" aria-hidden="true">✦</span><p class="section-kicker">Mon profil</p><h1>Votre profil reste à découvrir</h1><p class="lede">Vos réponses dessineront vos tendances sur six thèmes et les formations politiques dont les positions s’en rapprochent.</p><div class="profile-empty-steps"><span>21 questions · 5 min</span><span>Jusqu’à 15 précisions · 4 min</span></div><button class="btn btn-brass" id="btnStartFromProfile">Commencer le quiz <span aria-hidden="true">→</span></button></div>`;
+      root.innerHTML = `<div class="profile-empty"><span class="profile-empty-icon" aria-hidden="true">✦</span><p class="section-kicker">Mon profil</p><h1 id="resultsHeading">Votre profil reste à découvrir</h1><p class="lede">Vos réponses dessineront vos tendances sur six thèmes et les formations politiques dont les positions s’en rapprochent.</p><div class="profile-empty-steps"><span>${QUESTIONS.length} questions · ~5 min</span><span>Questions de précision ciblées</span></div><button class="btn btn-brass" id="btnStartFromProfile">Commencer le quiz <span aria-hidden="true">→</span></button></div>`;
       document.getElementById('btnStartFromProfile').addEventListener('click', () => showScreen('quizStart'));
       return;
     }
@@ -544,12 +585,12 @@
     let html = '';
 
     if (!overall.determined) {
-      html += `<div class="undetermined-box"><h2 style="margin-top:0">Profil non déterminé</h2>
+      html += `<div class="undetermined-box"><h2 id="resultsHeading" style="margin-top:0">Profil non déterminé</h2>
         <p style="margin-bottom:0">Trop peu de réponses exploitables (${overall.totalAnswered} sur ${overall.totalQuestions}, le reste en « je ne sais pas ») pour dégager une orientation fiable. C’est un résultat honnête, pas un bug : plutôt que d’inventer une tendance à partir de réponses absentes, l’application préfère vous le dire clairement.</p></div>`;
     } else {
       html += `<div class="result-headline">
         <p class="eyebrow-note">Votre orientation générale</p>
-        <h1 class="label">${overall.label}</h1>
+        <h1 class="label" id="resultsHeading">${overall.label}</h1>
         <p class="confidence-note">Confiance globale dans cette lecture : ${Math.round(overall.overallConfidence * 100)}% · fondée sur ${overall.totalAnswered} réponses exploitables sur ${overall.totalQuestions}.</p>
       </div>`;
       if (overall.composite) {
@@ -563,40 +604,31 @@
 
     // ---- Vos meilleures correspondances (partis) ----
     if (overall.determined) {
-      const allPartyMatches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
-      const matches = resultsViewMode === 'candidacies'
-        ? Scoring.computeCandidacyMatches(allPartyMatches)
-        : allPartyMatches;
+      const matches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
       const ranked = matches.filter(m => m.matchPercent !== null);
       const top = ranked.slice(0, 3);
-      const tiePair = Scoring.findNearTie(allPartyMatches);
+      const tiePair = Scoring.findNearTie(matches);
       const nQ = Object.keys(state.dpAnswers).filter(id => typeof state.dpAnswers[id] === 'number').length;
       html += `<div class="best-matches">
-        <div class="matches-header-row">
-          <div>
-    
-            <p class="lede">Calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Le pourcentage compare votre position à celle de chaque formation ou candidat, en donnant plus de poids à vos priorités — jamais un point auquel vous n’avez pas répondu.</p>
-          </div>
-          <div class="results-view-mode-bar">
-            <span class="view-mode-label">Regrouper par :</span>
-            <div class="btn-group" role="group" aria-label="Affichage des résultats">
-              <button class="btn btn-sm ${resultsViewMode === 'candidacies' ? 'btn-brass active' : 'btn-ghost'}" data-view-mode="candidacies">Candidatures (14)</button>
-              <button class="btn btn-sm ${resultsViewMode === 'parties' ? 'btn-brass active' : 'btn-ghost'}" data-view-mode="parties">Formations (16)</button>
-            </div>
-          </div>
-        </div>
-        <div class="match-grid">`;
-
-
+        <h2>Les formations les plus proches de vos réponses</h2>
+        <p class="lede">Indice éditorial sur 100, calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Ce n’est ni une probabilité, ni une intention de vote, ni une mesure de soutien. Les formations sont classées seulement si au moins la moitié des positions de la banque de précision est renseignée et si la comparaison porte sur assez de réponses communes.</p>
         <div class="match-grid">`;
       top.forEach((m, i) => {
         html += `<button class="match-card${i === 0 ? ' top' : ''}" style="--card-accent:${m.party.color}" data-party="${m.party.id}">
           ${i === 0 ? '<span class="top-badge">' + (tiePair ? 'En tête, de très peu' : 'Le plus proche de vous') + '</span>' : (i === 1 && tiePair ? '<span class="top-badge">Presque à égalité</span>' : '')}
           ${matchRingHTML(m.matchPercent, i === 0 ? 84 : 64)}
-          <div class="match-card-name"><h3>${m.party.name}</h3><span class="party-family">${m.party.family}</span></div>
+          <div class="match-card-name">
+            <h3>${m.party.name}</h3>
+            <span class="party-family">${m.party.family}</span>
+            ${candidacyBadge(m.party)}
+          </div>
         </button>`;
       });
-      html += `</div><div class="btn-row" style="margin-top:1rem"><button class="btn btn-ghost btn-sm" id="btnSeeAllParties">Voir les ${PARTIES.length} formations et leur détail</button></div></div>`;
+      html += `</div>`;
+      if (!ranked.length) html += '<p class="confidence-note">Aucune formation ne dispose ici d’assez de positions comparables pour un classement fiable.</p>';
+      const partialCount = matches.filter(m => m.partial).length;
+      if (partialCount) html += `<p class="confidence-note">${partialCount} formations ne sont pas classées, car leur couverture documentaire est trop faible ou trop incomplète sur vos réponses.</p>`;
+      html += `<div class="btn-row" style="margin-top:1rem"><button class="btn btn-ghost btn-sm" id="btnSeeAllParties">Voir les ${PARTIES.length} formations et leur détail</button></div></div>`;
       if (tiePair) html += departagerHTML(tiePair);
     }
 
@@ -628,13 +660,22 @@
     html += '</div>';
 
     html += `<div class="share-row">
-      <button class="btn btn-brass" id="btnGoParties">Explorer les partis qui s’en rapprochent</button>
+      <button class="btn btn-brass" id="btnExportBadge">Télécharger ma boussole en image 🎨</button>
+      <button class="btn btn-ghost" id="btnGoThemes">Explorer les thèmes 2027</button>
+      <button class="btn btn-ghost" id="btnGoPolls">Consulter les sondages</button>
+      <button class="btn btn-ghost" id="btnGoParties">Explorer les partis</button>
       <button class="btn btn-ghost" id="btnGoPrograms">Voir les positions par question</button>
       <button class="btn btn-ghost" id="btnShare">Copier un résumé</button>
       <button class="btn btn-ghost" id="btnRedo">Refaire le test</button>
     </div>`;
 
     root.innerHTML = html;
+    const exportBtn = document.getElementById('btnExportBadge');
+    if (exportBtn) exportBtn.addEventListener('click', openExportModal);
+    const goThemes = document.getElementById('btnGoThemes');
+    if (goThemes) goThemes.addEventListener('click', () => showScreen('themes'));
+    const goPolls = document.getElementById('btnGoPolls');
+    if (goPolls) goPolls.addEventListener('click', () => showScreen('polls'));
     const goParties = document.getElementById('btnGoParties');
     if (goParties) goParties.addEventListener('click', () => showScreen('parties'));
     const goPrograms = document.getElementById('btnGoPrograms');
@@ -658,19 +699,427 @@
 
   function shareResults() {
     if (!lastOverall) return;
-    const lines = ['Mon profil politique — Votez bien !', lastOverall.determined ? ('Orientation générale : ' + lastOverall.label) : 'Profil non déterminé'];
+    const lines = ['Mon profil politique — Votez bien ! (Présidentielle 2027)', lastOverall.determined ? ('Orientation générale : ' + lastOverall.label) : 'Profil non déterminé'];
     DIM_KEYS.forEach(k => {
       const d = lastDimResults[k];
       lines.push(DIMENSIONS[k].name + ' : ' + (d.n > 0 ? positionLabel(k, d.score) : 'non renseigné'));
     });
     const text = lines.join('\n');
     if (navigator.share) {
-      navigator.share({ title: 'Mon profil politique', text }).catch(() => {});
+      navigator.share({ title: 'Mon profil politique 2027', text }).catch(() => {});
     } else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(() => showToast('Résumé copié dans le presse-papiers')).catch(() => showToast('Impossible de copier automatiquement'));
     } else {
       showToast('Copie automatique indisponible sur ce navigateur');
     }
+  }
+
+  /* ================================================================
+     EXPORT DE LA BOUSSOLE ÉLECTORALE EN IMAGE (CANVAS)
+     ================================================================ */
+  function openExportModal() {
+    const modal = document.getElementById('exportModalBackdrop');
+    if (!modal) return;
+    modal.hidden = false;
+    document.body.style.overflow = 'hidden';
+
+    const canvas = document.getElementById('profileCanvas');
+    if (canvas && lastOverall && lastDimResults) {
+      drawProfileBadge(canvas, lastOverall, lastDimResults);
+    }
+
+    const closeBtn = document.getElementById('btnExportModalClose');
+    if (closeBtn) closeBtn.onclick = closeExportModal;
+
+    const downloadBtn = document.getElementById('btnDownloadCard');
+    if (downloadBtn) {
+      downloadBtn.onclick = () => {
+        try {
+          const a = document.createElement('a');
+          a.download = 'boussole-electorale-2027.png';
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          showToast('Image téléchargée avec succès !');
+        } catch (e) {
+          showToast('Téléchargement non supporté');
+        }
+      };
+    }
+
+    const copyBtn = document.getElementById('btnCopyCardText');
+    if (copyBtn) copyBtn.onclick = shareResults;
+  }
+
+  function closeExportModal() {
+    const modal = document.getElementById('exportModalBackdrop');
+    if (modal) modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  function drawProfileBadge(canvas, overall, dimResults) {
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+
+    // Fond dégradé élégant tricolore
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+    bgGrad.addColorStop(0, '#11223F');
+    bgGrad.addColorStop(1, '#0B1528');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Ruban républicain en haut
+    const ribbonH = 8;
+    ctx.fillStyle = '#244B83'; ctx.fillRect(0, 0, w / 3, ribbonH);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(w / 3, 0, w / 3, ribbonH);
+    ctx.fillStyle = '#C93948'; ctx.fillRect((2 * w) / 3, 0, w / 3, ribbonH);
+
+    // Titre
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 26px "Fraunces", Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Votez bien ! · Présidentielle 2027', w / 2, 54);
+
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '14px "Inter", sans-serif';
+    ctx.fillText('Boussole électorale citoyenne indépendante', w / 2, 78);
+
+    // Carte blanche centrale pour le résultat
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.roundRect(35, 105, w - 70, 115, 16);
+    ctx.fill();
+
+    ctx.fillStyle = '#C93948';
+    ctx.font = '800 12px "Inter", sans-serif';
+    ctx.fillText('ORIENTATION GÉNÉRALE', w / 2, 132);
+
+    ctx.fillStyle = '#14213D';
+    ctx.font = 'bold 30px "Fraunces", Georgia, serif';
+    ctx.fillText(overall.label || 'Profil analysé', w / 2, 172);
+
+    ctx.fillStyle = '#64748B';
+    ctx.font = '13px "Inter", sans-serif';
+    ctx.fillText(`Indice de clarté : ${Math.round((overall.overallConfidence || 0.8) * 100)} %`, w / 2, 198);
+
+    // 6 Thèmes majeurs
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 15px "Fraunces", Georgia, serif';
+    ctx.fillStyle = '#E2E8F0';
+    ctx.fillText('Profil par thèmes majeurs :', 40, 255);
+
+    let y = 285;
+    DIM_KEYS.forEach(k => {
+      const d = dimResults[k];
+      const dim = DIMENSIONS[k];
+      const score = (d && d.n > 0) ? d.score : 0;
+      const pct = (score + 2) / 4;
+
+      ctx.fillStyle = '#CBD5E1';
+      ctx.font = '600 13px "Inter", sans-serif';
+      ctx.fillText(dim.name, 40, y);
+
+      // Barre de fond
+      ctx.fillStyle = '#1E2D48';
+      ctx.beginPath();
+      ctx.roundRect(40, y + 8, w - 80, 8, 4);
+      ctx.fill();
+
+      // Curseur point
+      const dotX = 40 + pct * (w - 80);
+      ctx.fillStyle = '#C93948';
+      ctx.beginPath();
+      ctx.arc(dotX, y + 12, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      y += 48;
+    });
+
+    // Top partis
+    const matches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
+    const top = matches.filter(m => m.matchPercent !== null).slice(0, 3);
+
+    y += 15;
+    ctx.fillStyle = '#E2E8F0';
+    ctx.font = 'bold 15px "Fraunces", Georgia, serif';
+    ctx.fillText('Formations les plus proches :', 40, y);
+
+    y += 24;
+    top.forEach((m, idx) => {
+      ctx.fillStyle = '#162544';
+      ctx.beginPath();
+      ctx.roundRect(40, y, w - 80, 38, 10);
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 14px "Inter", sans-serif';
+      ctx.fillText(`${idx + 1}. ${m.party.name}`, 55, y + 24);
+
+      ctx.fillStyle = '#FF919A';
+      ctx.font = 'bold 16px "Fraunces", Georgia, serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(`${m.matchPercent} %`, w - 55, y + 25);
+      ctx.textAlign = 'left';
+
+      y += 46;
+    });
+
+    // Bas de carte
+    ctx.fillStyle = '#64748B';
+    ctx.font = '12px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Faites le quiz gratuit et anonyme sur votezbien.fr', w / 2, h - 22);
+  }
+
+  /* ================================================================
+     NOUVEL ONGLET : THÈMES
+     ================================================================ */
+  function renderThemes() {
+    const pillsWrap = document.getElementById('themePills');
+    const detailWrap = document.getElementById('themeDetailCard');
+    if (!pillsWrap || !detailWrap || typeof THEMES === 'undefined') return;
+
+    if (!selectedThemeId && THEMES.length) selectedThemeId = THEMES[0].id;
+
+    pillsWrap.innerHTML = THEMES.map(t => {
+      const active = t.id === selectedThemeId;
+      return `<button class="theme-pill${active ? ' active' : ''}" type="button" data-theme="${t.id}" aria-selected="${active ? 'true' : 'false'}">
+        <span aria-hidden="true">${t.icon || '📌'}</span> ${t.name}
+      </button>`;
+    }).join('');
+
+    pillsWrap.querySelectorAll('.theme-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedThemeId = btn.dataset.theme;
+        renderThemes();
+      });
+    });
+
+    const currentTheme = THEMES.find(t => t.id === selectedThemeId) || THEMES[0];
+    if (!currentTheme) return;
+
+    let html = `<article class="theme-briefing-box">
+      <h2><span aria-hidden="true">${currentTheme.icon || '📌'}</span> ${currentTheme.name}</h2>
+      <p class="lede">${currentTheme.summary}</p>
+      <div class="theme-cleavages-tag"><strong>Lignes de fracture 2027 :</strong> ${currentTheme.cleavages}</div>
+    </article>`;
+
+    html += `<h3 style="margin-top:1.2rem; font-size:1.25rem">Positions & mesures des candidats déclarés</h3>
+    <div class="theme-candidates-grid">`;
+
+    currentTheme.candidates.forEach(c => {
+      html += `<div class="theme-candidate-card" style="--candidate-color:${c.color || '#244B83'}">
+        <div class="tc-head">
+          <div>
+            <h4 class="tc-candidate">${c.candidateName}</h4>
+            <span class="tc-party-badge" style="border-left:3px solid ${c.color || '#244B83'}">${c.partyShort} · ${c.partyName}</span>
+          </div>
+        </div>
+        <p class="tc-stance">« ${c.stance} »</p>
+        <ul class="tc-proposals">
+          ${c.proposals.map(p => `<li>${p}</li>`).join('')}
+        </ul>
+      </div>`;
+    });
+
+    html += `</div>`;
+    detailWrap.innerHTML = html;
+  }
+
+  /* ================================================================
+     NOUVEL ONGLET : SONDAGES
+     ================================================================ */
+  function trendLabel(item) {
+    if (item.trend === null || item.trend === undefined) return 'première mesure';
+    const t = item.trend;
+    const arrow = t > 0 ? '▲' : '▼';
+    return arrow + ' ' + Math.abs(t).toFixed(1) + ' pt' + (Math.abs(t) > 1 ? 's' : '') + ' par rapport à la mesure précédente';
+  }
+
+  function renderPolls() {
+    const root = document.getElementById('pollsContent');
+    if (!root || typeof POLLS === 'undefined') return;
+
+    document.querySelectorAll('[data-poll-view]').forEach(btn => {
+      btn.classList.toggle('sel', btn.dataset.pollView === pollView);
+    });
+
+    let html = '';
+    if (pollView === 'first-round') {
+      const inScope = POLLS.averageFirstRound.filter(e => e.inScope !== false);
+      const outScope = POLLS.averageFirstRound.filter(e => e.inScope === false);
+      html += `<div class="poll-aggregate-box">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:.5rem">
+          <div>
+            <h2 style="margin:0">Moyenne agrégée du 1er tour</h2>
+            <p class="confidence-note" style="margin:.2rem 0 0">Mise à jour du ${POLLS.updatedAt} · moyenne de ${POLLS.waves.length} vagues d’enquêtes publiées, dont les ${inScope.length} candidats comparés sur ce site. <a href="${POLLS.sourceUrl}" target="_blank" rel="noopener">Source</a></p>
+          </div>
+          <span class="quiz-duration">Élection présidentielle 2027</span>
+        </div>
+        <div class="poll-bars-list">`;
+
+      POLLS.averageFirstRound.forEach(item => {
+        const barWidth = item.score;
+        const outside = item.inScope === false;
+        html += `<div class="poll-bar-item${outside ? ' poll-out-scope' : ''}">
+          <div class="poll-candidate-info">
+            <strong>${item.candidate}</strong>
+            <span>${item.partyShort === '—' ? '' : item.partyShort + ' · '}${item.family} · ${item.waves} vague${item.waves > 1 ? 's' : ''} · ${trendLabel(item)}</span>
+            ${item.note ? `<span class="poll-note">${item.note}</span>` : ''}
+          </div>
+          <div class="poll-bar-track" aria-hidden="true">
+            <div class="poll-bar-fill" style="width:${barWidth}%; background:${item.color || '#244B83'}"></div>
+          </div>
+          <div class="poll-score-val" style="color:${item.color || 'var(--ink)'}">${item.score} %</div>
+        </div>`;
+      });
+
+      html += `</div>`;
+      if (outScope.length) {
+        html += `<p class="confidence-note" style="margin-top:1rem">${outScope.length} candidature${outScope.length > 1 ? 's' : ''} mesurée${outScope.length > 1 ? 's' : ''} par les instituts figure${outScope.length > 1 ? 'nt' : ''} dans la moyenne sans faire l’objet d’une comparaison ici : aucune formation de ce site ne porte cette candidature, et aucune position n’est codée pour elle. ${outScope.map(e => e.candidate).join(', ')}.</p>`;
+      }
+      html += `</div>`;
+    } else if (pollView === 'second-round') {
+      html += `<div class="poll-aggregate-box">
+        <h2 style="margin:0 0 .3rem">Duels de second tour mesurés</h2>
+        <p class="confidence-note">Chaque duel est la moyenne des vagues qui l’ont testé. Les duels qui n’ont pas été mesurés ne sont pas affichés : ils n’existent pas dans les enquêtes publiées. <a href="${POLLS.secondRoundSourceUrl}" target="_blank" rel="noopener">Source</a></p>
+        <div class="duels-grid" style="margin-top:1.2rem">`;
+
+      POLLS.secondRoundDuels.forEach(d => {
+        html += `<div class="duel-card">
+          <h3>${d.duel}</h3>
+          <div class="duel-spread">${d.waves} vague${d.waves > 1 ? 's' : ''} · écart de ${Math.abs(d.candidateA.score - d.candidateB.score).toFixed(1)} point${Math.abs(d.candidateA.score - d.candidateB.score) > 1 ? 's' : ''}</div>
+          <div class="duel-bars-wrap" style="--color-a:${d.candidateA.color}; --color-b:${d.candidateB.color}">
+            <div class="duel-bar-a" style="width:${d.candidateA.score}%"></div>
+            <div class="duel-bar-b" style="width:${d.candidateB.score}%"></div>
+          </div>
+          <div class="duel-labels">
+            <span style="color:${d.candidateA.color}">${d.candidateA.name} : ${d.candidateA.score} %</span>
+            <span style="color:${d.candidateB.color}">${d.candidateB.name} : ${d.candidateB.score} %</span>
+          </div>
+          ${d.detail && d.detail.length ? `<details class="duel-detail"><summary>Détail des ${d.detail.length} mesures</summary><ul>${d.detail.map(x => `<li><span>${x.institute}</span><span>${x.date}</span><strong>${x.a} – ${x.b}</strong></li>`).join('')}</ul></details>` : ''}
+        </div>`;
+      });
+
+      html += `</div></div>`;
+    } else {
+      html += `<div class="poll-aggregate-box">
+        <h2 style="margin:0 0 .3rem">Détail des ${POLLS.waves.length} dernières vagues publiées</h2>
+        <p class="confidence-note">Chaque vague est reconstituée depuis sa notice de la Commission des sondages : commanditaire, terrain, taille d’échantillon et lien vers la notice d’origine.</p>
+        <div style="display:flex; flex-direction:column; gap:1.3rem; margin-top:1.2rem">`;
+
+      POLLS.waves.forEach(w => {
+        html += `<div class="depart-item" style="padding:1.1rem">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.5rem">
+            <div>
+              <h3 style="font-size:1.05rem; margin-bottom:.15rem">${w.institute}${w.sponsor ? ' pour ' + w.sponsor : ''}</h3>
+              <p class="confidence-note" style="margin:0">Publiée le ${w.publishedAt} · terrain du ${w.terrain} · ${w.sampleSize.toLocaleString('fr-FR')} personnes inscrites</p>
+              ${w.sponsorNote ? `<p class="confidence-note" style="margin:.2rem 0 0">${w.sponsorNote}</p>` : ''}
+            </div>
+            <span class="tc-party-badge">${w.scenario}</span>
+          </div>
+          <div class="poll-bars-list" style="margin-top:.8rem; gap:.5rem">`;
+
+        w.results.forEach(r => {
+          html += `<div style="display:flex; justify-content:space-between; gap:.6rem; font-size:.86rem; padding:.25rem 0; border-bottom:1px solid var(--line-soft)">
+            <span>${r.candidate}${r.partyShort ? ' <small class="text-muted">(' + r.partyShort + ')</small>' : ''}</span>
+            <strong style="font-family:var(--font-display)">${r.score} %</strong>
+          </div>`;
+        });
+
+        html += `</div>
+          <p class="confidence-note" style="margin:.7rem 0 0"><a href="${w.notice}" target="_blank" rel="noopener">Notice de la Commission des sondages</a></p>
+        </div>`;
+      });
+
+      html += `</div></div>`;
+    }
+
+    root.innerHTML = html;
+  }
+
+  document.querySelectorAll('[data-poll-view]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pollView = btn.dataset.pollView;
+      renderPolls();
+    });
+  });
+
+  /* ================================================================
+     CANDIDATURES & CALENDRIER DE CAMPAGNE
+     Données réelles : les candidatures déclarées et les jalons vérifiés.
+     ================================================================ */
+  function renderCandidatures() {
+    const root = document.getElementById('candidaturesContent');
+    if (!root || typeof CANDIDATURES === 'undefined') return;
+
+    const inScope = CANDIDATURES.filter(c => c.inScope !== false);
+    const outScope = CANDIDATURES.filter(c => c.inScope === false);
+
+    let html = `<p class="confidence-note">${CANDIDATURES.length} candidatures sont recensées ici pour la présidentielle 2027. ` +
+      `${inScope.length} sont portées par une formation comparée sur ce site ; ${outScope.length} ne le sont pas et ne font l\'objet d\'aucun codage de position. ` +
+      `Déclarer sa candidature ne vaut pas désignation officielle : chaque ligne indique la date et la forme exacte de la déclaration, et signale les cas où la déclaration n\'est pas établie.</p>`;
+
+    html += '<div class="candidatures-grid">';
+    inScope.forEach(c => {
+      const party = PARTIES.find(p => p.id === c.partyId);
+      html += `<article class="candidature-card"${party ? ` style="--card-accent:${party.color}"` : ''}>
+        <div class="candidature-head">
+          <h3>${c.name}</h3>
+          ${party ? '<span class="party-dot" style="background:' + party.color + '"></span>' : ''}
+        </div>
+        <p class="candidature-party">${c.party} · <span class="text-muted">${c.declaredOn ? 'déclarée le ' + formatFullDate(c.declaredOn) : 'date de déclaration non précisée'}</span></p>
+        <p class="candidature-note">${c.declarationNote || ''}</p>
+        ${c.pollScore !== null && c.pollScore !== undefined
+          ? `<p class="candidature-poll">Dernier relevé : <strong>${c.pollScore} %</strong>${c.pollWaves ? ' (' + c.pollWaves + ' vague' + (c.pollWaves > 1 ? 's' : '') + ')' : ''}</p>`
+          : '<p class="candidature-poll text-muted">Aucun relevé public dans la base des sondages</p>'}
+        ${c.url ? `<a class="program-primary-source" href="${c.url}" target="_blank" rel="noopener">Voir la déclaration</a>` : ''}
+      </article>`;
+    });
+    html += '</div>';
+
+    if (outScope.length) {
+      html += `<h2 style="margin-top:2rem">Candidatures déclarées hors du périmètre de comparaison</h2>
+        <p class="confidence-note">Ces personnes se sont déclarées candidates, mais aucune formation de ce site ne porte leur candidature : leurs positions ne sont pas codées, et aucune comparaison n\'est proposée. Elles sont listées pour que le tableau soit complet, pas pour être classées.</p>
+        <div class="candidatures-out-list">`;
+      outScope.forEach(c => {
+        html += `<div class="candidature-out-row">
+          <div><strong>${c.name}</strong><span>${c.party} · ${c.declaredOn ? formatFullDate(c.declaredOn) : 'date non précisée'}</span></div>
+          <p>${c.scopeReason || c.declarationNote || ''}</p>
+          ${c.url ? `<a href="${c.url}" target="_blank" rel="noopener">Source</a>` : ''}
+        </div>`;
+      });
+      html += '</div>';
+    }
+
+    if (typeof CALENDAR !== 'undefined' && CALENDAR.length) {
+      html += `<h2 style="margin-top:2.4rem">Calendrier de la campagne</h2>
+        <p class="confidence-note">Les jalons marqués « date fixée » sont les dates que les textes ou les annonces officielles ont déterminées ; les autres sont indicatifs et peuvent être modifiés.</p>
+        <ol class="calendar-list">`;
+      CALENDAR.forEach(c => {
+        html += `<li class="calendar-item${c.official ? ' official' : ''}">
+          <div class="calendar-date"><strong>${c.dateLabel}</strong><span>${c.kind}</span></div>
+          <div class="calendar-body">
+            <h3>${c.label}</h3>
+            <p>${c.detail || ''}</p>
+            ${c.sourceUrl ? `<a class="program-primary-source" href="${c.sourceUrl}" target="_blank" rel="noopener">Source</a>` : ''}
+          </div>
+          <span class="calendar-flag">${c.official ? 'date fixée' : 'indicatif'}</span>
+        </li>`;
+      });
+      html += '</ol>';
+    }
+
+    root.innerHTML = html;
+  }
+
+  function formatFullDate(iso) {
+    if (!iso) return 'date inconnue';
+    const parts = String(iso).split('-');
+    if (parts.length < 3) return iso;
+    const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+    const m = parseInt(parts[1], 10) - 1;
+    if (m < 0 || m > 11) return iso;
+    return parseInt(parts[2], 10) + ' ' + mois[m] + ' ' + parts[0];
   }
 
   /* ================================================================
@@ -712,6 +1161,7 @@
             <span class="party-family">${party.family}</span>
             <strong class="party-card-title">${party.name}</strong>
             <span class="party-person">${party.personName}<small>${party.personRole}</small></span>
+            ${candidacyBadge(party)}
             <span class="party-status">${party.status}</span>
             <span class="party-card-match">${comparison}</span>
             <span class="party-open-hint">Voir la fiche et le programme <span aria-hidden="true">→</span></span>
@@ -736,9 +1186,9 @@
       });
     });
     const intro = document.getElementById('partyDirectoryIntro');
-    if (intro) intro.textContent = hasResults
+    if (intro) intro.innerHTML = hasResults
       ? 'Voici les formations rapprochées de vos réponses. Le score reste une indication : ouvrez chaque fiche pour voir les points communs, les différences et les sources.'
-      : 'Explorez les 16 formations, leur personne de référence et leurs liens officiels. Les personnes en photo ne sont pas toutes candidates investies : leur statut est précisé dans chaque fiche.';
+      : 'Explorez les ' + PARTIES.length + ' formations, leur personne de référence et leurs liens officiels. Les personnes en photo ne sont pas toutes candidates investies : leur statut est précisé dans chaque fiche.';
     const startButton = document.getElementById('btnStartFromParties');
     if (startButton) {
       startButton.hidden = hasResults;
@@ -766,13 +1216,15 @@
     if (!party) return;
     const hasResults = !!(state.completed && lastDimResults);
     const match = hasResults ? Scoring.computePartyMatch(lastDimResults, party, matchOpts()) : null;
+    const cov = partyCoverage(party);
     lastFocusedEl = document.activeElement;
+    document.body.style.overflow = 'hidden';
 
     let intro;
     if (!hasResults) {
       intro = 'Terminez le questionnaire pour voir comment vos réponses se rapprochent des positions de cette formation.';
     } else if (match.matchPercent !== null) {
-      intro = 'Correspondance calculée sur ' + match.comparableCount + ' des ' + DIM_KEYS.length + ' thèmes' + (match.questionComparableCount ? ' et ' + match.questionComparableCount + ' questions de précision' : '') + ' (ceux où vous avez répondu et où ce parti a une position codée), en donnant plus de poids à vos priorités.';
+      intro = 'Indice éditorial de ' + match.matchPercent + '/100, calculé sur ' + match.comparableCount + ' des ' + DIM_KEYS.length + ' thèmes' + (match.questionComparableCount ? ' et ' + match.questionComparableCount + ' réponses précises comparables' : '') + '. Ce n’est ni une probabilité ni une prédiction de vote.';
     } else {
       intro = captionFor(match) + '.';
     }
@@ -782,12 +1234,12 @@
       : '';
     let html = `<div class="drawer-top">
       ${portrait}
-      <div><p class="party-family" style="margin:0">${party.family}</p><h2 style="margin-bottom:.2rem">${party.name}</h2><strong>${party.personName}</strong><p class="party-person-role">${party.personRole}</p></div>
-      <button class="drawer-close" id="drawerCloseBtn" aria-label="Fermer">✕ Fermer</button></div>
+      <div><p class="party-family" style="margin:0">${party.family}</p><h2 id="partyDrawerTitle" style="margin-bottom:.2rem">${party.name}</h2><strong>${party.personName}</strong><p class="party-person-role">${party.personRole}</p>${candidacyBadge(party)}</div>
+      <button class="drawer-close" id="drawerCloseBtn" aria-label="Fermer la fiche">✕ Fermer</button></div>
       ${hasResults ? matchRingHTML(match.matchPercent, 60) : ''}
       <p class="confidence-note" style="margin-top:.6rem">${intro}</p>
       <p style="margin-top:1rem">${party.status}${party.statusSource ? ` <a href="${party.statusSource}" target="_blank" rel="noopener">Source du statut</a>` : ''}</p>
-      <p class="confidence-note">Le statut de cette personne est actualisé en ${formatStatusDate(party.statusDate)}. Les positions politiques utilisées pour le calcul sont des estimations de la formation, codées à partir de sources publiques disponibles en septembre 2026 ; elles ne sont pas toutes des réponses de la personne citée. Voir la page Méthode.</p>
+      <p class="confidence-note">Statut vérifié en ${formatStatusDate(party.statusDate)}. Les positions sont des estimations éditoriales de la formation, à partir de sources publiques. Couverture des positions concrètes codées : ${cov.coded} sur ${cov.total} (${Math.round(cov.ratio * 100)} %). ${cov.partial ? `En dessous du seuil de ${Math.round(Scoring.PARTIAL_COVERAGE * 100)} % : cette formation ne reçoit pas de pourcentage de similitude.` : 'Seuil de couverture atteint : cette formation peut être comparée à votre profil.'}</p>
       <div class="source-row">
         <a class="btn btn-ghost btn-sm" href="${party.site}" target="_blank" rel="noopener">Site officiel</a>
         <a class="btn btn-ghost btn-sm" href="${party.program}" target="_blank" rel="noopener">Programme</a>
@@ -803,9 +1255,6 @@
       </div>`;
     });
     if (hasResults) html += '</div>';
-    if (hasResults && match.perDim.some(p => !p.available)) {
-      html += '<p class="dim-note" style="margin-top:1rem">Les thèmes marqués « non renseigné » ou « non comparable » ne comptent ni comme rapprochement ni comme opposition : soit vous n’y avez pas assez répondu, soit la position de ce parti n’y est pas codée.</p>';
-    }
 
     if (hasResults && match.perQuestion.length) {
       html += `<h3 style="margin-top:1.8rem">Vos réponses aux questions de précision</h3><div class="dim-compare">`;
@@ -813,9 +1262,11 @@
         const you = p.userPos !== null ? Scoring.stanceLabel(p.q, p.userPos).label : 'Vous n’avez pas tranché';
         const them = Scoring.stanceLabel(p.q, p.partyPos);
         const tag = p.available ? `<span class="dc-tag ${p.category.key}">${p.category.label}</span>` : `<span class="dc-tag non-renseigne">${p.reason === 'party-unknown' ? 'Position non codée' : 'Non tranché'}</span>`;
+        const note = (p.q.stanceNotes && p.q.stanceNotes[party.id]) ? `<p class="dc-note">${p.q.stanceNotes[party.id]}</p>` : '';
         html += `<div class="dc-item">
           <div class="dc-head"><span>${p.q.topic}</span>${tag}</div>
           <div class="dc-detail">Vous : ${you}<br>${party.short} : ${them.label}</div>
+          ${note}
         </div>`;
       });
       html += '</div>';
@@ -825,31 +1276,86 @@
     drawer.innerHTML = html;
     drawer.classList.add('show');
     drawer.setAttribute('aria-hidden', 'false');
+    drawer.setAttribute('role', 'dialog');
+    drawer.setAttribute('aria-modal', 'true');
     document.getElementById('drawerBackdrop').classList.add('show');
     document.getElementById('drawerCloseBtn').addEventListener('click', closePartyDrawer);
     document.getElementById('drawerCloseBtn').focus();
   }
+
   function closePartyDrawer() {
-    document.getElementById('partyDrawer').classList.remove('show');
-    document.getElementById('partyDrawer').setAttribute('aria-hidden', 'true');
+    const drawer = document.getElementById('partyDrawer');
+    drawer.classList.remove('show');
+    drawer.setAttribute('aria-hidden', 'true');
     document.getElementById('drawerBackdrop').classList.remove('show');
+    document.body.style.overflow = '';
     if (lastFocusedEl && lastFocusedEl.focus) lastFocusedEl.focus();
   }
   document.getElementById('drawerBackdrop').addEventListener('click', closePartyDrawer);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePartyDrawer(); });
+
+  /* Raccourcis clavier & Focus Trap */
+  document.addEventListener('keydown', e => {
+    const drawer = document.getElementById('partyDrawer');
+    if (drawer && drawer.classList.contains('show')) {
+      if (e.key === 'Escape') { closePartyDrawer(); return; }
+      if (e.key === 'Tab') {
+        const focusable = Array.from(drawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+          .filter(el => !el.hidden && el.getAttribute('aria-hidden') !== 'true');
+        if (!focusable.length) { e.preventDefault(); drawer.focus(); return; }
+        const first = focusable[0], last = focusable[focusable.length - 1];
+        if (e.shiftKey && (document.activeElement === first || !drawer.contains(document.activeElement))) {
+          e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !drawer.contains(document.activeElement))) {
+          e.preventDefault(); first.focus();
+        }
+      }
+      return;
+    }
+
+    const exportModal = document.getElementById('exportModalBackdrop');
+    if (exportModal && !exportModal.hidden) {
+      if (e.key === 'Escape') { closeExportModal(); return; }
+    }
+
+    // Touches du Quiz
+    const quizEl = document.getElementById('screen-quiz');
+    if (quizEl && quizEl.classList.contains('active')) {
+      if (['1', '2', '3', '4', '5'].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        const btns = document.querySelectorAll('#scaleButtons .scale-btn');
+        if (btns && btns[idx]) btns[idx].click();
+      } else if (e.key === '0') {
+        const dk = document.getElementById('dkBtn');
+        if (dk && !document.getElementById('viewScale').hidden) dk.click();
+      } else if (e.key === 'Enter') {
+        const next = document.getElementById('btnNext');
+        if (next && !next.disabled) next.click();
+      } else if (e.key === 'ArrowLeft') {
+        const back = document.getElementById('btnBack');
+        if (back && !back.disabled) back.click();
+      }
+    }
+  });
 
   /* ================================================================
      COMPARER
      ================================================================ */
   function renderCompare() {
     const root = document.getElementById('compareContent');
+    if (!state.completed || !lastDimResults) {
+      root.innerHTML = '<p class="lede">Pour comparer des formations politiques à vos idées, effectuez d’abord le questionnaire. Vous pouvez aussi consulter la liste des partis.</p><div class="btn-row"><button class="btn btn-brass" id="btnGoQuizFromCompare">Faire le quiz</button><button class="btn btn-ghost" id="btnGoPartiesFromCompare">Voir les partis</button></div>';
+      const b1 = document.getElementById('btnGoQuizFromCompare');
+      if (b1) b1.addEventListener('click', () => showScreen('quizStart'));
+      const b2 = document.getElementById('btnGoPartiesFromCompare');
+      if (b2) b2.addEventListener('click', () => showScreen('parties'));
+      return;
+    }
     if (compareSelection.length === 0) {
       root.innerHTML = '<p class="lede">Aucun parti sélectionné pour l’instant. Depuis l’écran « Les partis », cochez « Ajouter au comparateur » sur les formations qui vous intéressent.</p><div class="btn-row"><button class="btn btn-primary" id="btnGoPartiesFromCompare">Voir les partis</button></div>';
       const b = document.getElementById('btnGoPartiesFromCompare');
       if (b) b.addEventListener('click', () => showScreen('parties'));
       return;
     }
-    if (!lastDimResults) computeResults();
     const parties = compareSelection.map(id => PARTIES.find(p => p.id === id)).filter(Boolean);
     let html = '<div class="compare-table-wrap"><table class="compare"><thead><tr><th>Thème</th><th>Vous</th>' +
       parties.map(p => `<th>${p.short}</th>`).join('') + '</tr></thead><tbody>';
@@ -874,7 +1380,7 @@
   }
 
   /* ================================================================
-     PROGRAMMES — lecture des positions utilisées par les deux quiz
+     PROGRAMMES
      ================================================================ */
   function generalPosition(score) {
     if (typeof score !== 'number') return { label: 'Position non documentée', className: 'unknown' };
@@ -890,6 +1396,7 @@
       const position = isDepartage
         ? (Object.prototype.hasOwnProperty.call(question.stances || {}, party.id) ? question.stances[party.id] : undefined)
         : party.positions[question.dim];
+      const isKnown = typeof position === 'number';
       let label, description, className;
       if (isDepartage) {
         const stance = Scoring.stanceLabel(question, position);
@@ -911,10 +1418,16 @@
           ? `Orientation générale du parti sur « ${DIMENSIONS[question.dim].labelLeft} » ↔ « ${DIMENSIONS[question.dim].labelRight} », rapprochée de cette question.`
           : 'Aucune orientation générale n’est codée pour ce thème.';
       }
+      /* Note de position : la formulation qui justifie le codage, issue des
+         prises de position publiques de la formation. */
+      const note = isDepartage && question.stanceNotes && question.stanceNotes[party.id]
+        ? `<p class="program-answer-note">${question.stanceNotes[party.id]}</p>` : '';
       return `<article class="program-answer ${className}">
         <div class="program-answer-head"><strong>${party.name}</strong><span>${party.personName} · ${party.personRole}</span></div>
         <span class="program-answer-label">${label}</span>
         <p>${description}</p>
+        ${note}
+        ${isKnown ? `<a class="program-primary-source" href="${party.program}" target="_blank" rel="noopener">Consulter le programme ou le site officiel de ${party.short}</a>` : ''}
       </article>`;
     }).join('');
   }
@@ -931,6 +1444,18 @@
       document.querySelectorAll('[data-program-phase]').forEach(button => {
         button.addEventListener('click', () => { programPhase = button.dataset.programPhase; renderPrograms(); });
       });
+      document.querySelector('.program-tabs').addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        const tabs = Array.from(document.querySelectorAll('[data-program-phase]'));
+        const current = tabs.indexOf(event.target);
+        const next = event.key === 'Home' ? 0
+          : event.key === 'End' ? tabs.length - 1
+            : (current + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+        event.preventDefault();
+        programPhase = tabs[next].dataset.programPhase;
+        renderPrograms();
+        tabs[next].focus();
+      });
       filter.dataset.ready = '1';
     }
     filter.value = programPartyFilter;
@@ -938,7 +1463,9 @@
       const active = button.dataset.programPhase === programPhase;
       button.classList.toggle('active', active);
       button.setAttribute('aria-selected', active ? 'true' : 'false');
+      button.tabIndex = active ? 0 : -1;
     });
+    document.getElementById('programPanel').setAttribute('aria-labelledby', programPhase === 'main' ? 'programTabMain' : 'programTabDetail');
 
     const selectedParties = programPartyFilter === 'all'
       ? PARTIES
@@ -946,18 +1473,21 @@
     const isDepartage = programPhase === 'departage';
     const questions = isDepartage ? DEPARTAGE : QUESTIONS;
     phaseIntro.textContent = isDepartage
-      ? `La banque contient ${DEPARTAGE.length} questions ; le quiz en pose jusqu’à 15 (environ 4 min), choisies selon les formations encore proches. Les positions sont des estimations sur des choix concrets. « Non documentée » signifie qu’aucune position assez précise n’est codée.`
+      ? `La banque contient ${DEPARTAGE.length} questions concrètes ; le quiz en pose jusqu’à 15, choisies selon vos réponses. Les positions sont des estimations éditoriales sur des choix concrets, pas des réponses officielles.`
       : 'Chaque repère rapproche le profil thématique d’une formation de la proposition A ou B. Il ne signifie pas que la personne citée a répondu mot pour mot à la question.';
 
     list.innerHTML = questions.map((question, index) => {
       const title = isDepartage ? question.q : question.topic;
+      const relatedSources = (question.sourceIds || []).map(id => SOURCES.find(source => source.id === id)).filter(Boolean);
+      const evidence = `<div class="program-basis"><strong>Base éditoriale :</strong> ${question.basis || 'Aucune base documentaire détaillée n’est enregistrée.'}
+          ${relatedSources.length ? `<p>Repères de contexte pour cette question :</p><ul>${relatedSources.map(source => `<li><a href="${source.url}" target="_blank" rel="noopener">${source.label}</a> <span>(${source.type || 'source de recoupement'})</span></li>`).join('')}</ul>` : '<p>Aucun lien spécifique à cette question n’est référencé dans cette version.</p>'}</div>`;
       const body = isDepartage
         ? `<p class="program-question-plain">${question.plain || ''}</p>
           <div class="program-options">${question.options.map((option, i) => `<div><span>${i + 1}</span><p>${option.text}</p></div>`).join('')}</div>
-          <p class="program-basis"><strong>Repère documentaire :</strong> ${question.basis || 'Pas de source détaillée enregistrée pour cette question.'}</p>`
+          ${evidence}`
         : `<p class="program-question-plain">${question.plain || ''}</p>
           <div class="program-options"><div><span>A</span><p>${question.a}</p></div><div><span>B</span><p>${question.b}</p></div></div>
-          <p class="program-basis">La tendance affichée est une estimation du parti à l’échelle du thème « ${DIMENSIONS[question.dim].name} » ; ce n’est pas une réponse officielle à cette formulation.</p>`;
+          <div class="program-basis"><p>La tendance affichée est une estimation de la formation à l’échelle du thème « ${DIMENSIONS[question.dim].name} ».</p></div>`;
       return `<details class="program-question">
         <summary><span class="program-question-count">${String(index + 1).padStart(2, '0')}</span><span class="program-question-title">${title}</span><span class="program-question-topic">${isDepartage ? question.topic : DIMENSIONS[question.dim].short}</span></summary>
         <div class="program-question-content">${body}<div class="program-answer-list">${programPartyRows(question, isDepartage, selectedParties)}</div></div>
@@ -966,7 +1496,7 @@
 
     const programSources = document.getElementById('programSources');
     if (programSources && !programSources.dataset.filled) {
-      programSources.innerHTML = `<li class="source-subheading">Sources de recoupement</li>${SOURCES.map(source => `<li><a href="${source.url}" target="_blank" rel="noopener">${source.label}</a></li>`).join('')}<li class="source-subheading">Sites et programmes des formations</li>${PARTIES.map(party => `<li><a href="${party.program}" target="_blank" rel="noopener">${party.name} — site ou programme officiel</a></li>`).join('')}`;
+      programSources.innerHTML = `<li class="source-subheading">Repères éditoriaux et sources de contexte</li>${SOURCES.map(source => `<li><a href="${source.url}" target="_blank" rel="noopener">${source.label}</a> <span>(${source.type || 'source de recoupement'})</span></li>`).join('')}<li class="source-subheading">Sites et programmes des formations</li>${PARTIES.map(party => `<li><a href="${party.program}" target="_blank" rel="noopener">${party.name} — site ou programme officiel</a></li>`).join('')}`;
       programSources.dataset.filled = '1';
     }
   }
@@ -985,9 +1515,342 @@
     }
     const src = document.getElementById('methodSources');
     if (src && !src.dataset.filled) {
-      src.innerHTML = SOURCES.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.label}</a></li>`).join('');
+      src.innerHTML = SOURCES.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${s.label}</a> <span class="source-type">(${s.type || 'source de recoupement'})</span></li>`).join('');
       src.dataset.filled = '1';
     }
+  }
+
+
+  /* ================================================================
+     RADAR INTELLIGENT DES BIAIS & QUALITÉ
+     Tout ce qui est affiché sur cet écran est CALCULÉ à l'ouverture par
+     radar.js (window.Radar.audit()), qui rejoue réellement les contrôles
+     sur les données et sur le moteur de calcul. Aucun score n'est écrit
+     à la main : si une donnée change, l'écran change avec elle.
+     ================================================================ */
+  let radarAudit = null;
+
+  function getRadarAudit() {
+    if (radarAudit) return radarAudit;
+    if (typeof Radar === 'undefined' || !Radar.audit) return null;
+    radarAudit = Radar.audit({ seeds: 120, profiles: 40, simRuns: 400 });
+    /* L'audit exécuté est exposé publiquement : le lecteur peut le vérifier
+       lui-même dans la console (Radar.audit() refait exactement le même
+       calcul). Rien n'est caché derrière le score affiché. */
+    try { window.votezAudit = radarAudit; } catch (e) {}
+    return radarAudit;
+  }
+
+  const RADAR_LEVELS = {
+    ok:    { label: 'Audit conforme',            note: 'Tous les contrôles contrôlés passent.' },
+    warn:  { label: 'Audit : points à corriger', note: 'Des écarts réels ont été détectés et sont listés ci-dessous.' },
+    error: { label: 'Audit : anomalies',          note: 'Des anomalies bloquantes ont été détectées et sont listées ci-dessous.' }
+  };
+
+  function renderRadarScore(audit) {
+    const num = document.getElementById('radarScoreNumber');
+    if (num) num.innerHTML = audit.score + '<small>/100</small>';
+    const badge = document.getElementById('radarScoreBadge');
+    if (badge) {
+      const lvl = RADAR_LEVELS[audit.level] || RADAR_LEVELS.ok;
+      badge.textContent = lvl.label;
+      badge.dataset.level = audit.level;
+    }
+    const headline = document.getElementById('radarScoreHeadline');
+    if (headline) {
+      headline.innerHTML = '<strong>Score pondéré de ' + audit.score + '/100</strong>, obtenu en exécutant ' +
+        audit.axes.length + ' axes de contrôle sur ' + audit.counts.questions + ' questions d’orientation, ' +
+        audit.counts.departage + ' questions de départage, ' + audit.counts.parties + ' formations et ' +
+        audit.counts.sources + ' sources. Poids des axes : ' +
+        audit.axes.map(a => a.short + ' ' + Math.round(audit.axisWeights[a.key] * 100) + ' %').join(' · ') + '.';
+    }
+    const stamp = document.getElementById('radarGeneratedAt');
+    if (stamp) {
+      const d = new Date(audit.generatedAt);
+      stamp.textContent = 'Contrôles exécutés le ' + d.toLocaleString('fr-FR') + ' dans votre navigateur.';
+    }
+    /* La liste de contrôle reprend les axes réellement joués : rien n'y est
+       écrit à la main, chaque ligne est le résultat d'un calcul. */
+    const checkList = document.getElementById('radarCheckList');
+    if (checkList) {
+      checkList.innerHTML = audit.axes.map(ax => {
+        const level = ax.level || 'ok';
+        const mark = level === 'error' ? '✕' : (level === 'warn' ? '!' : '✓');
+        return '<li><span class="check-icon" data-level="' + level + '" aria-hidden="true">' + mark + '</span>' +
+          '<span>' + ax.label + ' — ' + ax.score + '/100</span></li>';
+      }).join('');
+    }
+  }
+
+  function renderRadarChart(audit) {
+    const svgWrapper = document.getElementById('radarSvgWrapper');
+    if (!svgWrapper) return;
+    const axes = audit.axes;
+    const cx = 175, cy = 175, r = 100;
+    const N = axes.length;
+
+    let gridSvg = '';
+    [0.2, 0.4, 0.6, 0.8, 1.0].forEach(level => {
+      const pts = [];
+      for (let i = 0; i < N; i++) {
+        const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
+        pts.push((cx + r * level * Math.cos(angle)).toFixed(1) + ',' + (cy + r * level * Math.sin(angle)).toFixed(1));
+      }
+      gridSvg += '<polygon class="grid-line' + (level < 1 ? ' dashed' : '') + '" points="' + pts.join(' ') + '" fill="none"/>';
+    });
+
+    let spokesSvg = '', labelsSvg = '', dataPts = [];
+    axes.forEach((ax, i) => {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
+      const x2 = cx + r * Math.cos(angle);
+      const y2 = cy + r * Math.sin(angle);
+      spokesSvg += '<line class="spoke" x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '"/>';
+
+      const lx = cx + (r + 30) * Math.cos(angle);
+      const ly = cy + (r + 18) * Math.sin(angle);
+      const textAnchor = Math.abs(Math.cos(angle)) < 0.2 ? 'middle' : (Math.cos(angle) > 0 ? 'start' : 'end');
+      labelsSvg += '<text class="axis-label" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + textAnchor + '">' + ax.short + '</text>';
+      labelsSvg += '<text class="axis-value" x="' + lx.toFixed(1) + '" y="' + (ly + 12).toFixed(1) + '" text-anchor="' + textAnchor + '">' + ax.score + '%</text>';
+
+      const scoreR = r * (Math.max(0, Math.min(100, ax.score)) / 100);
+      dataPts.push((cx + scoreR * Math.cos(angle)).toFixed(1) + ',' + (cy + scoreR * Math.sin(angle)).toFixed(1));
+    });
+
+    const polySvg = '<polygon class="shape" points="' + dataPts.join(' ') + '"/>';
+    const dotsSvg = axes.map((ax, i) => {
+      const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
+      const scoreR = r * (Math.max(0, Math.min(100, ax.score)) / 100);
+      const px = cx + scoreR * Math.cos(angle);
+      const py = cy + scoreR * Math.sin(angle);
+      return '<circle class="dot" cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4"/>';
+    }).join('');
+
+    svgWrapper.innerHTML = '<svg viewBox="0 0 350 350" class="radar-svg" role="img" aria-label="Boussole d’intégrité civique, ' + N + ' axes calculés">' +
+      '<defs>' +
+        '<linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0%" style="stop-color:var(--blue);stop-opacity:.45"/>' +
+          '<stop offset="100%" style="stop-color:var(--right);stop-opacity:.18"/>' +
+        '</linearGradient>' +
+      '</defs>' +
+      gridSvg + spokesSvg + polySvg + dotsSvg + labelsSvg +
+    '</svg>';
+  }
+
+  function renderRadarAxes(audit) {
+    const axisListEl = document.getElementById('radarAxisList');
+    if (!axisListEl) return;
+    axisListEl.innerHTML = audit.axes.map(ax =>
+      '<div class="radar-axis-card">' +
+        '<div class="axis-card-top">' +
+          '<strong>' + ax.label + '</strong>' +
+          '<span class="axis-score">' + ax.score + ' / 100</span>' +
+        '</div>' +
+        '<p>' + ax.summary + '</p>' +
+        '<div class="axis-bar-track">' +
+          '<div class="axis-bar-fill" style="width:' + ax.score + '%"></div>' +
+        '</div>' +
+        '<ul class="axis-metrics">' +
+          ax.metrics.map(m => '<li><span>' + m.label + '</span><strong>' + m.value + '</strong></li>').join('') +
+        '</ul>' +
+      '</div>'
+    ).join('');
+  }
+
+  function renderRadarFindings(audit) {
+    const wrap = document.getElementById('radarFindings');
+    if (!wrap) return;
+    const order = { error: 0, warn: 1, ok: 2 };
+    const sorted = audit.findings.slice().sort((a, b) => order[a.level] - order[b.level]);
+    const counts = { error: 0, warn: 0, ok: 0 };
+    sorted.forEach(f => { counts[f.level] = (counts[f.level] || 0) + 1; });
+
+    const summary = document.getElementById('radarFindingsSummary');
+    if (summary) {
+      summary.textContent = counts.error + ' anomalie' + (counts.error > 1 ? 's' : '') + ', ' +
+        counts.warn + ' point' + (counts.warn > 1 ? 's' : '') + ' d\'amélioration, ' +
+        counts.ok + ' contrôle' + (counts.ok > 1 ? 's' : '') + ' conforme' + (counts.ok > 1 ? 's' : '') + '.';
+    }
+
+    wrap.innerHTML = sorted.map(f => {
+      const mark = f.level === 'error' ? '✕' : (f.level === 'warn' ? '!' : '✓');
+      return '<article class="radar-finding ' + f.level + '">' +
+        '<span class="finding-mark" aria-hidden="true">' + mark + '</span>' +
+        '<div><h3>' + f.title + '</h3><p>' + f.message + '</p>' +
+        '<span class="finding-axis">' + (audit.axes.find(a => a.key === f.axis) ? audit.axes.find(a => a.key === f.axis).label : f.axis) + '</span></div>' +
+      '</article>';
+    }).join('');
+  }
+
+  function renderRadarParties(audit) {
+    const tbody = document.getElementById('radarPartiesTbody');
+    if (!tbody) return;
+    const cov = audit.axes.find(a => a.key === 'coverage');
+    const rows = cov ? cov.detail.parties : PARTIES.map(p => Object.assign({ short: p.short, name: p.name }, partyCoverage(p)));
+    tbody.innerHTML = rows.map(r => {
+      const pct = r.total ? Math.round((r.coded / r.total) * 100) : 0;
+      const statusBadge = r.partial
+        ? '<span class="status-chip partial">Sous le seuil (' + pct + ' %) — non classée</span>'
+        : '<span class="status-chip ready">Comparable (' + pct + ' % documenté)</span>';
+      const party = PARTIES.find(p => p.id === r.id);
+      return '<tr>' +
+        '<td><span class="party-dot" style="background:' + r.color + '"></span> <strong>' + r.name + '</strong> (' + r.short + ')</td>' +
+        '<td>' + r.personName + ' <small class="text-muted">· ' + r.personRole + '</small></td>' +
+        '<td>' + r.family + '</td>' +
+        '<td><strong>' + r.coded + '</strong> / ' + r.total + ' questions</td>' +
+        '<td>' + statusBadge + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderRadarSim(sim) {
+    const statusText = document.getElementById('simStatusText');
+    if (statusText) {
+      statusText.innerHTML = '<strong>' + sim.runs.toLocaleString('fr-FR') + ' profils aléatoires simulés en ' +
+        sim.elapsedMs + ' ms.</strong> ' + sim.scored + ' profils ont pu être classés, ' +
+        sim.ties + ' quasi-égalités honnêtes (' + Math.round(sim.tieRate * 100) + ' %), ' +
+        sim.noWinner + ' sans classement possible. ' +
+        sim.everWon + ' formations sur ' + sim.eligible + ' classables ont été winner au moins une fois : ' +
+        'aucune formation n’est favorisée par construction.';
+    }
+    const bars = document.getElementById('radarSimBars');
+    if (!bars) return;
+    const max = sim.distribution.length ? Math.max.apply(null, sim.distribution.map(d => d.wins)) : 0;
+    bars.innerHTML = sim.distribution.map(d => {
+      const pct = sim.scored ? (d.wins / sim.scored) * 100 : 0;
+      const width = max ? (d.wins / max) * 100 : 0;
+      return '<div class="sim-bar-row">' +
+        '<div class="sim-bar-label">' +
+          '<span class="party-dot" style="background:' + d.color + '"></span>' +
+          '<strong>' + d.short + '</strong> <small class="text-muted">(' + d.name + ')</small>' +
+        '</div>' +
+        '<div class="sim-bar-track">' +
+          '<div class="sim-bar-fill" style="width:' + Math.max(width, d.wins > 0 ? 2 : 0) + '%; background:' + d.color + '"></div>' +
+        '</div>' +
+        '<div class="sim-bar-val"><strong>' + pct.toFixed(1) + '%</strong> <span class="text-muted">(' + d.wins + ')</span></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderRadar() {
+    const audit = getRadarAudit();
+    if (!audit) {
+      const num = document.getElementById('radarScoreNumber');
+      if (num) num.innerHTML = '—<small>/100</small>';
+      const badge = document.getElementById('radarScoreBadge');
+      if (badge) { badge.textContent = 'Audit indisponible'; badge.dataset.level = 'error'; }
+      return;
+    }
+    renderRadarScore(audit);
+    renderRadarChart(audit);
+    renderRadarAxes(audit);
+    renderRadarFindings(audit);
+    renderRadarParties(audit);
+    renderRadarSim(audit.simulation);
+    renderRadarReflexive(audit);
+
+    const btnSim = document.getElementById('btnRunRadarSimulations');
+    if (btnSim && !btnSim.dataset.bound) {
+      btnSim.dataset.bound = '1';
+      btnSim.addEventListener('click', runRadarSimulation);
+    }
+  }
+
+  /* Les quatre contrôles de qualité permanent : leur contenu est produit
+     par l'audit, jamais écrit à la main. */
+  function renderRadarReflexive(audit) {
+    const checks = audit.findings.length;
+    const errors = audit.findings.filter(f => f.level === 'error').length;
+    const warns = audit.findings.filter(f => f.level === 'warn').length;
+
+    const nChecks = document.getElementById('rfChecksCount');
+    if (nChecks) nChecks.textContent = '· ' + checks + (checks > 1 ? ' contrôles' : ' contrôle');
+
+    const ethics = document.getElementById('rfEthicsText');
+    if (ethics) {
+      const external = externalResources();
+      ethics.innerHTML = 'Zéro compte, zéro cookie de suivi, zéro balise publicitaire : vos ' +
+        QUESTIONS.length + ' réponses et vos ' + Scoring.MAX_PRIORITIES + ' priorités restent dans le stockage ' +
+        'local de cet appareil. Contrôle effectué à l\'instant : ' + external.length +
+        ' ressource(s) externe(s) chargée(s) par cette page' +
+        (external.length ? ' (' + external.join(', ') + ')' : '') +
+        ' — aucune ne reçoit de donnée du questionnaire.';
+    }
+
+    const reliability = document.getElementById('rfReliabilityText');
+    if (reliability) {
+      reliability.innerHTML = checks + ' contrôles automatisés sont exécutés à l\'ouverture de cet écran, sur les données et sur le moteur de calcul lui-même. Résultat de cette exécution : ' +
+        errors + ' anomalie' + (errors > 1 ? 's' : '') + ', ' + warns + ' point' + (warns > 1 ? 's' : '') + ' d\'amélioration. ' +
+        'Le départage s\'arrête dès qu\'un leader net ressort (écart de ' + Scoring.CLEAR_LEAD_POINTS + ' points) et refuse de fabriquer un gagnant lorsque l\'écart est inférieur à la marge de ' + Scoring.NEAR_TIE_POINTS + ' points.';
+    }
+
+    const neutrality = document.getElementById('rfNeutralityText');
+    if (neutrality) {
+      const dup = audit.axes.find(a => a.key === 'pluralism');
+      const trace = audit.axes.find(a => a.key === 'traceability');
+      neutrality.innerHTML = 'Le contrôle de doublons est exécuté sur les ' + audit.counts.parties +
+        ' formations à chaque ouverture : ' + (dup ? dup.summary : '') + ' Chaque personne et chaque couleur n\'apparaissent qu\'une fois. ' +
+        'Sur les ' + audit.counts.departage + ' questions de départage, ' + (trace ? trace.summary : '') + '.';
+    }
+
+    const coverage = document.getElementById('rfCoverageText');
+    if (coverage) {
+      const cov = audit.axes.find(a => a.key === 'coverage');
+      coverage.innerHTML = cov ? cov.summary + '. ' + cov.metrics.map(m => m.label + ' : ' + m.value).join(' · ') + '.' : '';
+    }
+
+    const ergonomy = document.getElementById('rfErgonomyText');
+    if (ergonomy) {
+      const layout = (typeof Radar !== 'undefined' && Radar.auditLayout) ? Radar.auditLayout() : null;
+      if (!layout) {
+        ergonomy.textContent = 'La mesure de mise en page n\'est disponible que dans un navigateur.';
+      } else if (!layout.overflow && layout.offenderCount === 0) {
+        ergonomy.textContent = 'Mesure de mise en page exécutée à l\'instant sur cet écran : aucun débordement horizontal ' +
+          '(fenêtre de ' + layout.viewport + ' px, largeur du document ' + layout.documentWidth + ' px) et aucun élément hors cadre.';
+      } else {
+        ergonomy.textContent = 'Mesure de mise en page exécutée à l\'instant sur cet écran : ' + layout.offenderCount +
+          ' élément(s) dépassent la fenêtre de ' + layout.viewport + ' px' +
+          (layout.offenders.length
+            ? ' (' + layout.offenders.map(o => o.tag + (o.cls ? '.' + o.cls.split(' ')[0] : '')).join(', ') + ')'
+            : '') + '.';
+      }
+    }
+  }
+
+  /* Ressources externes réellement chargées par la page : la liste est
+     calculée à partir du DOM, pas recopiée dans un texte. */
+  function externalResources() {
+    if (typeof document === 'undefined') return [];
+    const hosts = [];
+    const nodes = document.querySelectorAll('script[src], link[href], iframe[src], img[src], source[src]');
+    Array.prototype.forEach.call(nodes, el => {
+      const raw = el.getAttribute('src') || el.getAttribute('href') || '';
+      if (!/^https?:\/\//i.test(raw)) return;
+      try {
+        const host = new URL(raw, window.location.href).hostname;
+        if (host && hosts.indexOf(host) === -1) hosts.push(host);
+      } catch (e) { /* URL illisible : ignorée */ }
+    });
+    return hosts;
+  }
+
+  function runRadarSimulation() {
+    const btnSim = document.getElementById('btnRunRadarSimulations');
+    const barsContainer = document.getElementById('radarSimBars');
+    if (!barsContainer || typeof Radar === 'undefined') return;
+
+    if (btnSim) {
+      btnSim.disabled = true;
+      btnSim.innerHTML = '<span aria-hidden="true">⏳</span> Simulation en cours...';
+    }
+
+    setTimeout(() => {
+      const sim = Radar.simulate({ runs: 2000, seed: (Date.now() % 100000) + 1 });
+      if (btnSim) {
+        btnSim.disabled = false;
+        btnSim.innerHTML = '<span aria-hidden="true">🔄</span> Re-lancer 2 000 simulations';
+      }
+      renderRadarSim(sim);
+    }, 20);
   }
 
   /* ================================================================
@@ -1003,9 +1866,49 @@
   }
 
   /* ================================================================
-     INIT
+     INITIALISATION
      ================================================================ */
+  /* Les chiffres affichés dans le texte statique sont remplacés par les
+     valeurs réelles issues des données : un changement de la base se
+     répercute partout, sans laisser de nombre périmé dans le site. */
+  function applyDynamicCounts() {
+    const counts = {
+      questions: QUESTIONS.length,
+      departage: DEPARTAGE.length,
+      parties: PARTIES.length,
+      themes: typeof THEMES !== 'undefined' ? THEMES.length : 0,
+      sources: typeof SOURCES !== 'undefined' ? SOURCES.length : 0,
+      candidates: typeof CANDIDATURES !== 'undefined' ? CANDIDATURES.length : 0,
+      calendar: typeof CALENDAR !== 'undefined' ? CALENDAR.length : 0,
+      dimensions: DIM_KEYS.length,
+      threshold: Math.round(Scoring.PARTIAL_COVERAGE * 100)
+    };
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const v = counts[el.dataset.count];
+      if (v !== undefined) el.textContent = String(v);
+    });
+  }
+
+  /* Navigation mobile : le menu se replie dans un panneau déroulant
+     sous la barre du haut, et se referme après un choix. */
+  function initMobileNav() {
+    const toggle = document.getElementById('navToggle');
+    const nav = document.getElementById('mainNav');
+    if (!toggle || !nav) return;
+    const setOpen = open => {
+      nav.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Fermer le menu' : 'Ouvrir le menu');
+    };
+    toggle.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+    nav.querySelectorAll('[data-nav]').forEach(btn => btn.addEventListener('click', () => setOpen(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && nav.classList.contains('open')) { setOpen(false); toggle.focus(); } });
+    window.addEventListener('resize', () => { if (window.innerWidth > 900) setOpen(false); });
+  }
+
   function init() {
+    applyDynamicCounts();
+    initMobileNav();
     refreshResumeBanner();
     const stored = loadState();
     if (stored && stored.completed) {
@@ -1013,27 +1916,17 @@
       setNavEnabled(true);
       computeResults();
     }
-    const initialHash = window.location.hash.replace(/^#/, '');
-    const validScreens = ['home', 'quizStart', 'quiz', 'themes', 'sondages', 'results', 'programs', 'parties', 'compare', 'method', 'checkpoint'];
-    if (initialHash && validScreens.includes(initialHash)) {
-      showScreen(initialHash, false);
+    const hash = window.location.hash.replace('#', '');
+    if (hash && VALID_SCREENS.includes(hash)) {
+      showScreen(hash, false);
     } else {
       showScreen('home', false);
     }
-
-    window.addEventListener('popstate', () => {
-      const hash = window.location.hash.replace(/^#/, '') || 'home';
-      if (validScreens.includes(hash)) {
-        showScreen(hash, false);
-      }
-    });
-
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js').catch(() => { /* PWA hors-ligne indisponible, l’app reste utilisable */ });
+      navigator.serviceWorker.register('./service-worker.js').catch(() => {});
     }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-

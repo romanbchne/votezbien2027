@@ -1,6 +1,6 @@
 /* ============================================================================
    VOTEZ BIEN ! — service-worker.js
-   Différences volontaires avec la V5.1 auditée :
+   ---------------------------------------------------------------------------
    1) Le numéro de version vit UNIQUEMENT dans CACHE_VERSION ci-dessous, plus
       dans les noms de fichiers (qui devaient être renommés à chaque mise à
       jour dans V5.1 — fragile, source d'oublis). Pour publier une mise à
@@ -10,15 +10,21 @@
       navigateur sans jamais nettoyer les précédentes.
    3) Stratégie "network-first" : les visites connectées reçoivent la
       dernière version publiée ; le cache prend le relais en cas de coupure.
+   4) La précharge esttolérante : un fichier absent (ou en erreur réseau)
+      n'empêche plus l'installation du service worker. L'ancienne version
+      échouait en bloc dès qu'une seule ressource manquait.
+   5) Seules les requêtes de même origine sont interceptées : les polices
+      Google sont laissées au réseau, comme les appels vers un autre site.
    ========================================================================= */
-const CACHE_VERSION = 'v7.5.0';
+const CACHE_VERSION = 'v7.6.0';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
+  './',
   './index.html',
   './styles.css',
   './data.js',
-  './themes-and-polls.js',
   './scoring.js',
+  './radar.js',
   './app.js',
   './manifest.json',
   './embleme-citoyen-180.png',
@@ -29,7 +35,11 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS))
+      /* Chaque ressource est préchargée indépendamment : une ressource
+         manquante n'annule pas les autres. */
+      .then((cache) => Promise.all(
+        ASSETS.map((asset) => cache.add(asset).catch(() => null))
+      ))
       .then(() => self.skipWaiting())
   );
 });
@@ -46,15 +56,27 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  let sameOrigin = false;
+  try {
+    sameOrigin = new URL(event.request.url).origin === self.location.origin;
+  } catch (e) {
+    sameOrigin = false;
+  }
+  if (!sameOrigin) return; // ressources tierces : réseau direct, sans cache
+
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) =>
       fetch(event.request)
-          .then((response) => {
-            if (response && response.ok) cache.put(event.request, response.clone());
-            return response;
-          })
-          .catch(() => cache.match(event.request, { ignoreSearch: true })) // hors-ligne : le cache prend le relais
+        .then((response) => {
+          if (response && response.ok) cache.put(event.request, response.clone());
+          return response;
+        })
+        .catch(() => cache.match(event.request, { ignoreSearch: true })
+          .then((cached) => cached || new Response('Hors ligne', {
+            status: 503,
+            statusText: 'Offline',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+          })))
     )
   );
 });
-

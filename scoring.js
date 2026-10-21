@@ -6,7 +6,7 @@
    testé est EXACTEMENT le code qui s’exécute dans l’application.
 
    Deux niveaux de preuve, jamais mélangés :
-     1. les 21 questions générales → un score par thème (6), de -2 à +2 ;
+     1. les questions générales d'orientation → un score par thème (6), de -2 à +2 ;
      2. jusqu’à 15 questions de départage concrètes → une position précise sur
         des propositions, comparée à celle de chaque parti.
    ========================================================================= */
@@ -41,12 +41,13 @@
   const QUESTION_WEIGHT = 1.0;        // poids d'une question de départage, avant boost de priorité
   const MAX_DEPARTAGE = 15;           // plafond annoncé à la personne
   const MIN_DEPARTAGE = 4;            // minimum avant arrêt anticipé
-  const CLEAR_LEAD_POINTS = 15;       // un leader net arrête le test dès MIN_DEPARTAGE questions
+  const CLEAR_LEAD_POINTS = 10;       // un leader net arrête le test dès MIN_DEPARTAGE questions (optimisé de 15 à 10 pour un arrêt anticipé réel)
   const SOFTMAX_BETA = 14;            // concentration de la probabilité « c'est ce parti » sur les premiers
   const SAME_DIM_DECAY = 0.8;         // chaque question déjà posée sur un thème vaut 20 % de moins
   const MAX_PER_GROUP = 2;            // jamais plus de 2 questions du même sujet (ex. défense)
-  const MIN_QUESTIONS_FOR_QUESTION_MODE = 3; // à partir de 3 réponses, on compare sur les propositions
-  const PARTIAL_COVERAGE = 0.5;       // en dessous, un parti est « comparé partiellement »
+  const MIN_QUESTIONS_FOR_QUESTION_MODE = 3; // seuil pour juger la couverture des questions déjà répondues
+  const PARTIAL_COVERAGE = 0.5;       // couverture minimale, sur la banque complète comme sur les réponses
+  const MIN_COMPARABLE_QUESTIONS = 3; // en dessous, les réponses précises ne suffisent pas à classer
   const NEAR_TIE_POINTS = 6;          // sous cet écart, pas de « gagnant » déclaré
 
   /* ----------------------------------------------------------------------
@@ -223,34 +224,28 @@
     const themeScore = dimW > 0 ? dimSum / dimW : 0;
     const sortScore = (dimW + qW) > 0 ? (dimSum + qSum) / (dimW + qW) : 0;
 
-    // Équité de la comparaison : dès que la personne a répondu à quelques
-    // questions de départage, tous les partis doivent être jugés sur la même
-    // base. Un parti dont on ne code presque aucune position sur ces
-    // questions n'est plus classé (il garderait sinon son score de thèmes,
-    // bien plus indulgent que celui des partis réellement confrontés aux
-    // propositions) : il est « comparé partiellement ».
-    const totalBankQuestions = bank.length;
-    const partyBankStancesCount = bank.filter(q => q.stances && typeof q.stances[party.id] === 'number').length;
-    const totalDpAttempted = Object.keys(dpAnswers).filter(id => bankById[id]).length;
+    // Couverture réelle du fichier éditorial : un parti avec très peu de
+    // positions concrètes documentées ne reçoit pas un score complet grâce
+    // à ses seuls repères thématiques. Le seuil s'applique même avant les
+    // réponses précises : sinon une formation presque jamais documentée
+    // pouvait paraître artificiellement proche.
+    const databaseKnownCount = bank.filter(q => q.stances && typeof q.stances[party.id] === 'number').length;
+    const databaseTotalCount = bank.length;
+    const databaseCoverage = databaseTotalCount ? databaseKnownCount / databaseTotalCount : 0;
+
+    // Parmi les questions réellement répondues, les partis doivent aussi
+    // avoir assez de positions codées pour être comparés sur une base saine.
     const answeredQs = Object.keys(dpAnswers).filter(id => bankById[id] && typeof dpAnswers[id] === 'number');
     const covered = answeredQs.filter(id => bankById[id].stances && typeof bankById[id].stances[party.id] === 'number').length;
     const questionMode = answeredQs.length >= MIN_QUESTIONS_FOR_QUESTION_MODE;
-    const precisionPhaseEngaged = totalDpAttempted >= MIN_QUESTIONS_FOR_QUESTION_MODE;
-    const questionCoverage = answeredQs.length ? covered / answeredQs.length : (totalBankQuestions ? partyBankStancesCount / totalBankQuestions : 1);
-    const partial = (questionMode && questionCoverage < PARTIAL_COVERAGE) || (precisionPhaseEngaged && partyBankStancesCount < 3);
+    const questionCoverage = answeredQs.length ? covered / answeredQs.length : 1;
+    const insufficientDatabase = databaseCoverage < PARTIAL_COVERAGE;
+    const insufficientAnsweredData = questionMode && (
+      questionCoverage < PARTIAL_COVERAGE || covered < MIN_COMPARABLE_QUESTIONS
+    );
+    const partial = insufficientDatabase || insufficientAnsweredData;
 
-    const dataCoverage = {
-      themeKnown: partyKnownCount,
-      totalThemes: DIM_KEYS.length,
-      precisionKnown: partyBankStancesCount,
-      totalPrecisionBank: totalBankQuestions,
-      comparedThemes: comparable.length,
-      comparedQuestions: qComparable.length,
-      level: (partyKnownCount >= 5 && partyBankStancesCount >= 10) ? 'complete' : (partyKnownCount >= 4 && partyBankStancesCount >= 3) ? 'moyenne' : 'faible',
-      label: (partyKnownCount >= 5 && partyBankStancesCount >= 10) ? 'Données complètes' : (partyKnownCount >= 4 && partyBankStancesCount >= 3) ? 'Données moyennes' : 'Données partielles'
-    };
-
-    const dimsOk = comparable.length >= 3;
+    const dimsOk = comparable.length >= 4;
     const matchPercent = (dimsOk && !partial) ? Math.round(sortScore * 100) : null;
     const themePercent = dimsOk ? Math.round(themeScore * 100) : null;
 
@@ -260,7 +255,7 @@
       questionComparableCount: qComparable.length,
       questionCloseCount: qComparable.filter(p => p.category.key === 'proche' || p.category.key === 'assez-proche').length,
       questionCoverage, questionAnsweredCount: answeredQs.length, partial,
-      dataCoverage,
+      databaseKnownCount, databaseTotalCount, databaseCoverage,
       sortScore, themeScore, matchPercent, themePercent
     };
   }
@@ -429,69 +424,15 @@
     return order;
   }
 
-  /* ----------------------------------------------------------------------
-     computeCandidacyMatches(partyMatches) — regroupe les partis par
-     candidat unique (ex. Glucksmann = PS + Place publique après primaire).
-     ------------------------------------------------------------------- */
-  function computeCandidacyMatches(partyMatches) {
-    const list = [];
-    const seen = new Set();
-    partyMatches.forEach(m => {
-      const cid = m.party.jointCandidacyId || m.party.id;
-      if (seen.has(cid)) return;
-      seen.add(cid);
-      if (m.party.jointCandidacyId) {
-        const partners = partyMatches.filter(x => x.party.jointCandidacyId === cid);
-        partners.sort((a, b) => ((b.matchPercent !== null ? b.matchPercent : -1) - (a.matchPercent !== null ? a.matchPercent : -1)) || (b.sortScore - a.sortScore));
-        const lead = partners[0];
-        list.push({
-          isJointCandidacy: true,
-          candidacyId: cid,
-          candidateName: lead.party.personName,
-          candidateRole: lead.party.personRole,
-          portraitFile: lead.party.portraitFile,
-          color: lead.party.color,
-          leadMatch: lead,
-          partyMatches: partners,
-          jointLabel: lead.party.jointCandidacyLabel || partners.map(p => p.party.name).join(' · '),
-          matchPercent: lead.matchPercent,
-          themePercent: lead.themePercent,
-          sortScore: lead.sortScore,
-          partial: lead.partial,
-          dataCoverage: lead.dataCoverage
-        });
-      } else {
-        list.push({
-          isJointCandidacy: false,
-          candidacyId: cid,
-          candidateName: m.party.personName,
-          candidateRole: m.party.personRole,
-          portraitFile: m.party.portraitFile,
-          color: m.party.color,
-          leadMatch: m,
-          partyMatches: [m],
-          jointLabel: m.party.name,
-          matchPercent: m.matchPercent,
-          themePercent: m.themePercent,
-          sortScore: m.sortScore,
-          partial: m.partial,
-          dataCoverage: m.dataCoverage
-        });
-      }
-    });
-    return list;
-  }
-
   const api = {
     LABEL_BANDS, MIN_ANSWERED_RATIO_FOR_LABEL, MIN_CONFIDENCE_FOR_LABEL,
     PRIORITY_BOOSTS, MAX_PRIORITIES, MAX_DEPARTAGE, MIN_DEPARTAGE, CLEAR_LEAD_POINTS,
-    MAX_PER_GROUP, PARTIAL_COVERAGE, NEAR_TIE_POINTS,
+    MAX_PER_GROUP, PARTIAL_COVERAGE, MIN_COMPARABLE_QUESTIONS, NEAR_TIE_POINTS,
     computeDimensionResults, computeOverall, priorityMultipliers,
     optionRange, stanceProximity, stanceLabel, proximityCategory, questionCategory,
-    computePartyMatch, computePartyMatches, computeCandidacyMatches, findNearTie, selectNextDepartage,
+    computePartyMatch, computePartyMatches, findNearTie, selectNextDepartage,
     seededRandom, makeBalancedFlips, makeOptionOrder
   };
 
   if (isNode) module.exports = api; else root.Scoring = api;
 })(typeof window !== 'undefined' ? window : this);
-

@@ -1,11 +1,49 @@
 {
-  "name": "votez-bien-tests",
+  "name": "votez-bien",
   "private": true,
-  "description": "Suite de tests automatiques pour Votez bien ! — voir ../README.md pour le contexte.",
+  "version": "1.0.0",
+  "description": "Votez bien ! — Boussole & comparateur politique 2027. Site statique, sans dependance runtime.",
   "scripts": {
-    "test": "node tests.js && node test-simulation.js && node test-order.js && node test-integration.js && node test-flows.js && node test-departage-ui.js && node test-e2e-signconvention.js"
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rimraf dist",
+    "lint": "tsc --noEmit",
+    "test": "node tests/run-all.js",
+    "test:unit": "node tests/tests.js",
+    "test:flows": "node tests/test-flows.js",
+    "test:integration": "node tests/test-integration.js",
+    "test:order": "node tests/test-order.js",
+    "test:simulation": "node tests/test-simulation.js",
+    "test:departage": "node tests/test-departage-ui.js",
+    "test:e2e": "node tests/test-e2e-signconvention.js",
+    "test:radar": "node tests/test-radar.js",
+    "test:massif": "node tests/massive-simulation.js",
+    "audit:devices": "node tests/multi-device-audit.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "lucide-react": "^0.546.0",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "vite": "^8.3.0",
+    "express": "^4.21.2",
+    "dotenv": "^17.2.3",
+    "motion": "^12.23.24"
   },
   "devDependencies": {
-    "jsdom": "^24.0.0"
+    "@types/express": "^4.17.21",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.21",
+    "esbuild": "^0.28.0",
+    "jsdom": "^30.1.3",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2"
   }
 }

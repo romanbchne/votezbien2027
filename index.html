@@ -3,17 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Votez bien ! — Comprendre où vous vous situez avant la présidentielle 2027</title>
-<meta name="description" content="Quiz politique indépendant et gratuit : 21 questions de profil, questions concrètes de précision, décryptage des thèmes clés, sondages récents et comparaison de 16 formations pour 2027.">
-<meta name="theme-color" content="#14213D">
+<title>Votez bien ! — Comprendre où vous vous situez avant 2027</title>
+<meta name="description" content="Quiz politique interactif et indépendant pour l'élection présidentielle 2027 : 22 questions, analyse multidimensionnelle, départage ciblé, thèmes détaillés et baromètre des sondages.">
 <meta property="og:title" content="Votez bien ! — Comprendre où vous vous situez avant 2027">
-<meta property="og:description" content="Quiz politique, fiches thématiques détaillées, baromètre des sondages et comparaison des programmes pour l’élection présidentielle 2027.">
-<meta property="og:image" content="./embleme-citoyen-512.jpg">
+<meta property="og:description" content="Quiz politique interactif et indépendant pour l'élection présidentielle 2027 : 22 questions, analyse multidimensionnelle, départage ciblé, thèmes détaillés et baromètre des sondages.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="./embleme-citoyen-512.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Votez bien ! — Comprendre où vous vous situez avant 2027">
-<meta name="twitter:description" content="Quiz politique, fiches thématiques détaillées, baromètre des sondages et comparaison des programmes pour 2027.">
-<meta name="twitter:image" content="./embleme-citoyen-512.jpg">
+<meta name="theme-color" content="#14213D">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./embleme-citoyen-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="./embleme-citoyen-180.png" sizes="180x180">
@@ -31,14 +28,21 @@
       <img class="mark" src="./embleme-citoyen-192.png" alt="" width="36" height="36" decoding="async">
       Votez bien !
     </button>
-    <nav aria-label="Navigation principale">
+    <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Ouvrir le menu">
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+      <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <nav id="mainNav" aria-label="Navigation principale">
       <button class="navlink" data-nav="home" id="navHome">Accueil</button>
       <button class="navlink" data-nav="quizStart" id="navQuiz">Quiz</button>
-      <button class="navlink" data-nav="themes" id="navThemes">Thèmes</button>
-      <button class="navlink" data-nav="sondages" id="navPolls">Sondages</button>
       <button class="navlink" data-nav="results" id="navResults">Mon profil</button>
-      <button class="navlink" data-nav="programs" id="navPrograms">Programmes</button>
-      <button class="navlink" data-nav="parties" id="navParties">Partis</button>
+      <button class="navlink" data-nav="themes" id="navThemes">Thèmes</button>
+      <button class="navlink" data-nav="polls" id="navPolls">Sondages</button>
+      <button class="navlink" data-nav="programs" id="navPrograms">Les programmes</button>
+      <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
+      <button class="navlink" data-nav="candidatures" id="navCandidatures">Candidatures</button>
+      <button class="navlink" data-nav="radar" id="navRadar"><span aria-hidden="true">🛡️</span> Radar d’audit</button>
       <button class="navlink" data-nav="method">Méthode</button>
     </nav>
   </header>
@@ -47,7 +51,7 @@
     <div class="wrap">
 
       <!-- ============ ACCUEIL ============ -->
-      <section class="screen" id="screen-home">
+      <section class="screen" id="screen-home" aria-labelledby="homeTitle">
         <div id="resumeBanner" class="resume-banner" hidden>
           <p><strong>Un test est en cours.</strong> Vous pouvez reprendre là où vous en étiez.</p>
           <div class="btn-row">
@@ -58,24 +62,25 @@
 
         <div class="hero">
           <div class="hero-text">
-            <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> gratuit, anonyme, sans compte</p>
-            <h1>Vos idées. Les enjeux. <span class="accent">Les partis.</span></h1>
-            <p class="lede">Répondez à des questions concrètes, découvrez les thèmes qui comptent pour vous et comparez vos réponses aux positions publiques des formations politiques.</p>
+            <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> 100 % gratuit, anonyme, sans compte</p>
+            <h1 id="homeTitle">Vos idées. Les enjeux. <span class="accent">Les partis.</span></h1>
+            <p class="lede">Répondez à des questions concrètes, découvrez vos tendances sur les 6 axes cardinaux de notre boussole citoyenne et comparez vos réponses aux positions des <span data-count="parties">16</span> formations et candidats.</p>
             <div class="duration-grid" aria-label="Durée estimée du questionnaire">
-              <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small>21 questions · 5 min</small></span></div>
-              <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Jusqu’à 15 questions · 4 min</small></span></div>
+              <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small><span data-count="questions">22</span> questions d’orientation · ~5 min</small></span></div>
+              <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Questions concrètes ciblées</small></span></div>
             </div>
-            <p class="duration-total">Environ 9 min au total. La seconde partie s’arrête plus tôt si les réponses font déjà ressortir une formation.</p>
+            <p class="duration-total">La seconde étape s’arrête dès qu’une formation ressort nettement. Vos réponses restent sur votre appareil.</p>
             <div class="hero-actions btn-row">
               <button class="btn btn-brass" id="btnStart">Faire le quiz <span aria-hidden="true">→</span></button>
-              <button class="btn btn-ghost" data-nav="themes">Les thèmes 2027</button>
-              <button class="btn btn-ghost" data-nav="sondages">Les sondages</button>
-              <button class="btn btn-ghost" data-nav="programs">Les programmes</button>
+              <button class="btn btn-ghost" data-nav="themes">Explorer les <span data-count="themes">8</span> thèmes</button>
+              <button class="btn btn-ghost" data-nav="polls">Baromètre des sondages</button>
+              <button class="btn btn-ghost" data-nav="radar"><span aria-hidden="true">🛡️</span> Radar des biais</button>
             </div>
             <div class="trust-row">
-              <div><strong>21</strong>questions principales</div>
-              <div><strong>6</strong>grands thèmes politiques</div>
-              <div><strong>16</strong>formations à explorer</div>
+              <div><strong data-count="questions">22</strong>questions d’orientation</div>
+              <div><strong>6</strong>axes du quiz</div>
+              <div><strong data-count="themes">8</strong>thèmes présidentiels</div>
+              <div><strong data-count="parties">16</strong>formations analysées</div>
             </div>
           </div>
         </div>
@@ -83,43 +88,43 @@
         <div class="how-it-works">
           <h2>Comment ça marche</h2>
           <div class="hiw-list">
-            <div class="hiw-item"><span class="hiw-num">1</span><div><h3>21 questions</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible — aucune réponse n’est forcée.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Jusqu’à 15 questions concrètes · 4 min</h3><p>Après un aperçu provisoire et le choix facultatif de vos 3 priorités, des questions précises (retraites, nucléaire, OTAN…) départagent les partis encore proches. Le test s’arrête dès qu’un parti ressort nettement.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">3</span><div><h3>Votre profil</h3><p>Une orientation générale, le détail sur 6 thèmes avec leur niveau de clarté, et vos priorités personnelles.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Vos partis les plus proches</h3><p>Un pourcentage de proximité par parti, thème par thème, expliqué et sourcé — jamais un chiffre sans détail derrière.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">1</span><div><h3><span data-count="questions">22</span> questions d’orientation</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire équilibré, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Questions concrètes pour départager</h3><p>Après un aperçu provisoire et vos 3 priorités, des questions précises (retraites, nucléaire, santé, pouvoir d’achat…) départagent les partis encore proches.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">3</span><div><h3>Votre profil nuancé</h3><p>Une orientation générale, le détail sur 6 thèmes avec indicateur de clarté, et vos priorités personnelles sans calcul opaque.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Formations les plus proches & nuances</h3><p>Un indice éditorial de proximité sur 100, la transparence des données et l’affichage des propositions qui vous séparent.</p></div></div>
           </div>
         </div>
       </section>
 
       <!-- ============ ENTRÉE DU QUIZ ============ -->
-      <section class="screen" id="screen-quizStart">
+      <section class="screen" id="screen-quizStart" aria-labelledby="quizStartTitle">
         <div class="section-kicker">Le questionnaire</div>
-        <h1>Vos idées, en deux étapes</h1>
+        <h1 id="quizStartTitle">Vos idées, en deux étapes</h1>
         <p class="lede">Un premier quiz dessine votre profil sur six grands thèmes. Un second pose des questions concrètes pour départager les formations encore proches.</p>
         <div class="quiz-intro-grid">
-          <article class="quiz-intro-card"><span class="quiz-intro-number">01</span><div><h2>Votre profil</h2><p>21 questions · environ 5 min</p><small>Économie, libertés, sécurité, Europe, immigration et écologie.</small></div></article>
-          <article class="quiz-intro-card"><span class="quiz-intro-number">02</span><div><h2>Les points qui départagent</h2><p>Jusqu’à 15 questions · environ 4 min</p><small>Retraites, nucléaire, institutions et autres choix de politique publique.</small></div></article>
+          <article class="quiz-intro-card"><span class="quiz-intro-number">01</span><div><h2>Votre profil</h2><p><span data-count="questions">22</span> questions · environ 5 min</p><small>Économie, libertés, sécurité, Europe, immigration et écologie.</small></div></article>
+          <article class="quiz-intro-card"><span class="quiz-intro-number">02</span><div><h2>Les points qui départagent</h2><p>Questions concrètes ciblées · environ 4 min</p><small>Retraites, santé, pouvoir d’achat, nucléaire, institutions et autres choix réels.</small></div></article>
         </div>
         <div class="quiz-start-state" id="quizStartState"></div>
         <div class="btn-row" style="margin-top:1rem">
           <button class="btn btn-brass" id="btnQuizStart">Commencer le quiz 1 <span aria-hidden="true">→</span></button>
           <button class="btn btn-primary" id="btnQuizResume" hidden>Reprendre là où j’en étais</button>
         </div>
-        <p class="quiz-intro-note">Vos réponses restent enregistrées dans ce navigateur. Vous pouvez répondre « je ne sais pas » et interrompre le questionnaire à tout moment.</p>
+        <p class="quiz-intro-note">Raccourcis clavier disponibles : touches 1 à 5 pour répondre, 0 pour « je ne sais pas », Entrée pour valider.</p>
       </section>
 
       <!-- ============ QUIZ ============ -->
-      <section class="screen" id="screen-quiz">
+      <section class="screen" id="screen-quiz" aria-labelledby="qDim">
         <div id="phaseChipWrap"></div>
         <div class="quiz-head">
-          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-          <span class="progress-label" id="progressLabel">1 / 21</span>
+          <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="quizProgressTrack"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <span class="progress-label" id="progressLabel" aria-live="polite">1 / <span data-count="questions">22</span></span>
           <span class="quiz-duration" id="quizDurationLabel">Environ 5 min</span>
         </div>
         <div class="q-card">
           <p class="q-topic" id="qTopic"></p>
           <h2 id="qDim"></h2>
-          <button class="q-why-toggle" id="qWhyToggle" type="button">Pourquoi cette question ?</button>
+          <button class="q-why-toggle" id="qWhyToggle" type="button" aria-expanded="false" aria-controls="qWhy">Pourquoi cette question ?</button>
           <p class="q-why" id="qWhy"></p>
 
           <div id="viewScale">
@@ -127,12 +132,12 @@
               <div class="prop"><span class="letter">Proposition A</span><p id="propA"></p><p class="clarify" id="clarifyA" hidden></p></div>
               <div class="prop"><span class="letter">Proposition B</span><p id="propB"></p><p class="clarify" id="clarifyB" hidden></p></div>
             </div>
-            <div class="scale" id="scaleButtons" role="group" aria-label="Votre réponse"></div>
-            <div class="dk-row"><button class="dk-btn" id="dkBtn" type="button">Je ne sais pas / je n’ai pas assez d’informations</button></div>
+            <div class="scale" id="scaleButtons" role="group" aria-label="Votre réponse (échelle en 5 niveaux)"></div>
+            <div class="dk-row"><button class="dk-btn" id="dkBtn" type="button">Je ne sais pas / je n’ai pas assez d’informations (Touche 0)</button></div>
           </div>
 
           <div id="viewChoice" hidden>
-            <div class="choice-list" id="choiceList" role="group" aria-label="Votre choix"></div>
+            <div class="choice-list" id="choiceList" role="group" aria-label="Votre choix parmi les options"></div>
             <div class="dk-row"><button class="dk-btn" id="dkBtnChoice" type="button">Aucune de ces options / je ne sais pas</button></div>
           </div>
 
@@ -140,173 +145,253 @@
         </div>
         <div class="quiz-nav">
           <button class="btn btn-ghost" id="btnBack">Précédent</button>
-          <button class="btn btn-primary" id="btnNext" disabled>Suivant</button>
+          <button class="btn btn-primary" id="btnNext" disabled>Suivant (Entrée)</button>
         </div>
       </section>
 
-      <!-- ============ PALIER (fin des 21 questions) ============ -->
-      <section class="screen" id="screen-checkpoint">
+      <!-- ============ PALIER (fin des questions d'orientation) ============ -->
+      <section class="screen" id="screen-checkpoint" aria-labelledby="checkpointHeading">
         <div id="checkpointContent"></div>
       </section>
 
       <!-- ============ RÉSULTATS ============ -->
-      <section class="screen" id="screen-results">
+      <section class="screen" id="screen-results" aria-labelledby="resultsHeading">
         <div id="resultsContent"></div>
       </section>
 
-      <!-- ============ THÈMES ============ -->
-      <section class="screen" id="screen-themes">
-        <div class="section-kicker">Les enjeux de 2027</div>
-        <h1>Les grands thèmes et les idées des candidats</h1>
-        <p class="lede">Explorez les 10 thèmes déterminants de l’élection présidentielle : définitions claires, débats décisifs et propositions chiffrées de chaque candidat et formation politique.</p>
+      <!-- ============ NOUVEL ONGLET : THÈMES ============ -->
+      <section class="screen" id="screen-themes" aria-labelledby="themesTitle">
+        <div class="section-kicker">Panorama thématique 2027</div>
+        <h1 id="themesTitle">Les thèmes majeurs & propositions des candidats</h1>
+        <p class="lede">Explorez les 8 grands chantiers présidentiels (dont les 6 axes cardinaux de notre boussole), les clivages idéologiques et les engagements précis pris par chaque force politique en vue de 2027.</p>
+        
+        <div class="theme-filters-box">
+          <div class="theme-pills" id="themePills" role="tablist" aria-label="Choisir un thème"></div>
+        </div>
 
-        <div class="themes-nav-bar" id="themesNav" role="tablist" aria-label="Choisir un thème"></div>
-        <div id="themesContent" class="themes-container"></div>
+        <div id="themeDetailCard" class="theme-detail-container"></div>
       </section>
 
-      <!-- ============ SONDAGES ============ -->
-      <section class="screen" id="screen-sondages">
-        <div class="section-kicker">Baromètre d’opinion 2027</div>
-        <h1>Les sondages de l’élection présidentielle</h1>
-        <p class="lede">Suivi consolidé des intentions de vote au premier et second tour, d’après les enquêtes publiées par les instituts agréés et répertoriées sur Wikipédia.</p>
+      <!-- ============ NOUVEL ONGLET : SONDAGES ============ -->
+      <section class="screen" id="screen-polls" aria-labelledby="pollsTitle">
+        <div class="section-kicker">Baromètre électoral 2027</div>
+        <h1 id="pollsTitle">Les intentions de vote & synthèses des sondages</h1>
+        <p class="lede">Baromètre agrégé des enquêtes d’opinion publiées en octobre 2026 (IFOP, Elabe, Cluster17 et OpinionWay), avec le détail de chaque vague et le lien vers sa notice publiée à la Commission des sondages. Le baromètre tient compte des candidatures déclarées, dont celle de Raphaël Glucksmann issue de la primaire « Choisir 2027 » des 9 et 10 octobre 2026.</p>
+
+        <div class="polls-notice-card">
+          <span class="flag-mark" aria-hidden="true"></span>
+          <p><strong>Avertissement méthodologique légal (Loi du 19 juillet 1977) :</strong> Les intentions de vote ne constituent en aucun cas une prédiction du scrutin, mais une photographie des équilibres politiques au moment de l’enquête. Chaque vague est assortie de sa propre marge d’erreur, liée à l’échantillon.</p>
+        </div>
 
         <div class="polls-controls">
-          <div class="program-tabs" role="tablist" aria-label="Hypothèses de premier tour" id="pollsHypTabs">
-            <button class="program-tab active" type="button" data-poll-hyp="philippe" role="tab" aria-selected="true">Hypothèse Édouard Philippe</button>
-            <button class="program-tab" type="button" data-poll-hyp="attal" role="tab" aria-selected="false">Hypothèse Gabriel Attal</button>
-          </div>
+          <button class="filter-chip sel" data-poll-view="first-round">Premier tour (Moyenne agrégée)</button>
+          <button class="filter-chip" data-poll-view="second-round">Duels de 2nd tour</button>
+          <button class="filter-chip" data-poll-view="waves">Détail des dernières enquêtes</button>
         </div>
 
-        <div id="pollsChartWrap" class="polls-chart-section"></div>
-
-        <div class="polls-duels-section">
-          <h2>Hypothèses de second tour</h2>
-          <p class="lede">Les configurations de duels mesurées par les enquêtes d’opinion récentes.</p>
-          <div id="pollsDuelsGrid" class="polls-duels-grid"></div>
-        </div>
-
-        <div class="polls-table-section">
-          <h2>Derniers sondages publiés</h2>
-          <p class="lede">Enquêtes complètes avec échantillon, dates et commanditaire.</p>
-          <div id="pollsTableWrap" class="polls-table-wrap"></div>
-        </div>
-
-        <div class="polls-notice-box" id="pollsNoticeBox"></div>
+        <div id="pollsContent"></div>
       </section>
 
       <!-- ============ PROGRAMMES ============ -->
-      <section class="screen" id="screen-programs">
+      <section class="screen" id="screen-programs" aria-labelledby="programsTitle">
         <div class="section-kicker">Comprendre les positions</div>
-        <h1>Les programmes, question par question</h1>
+        <h1 id="programsTitle">Les programmes, question par question</h1>
         <p class="lede">Comparez les positions politiques utilisées dans les deux quiz, avec les nuances et les points encore non documentés.</p>
-        <div class="programs-note"><strong>Comment lire cette page</strong><p>Les 21 premières questions indiquent une tendance générale par thème : elles ne sont pas des réponses mot pour mot des candidats. Pour les questions de précision, une position n’apparaît que lorsqu’elle a été codée à partir d’une prise de position publique ; sinon, elle est indiquée comme non documentée. La comparaison porte sur les formations, et non sur une promesse officielle de chaque personne citée.</p><p>Les candidatures évoluent : la liste officielle de l’élection sera publiée au plus tard le 26 mars 2027. <a href="https://www.info.gouv.fr/actualite/election-presidentielle-2027" target="_blank" rel="noopener">Calendrier officiel</a></p></div>
+        <div class="programs-note"><strong>Comment lire cette page</strong><p>Les <span data-count="questions">22</span> premières questions indiquent une tendance générale par thème : elles ne sont pas des réponses mot pour mot des candidats. Pour les questions de précision, une position n’apparaît que lorsqu’elle a été codée à partir d’une prise de position publique ; sinon, elle est indiquée comme non documentée. La comparaison porte sur les formations, et non sur une promesse officielle de chaque personne citée.</p><p>Les candidatures évoluent : la liste officielle de l’élection n’est pas encore publiée, et la date de proclamation de la liste des candidats reste à confirmer par l’autorité compétente. Le calendrier de campagne appliqué ici est celui de <a href="https://www.elections2027.com/calendrier" target="_blank" rel="noopener">l’agrégateur Élections 2027</a>, avec la mention explicite des dates qui sont indicatives.</p></div>
         <div class="programs-controls">
           <div class="program-tabs" role="tablist" aria-label="Choisir un questionnaire">
-            <button class="program-tab active" type="button" data-program-phase="main" role="tab" aria-selected="true">Quiz 1 · 21 thèmes</button>
-            <button class="program-tab" type="button" data-program-phase="departage" role="tab" aria-selected="false">Quiz 2 · banque de 24 questions</button>
+            <button class="program-tab active" type="button" id="programTabMain" data-program-phase="main" role="tab" aria-controls="programPanel" aria-selected="true" tabindex="0">Quiz 1 · <span data-count="questions">22</span> questions générales</button>
+            <button class="program-tab" type="button" id="programTabDetail" data-program-phase="departage" role="tab" aria-controls="programPanel" aria-selected="false" tabindex="-1">Quiz 2 · <span data-count="departage">27</span> questions concrètes</button>
           </div>
           <label class="program-filter">Afficher
             <select id="programPartyFilter" aria-label="Filtrer par formation"><option value="all">Toutes les formations</option></select>
           </label>
         </div>
-        <p id="programPhaseIntro" class="program-phase-intro"></p>
-        <div id="programQuestions" class="program-question-list"></div>
+        <div id="programPanel" role="tabpanel" aria-labelledby="programTabMain" tabindex="0">
+          <p id="programPhaseIntro" class="program-phase-intro"></p>
+          <div id="programQuestions" class="program-question-list"></div>
+        </div>
         <div class="program-source-list"><details><summary>Sources et programmes consultés</summary><ul id="programSources"></ul></details></div>
       </section>
 
       <!-- ============ PARTIS ============ -->
-      <section class="screen" id="screen-parties">
+      <section class="screen" id="screen-parties" aria-labelledby="partiesTitle">
         <div class="section-kicker">Les formations politiques</div>
-        <h1>Les partis à explorer</h1>
-        <p class="lede" id="partyDirectoryIntro">Explorez les 16 formations, leur personne de référence et leurs liens officiels. Les personnes en photo ne sont pas toutes candidates investies : leur statut est précisé dans chaque fiche.</p>
+        <h1 id="partiesTitle">Les partis & candidatures à explorer</h1>
+        <p class="lede" id="partyDirectoryIntro">Explorez les <span data-count="parties">16</span> formations, leur candidature ou personnalité de référence et leurs liens officiels. La distinction entre parti et candidat est précisée pour chaque fiche (ex. Place publique représentée par Raphaël Glucksmann).</p>
         <div class="party-directory-banner"><span class="flag-mark" aria-hidden="true"></span><p><strong>Un repère pour vous informer.</strong> Les portraits identifient des personnalités associées aux partis ; les candidatures évoluent. Consultez le statut daté et les sources de chaque fiche.</p></div>
         <div class="filter-row" id="familyFilters"></div>
         <div class="party-grid" id="partyGrid"></div>
         <div class="btn-row party-directory-actions" style="margin-top:1.8rem">
           <button class="btn btn-brass" id="btnStartFromParties">Faire le questionnaire</button>
           <button class="btn btn-ghost" data-nav="compare" id="btnCompareParties" hidden>Comparer jusqu’à 3 partis →</button>
+          <button class="btn btn-ghost" data-nav="candidatures">Candidatures & calendrier</button>
         </div>
       </section>
 
+      <!-- ============ CANDIDATURES & CALENDRIER ============ -->
+      <section class="screen" id="screen-candidatures" aria-labelledby="candidaturesTitle">
+        <div class="section-kicker">Qui se présente, et pour quand</div>
+        <h1 id="candidaturesTitle">Candidatures déclarées & calendrier de campagne</h1>
+        <p class="lede">La liste complète des candidatures annoncées pour la présidentielle 2027, avec leur date de déclaration, et le calendrier de la campagne jusqu’au second tour.</p>
+        <div id="candidaturesContent"></div>
+      </section>
+
       <!-- ============ COMPARER ============ -->
-      <section class="screen" id="screen-compare">
-        <h1>Comparer des partis</h1>
+      <section class="screen" id="screen-compare" aria-labelledby="compareTitle">
+        <h1 id="compareTitle">Comparer des partis</h1>
         <p class="lede">Choisissez jusqu’à 3 formations depuis l’écran « Les partis » pour les mettre côte à côte.</p>
         <div id="compareContent"></div>
       </section>
 
+            <!-- ============ RADAR INTELLIGENT DES BIAIS & QUALITÉ ============ -->
+      <section class="screen" id="screen-radar" aria-labelledby="radarTitle">
+        <div class="section-kicker">Audit d'intégrité civique & neutralité algorithmique</div>
+        <h1 id="radarTitle">Radar intelligent des biais & conformité</h1>
+        <p class="lede">Ce radar n'affiche aucun score écrit à l'avance. À l'ouverture de cet écran, il rejoue réellement ses contrôles dans votre navigateur sur le <span data-count="questions">22</span> questions d’orientation, les <span data-count="departage">27</span> questions concrètes de départage, les <span data-count="parties">16</span> formations politiques et les <span data-count="sources">43</span> sources référencées, puis affiche les résultats et les anomalies qu'il a réellement détectées.</p>
+
+        <!-- Indice synthétique d'intégrité -->
+        <div class="radar-score-card">
+          <div class="radar-score-val">
+            <span class="score-number" id="radarScoreNumber">—<small>/100</small></span>
+            <span class="score-badge" id="radarScoreBadge">Audit en cours…</span>
+          </div>
+          <div class="radar-score-details">
+            <p id="radarScoreHeadline">Les contrôles sont en cours d'exécution…</p>
+            <ul class="radar-check-list" id="radarCheckList"></ul>
+            <p class="confidence-note" id="radarGeneratedAt"></p>
+          </div>
+        </div>
+
+        <!-- Boussole SVG & axes d'audit -->
+        <div class="radar-visual-grid">
+          <div class="radar-chart-container">
+            <h2>Boussole d’audit des 6 dimensions d'intégrité</h2>
+            <div id="radarSvgWrapper" class="radar-svg-wrapper"></div>
+            <p class="radar-chart-caption">Évaluation multicritère calculée en direct sur l’ensemble des données.</p>
+          </div>
+          <div class="radar-axis-breakdown" id="radarAxisList"></div>
+        </div>
+
+        <!-- Constats réels détectés par l'audit -->
+        <div class="radar-findings-section">
+          <h2>Ce que l'audit a réellement détecté</h2>
+          <p class="confidence-note" id="radarFindingsSummary"></p>
+          <div id="radarFindings" class="radar-findings"></div>
+        </div>
+
+        <!-- Banc d'essai Monte-Carlo en direct -->
+        <div class="radar-sim-box">
+          <div class="radar-sim-header">
+            <div>
+              <h2>Banc d’essai interactif : 2 000 électeurs simulés en direct</h2>
+              <p>Testez en temps réel la résistance aux biais de l'algorithme en générant des profils citoyens synthétiques dans votre navigateur. Chaque profil est tiré au hasard, passe par le même moteur de calcul que le quiz, et le classement obtenu est enregistré.</p>
+            </div>
+            <button class="btn btn-brass" id="btnRunRadarSimulations">
+              <span aria-hidden="true">⚡</span> Lancer 2 000 simulations
+            </button>
+          </div>
+          <div id="radarSimResults" class="radar-sim-results">
+            <div class="sim-status-banner">
+              <span class="sim-pulse"></span>
+              <span id="simStatusText">Les contrôles sont en cours d'exécution…</span>
+            </div>
+            <div class="sim-bars-grid" id="radarSimBars"></div>
+          </div>
+        </div>
+
+        <!-- Les 4 questions de contrôle qualité permanent -->
+        <div class="radar-reflexive-section">
+          <h2>Les 4 questions de contrôle qualité permanent</h2>
+          <div class="reflexive-grid">
+            <article class="reflexive-card">
+              <div class="rf-badge">01 · Éthique</div>
+              <h3>Est-ce que c’est bien ?</h3>
+              <p id="rfEthicsText">Les contrôles automatisés sont en cours d'exécution…</p>
+            </article>
+            <article class="reflexive-card">
+              <div class="rf-badge">02 · Fiabilité <span id="rfChecksCount"></span></div>
+              <h3>Est-ce que ça marche ?</h3>
+              <p id="rfReliabilityText">Les contrôles automatisés sont en cours d'exécution…</p>
+            </article>
+            <article class="reflexive-card">
+              <div class="rf-badge">03 · Neutralité</div>
+              <h3>Y a-t-il une erreur ou un biais ?</h3>
+              <p id="rfNeutralityText">Les contrôles de doublons et de traçabilité sont en cours d'exécution…</p>
+            </article>
+            <article class="reflexive-card">
+              <div class="rf-badge">04 · Équité du classement</div>
+              <h3>Qui est réellement comparable ?</h3>
+              <p id="rfCoverageText">Le calcul de couverture est en cours d'exécution…</p>
+            </article>
+          </div>
+          <p class="confidence-note radar-layout-note" id="rfErgonomyText">La mesure de mise en page est en cours d'exécution…</p>
+        </div>
+
+        <!-- Tableau d'audit des formations -->
+        <div class="radar-parties-audit">
+          <h2>Contrôle de complétude des <span data-count="parties">16</span> formations</h2>
+          <div class="radar-table-wrap">
+            <table class="radar-table">
+              <thead>
+                <tr>
+                  <th scope="col">Formation</th>
+                  <th scope="col">Personnalité de référence</th>
+                  <th scope="col">Sensibilité</th>
+                  <th scope="col">Positions codées</th>
+                  <th scope="col">Statut de comparabilité</th>
+                </tr>
+              </thead>
+              <tbody id="radarPartiesTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ MÉTHODE ============ -->
-      <section class="screen" id="screen-method">
-        <h1>Méthode</h1>
+      <section class="screen" id="screen-method" aria-labelledby="methodTitle">
+        <h1 id="methodTitle">Méthode & Transparence</h1>
         <p class="lede">Ce que mesure vraiment l’application, comment le score est calculé, et ce que vous devez garder à l’esprit en le lisant.</p>
 
         <div class="method-section">
           <h2>Ce n’est ni scientifique, ni infaillible</h2>
-          <p>Ce test simplifie des sujets complexes en 21 questions principales (environ 5 minutes), suivies d’au plus 15 questions concrètes de précision (environ 4 minutes), toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes (que l’application appelle des « dimensions »), pas une vérité psychologique ni un verdict définitif sur qui vous êtes. Deux personnes qui partagent vos réponses peuvent avoir des raisons très différentes de les avoir choisies.</p>
+          <p>Ce test simplifie des sujets complexes en <span data-count="questions">22</span> questions principales (~5 minutes), suivies de questions concrètes de précision (~4 minutes), toutes fermées. Il donne une <strong>indication</strong> de vos tendances sur 6 grands thèmes, pas un verdict définitif sur qui vous êtes.</p>
         </div>
 
         <div class="method-section">
           <h2>Position ≠ importance : vos 3 priorités</h2>
-          <p>Ce que vous <strong>pensez</strong> d’un sujet et <strong>l’importance</strong> que vous lui donnez sont deux choses séparées. L’importance ne modifie jamais votre position sur l’échelle gauche-droite.</p>
-          <p>Demander « à quel point ce sujet compte-t-il pour vous ? » après chaque question ne fonctionne pas : quand on parle de grands thèmes de la République, presque tout paraît « important », voire « essentiel ». À la place, l’application vous demande <strong>une seule fois</strong> de désigner, dans l’ordre, vos 3 sujets prioritaires — ce qui oblige à arbitrer. Ils comptent davantage dans la comparaison aux partis (le premier compte double) ; tous les autres thèmes comptent à égalité. Vous pouvez ne rien choisir : tous les thèmes comptent alors autant.</p>
+          <p>Ce que vous <strong>pensez</strong> d’un sujet et <strong>l’importance</strong> que vous lui donnez sont deux choses séparées. L’importance ne modifie jamais votre position sur l’échelle gauche-droite. L’application vous demande une seule fois au palier de désigner, dans l’ordre, vos 3 priorités (pondérées à ×2,0 / ×1,6 / ×1,3 dans la proximité aux partis).</p>
         </div>
 
         <div class="method-section">
           <h2>Un ordre d’affichage aléatoire, sans effet sur le résultat</h2>
-          <p>Pour que l’ordre des propositions ne vous influence pas, la proposition de gauche ou de droite est affichée tantôt en A, tantôt en B (à peu près moitié-moitié dans chaque thème, jamais plus de trois fois de suite dans le même sens). Les options des questions concrètes sont aussi mélangées. Ce qui est enregistré est toujours <strong>le texte que vous avez choisi</strong>, jamais sa place à l’écran : deux personnes qui pensent la même chose obtiennent le même résultat, quel que soit l’ordre affiché.</p>
+          <p>Pour que l’ordre des propositions ne vous influence pas, la proposition de gauche ou de droite est affichée tantôt en A, tantôt en B de manière équilibrée dans chaque thème. La valeur enregistrée est toujours <strong>le texte que vous avez choisi</strong>, jamais sa position physique à l’écran.</p>
         </div>
 
         <div class="method-section">
           <h2>6 dimensions, une seule convention de signe</h2>
           <p>Chaque dimension va d’un pôle à l’autre ; un score négatif rapproche du premier pôle, un score positif du second. C’est la même convention partout : calcul, courbe, couleurs, textes.</p>
           <ul id="methodDims"></ul>
-          <p>Sur les dimensions Autorité, Europe et Immigration, l’axe mesuré ne recoupe pas toujours le clivage gauche-droite classique : le souverainisme, par exemple, existe à gauche comme à droite, pour des raisons différentes. Regardez le détail par dimension plutôt que la seule étiquette globale.</p>
         </div>
 
         <div class="method-section">
-          <h2>Incertitude : pourquoi certaines dimensions restent floues</h2>
-          <p>Pour chaque dimension, l’application affiche un niveau de clarté. Il diminue quand vous répondez « je ne sais pas », quand vos réponses se contredisent au sein d’une même dimension, ou — plus modérément — quand votre position moyenne reste proche du centre avec peu de questions pour la confirmer. Un profil peut rester <strong>volontairement non déterminé</strong> si vous avez répondu « je ne sais pas » à presque tout : l’application ne fabrique jamais une orientation à partir de réponses absentes.</p>
+          <h2>Actualité politique & Candidatures 2026/2027</h2>
+          <p>Le site est actualisé en continu au fil des déclarations officielles. La primaire « Choisir 2027 » (Parti socialiste, Place publique et GRS) s’est tenue les <strong>9 et 10 octobre 2026</strong>, avec un résultat proclamé le 11 octobre 2026 : Raphaël Glucksmann l’a remportée dès le premier tour avec 66 % des suffrages, devant Olivier Faure, Ségolène Royal, Emmanuel Maurel et Jérôme Guedj. Il est donc le candidat porté par Place publique. Chaque fiche distingue la formation politique de la candidature qu’elle soutient, et l’écran « Candidatures » donne la liste complète des déclarations, y compris celles qui ne sont pas portées par une formation de ce site.</p>
         </div>
 
         <div class="method-section">
-          <h2>Les questions concrètes pour départager les partis</h2>
-          <p>Les 21 premières questions placent votre profil entre la gauche et la droite, mais elles ne suffisent pas à distinguer deux partis d’un même camp (par exemple Les Écologistes et le Parti socialiste). L’application pose donc ensuite, <strong>une par une et jusqu’à 15</strong>, des questions <strong>concrètes à plusieurs options</strong> (retraites à 60, 62 ou 64 ans ; avenir du nucléaire ; impôt sur les très grandes fortunes ; OTAN…), toutes écrites à l’avance dans une banque de questions et jamais générées à la volée. Cette seconde partie prend environ 4 minutes.</p>
-          <p>Chaque question est choisie d’après vos réponses précédentes : on estime quels partis sont encore les plus proches de vous, et on pose la question sur laquelle ces partis-là se séparent le plus. Si vous êtes proche de partis de gauche, elle distingue des partis de gauche ; si vous êtes proche de partis de droite, des partis de droite. Les options ne sont pas rangées de « gauche » à « droite » : ce sont de vrais choix de politique, présentés sans nom de parti.</p>
-          <p><strong>Les noms et pourcentages des partis restent cachés pendant ces questions</strong>, pour ne pas orienter vos réponses vers un résultat espéré. Le test s’arrête dès qu’un parti mène nettement (au moins 4 questions posées) ; il peut aller jusqu’à 15 si les positions restent proches.</p>
-          <p>Ce choix de questions ne garantit aucun écart final : si vos réponses sincères vous laissent à égalité entre deux partis, c’est le bon résultat, pas un échec à corriger.</p>
-        </div>
-
-        <div class="method-section">
-          <h2>Quand deux partis sont à égalité</h2>
-          <p>Si l’écart entre vos deux premiers partis est de 6 points ou moins, il est plus petit que la marge d’incertitude de ces estimations. L’application ne désigne alors pas de gagnant : elle affiche ce qui distingue réellement les deux partis, thème par thème, pour que vous tranchiez selon ce qui compte le plus pour vous.</p>
-        </div>
-
-        <div class="method-section">
-          <h2>Comparaison aux partis</h2>
-          <p>Les positions attribuées aux formations sont des <strong>estimations éditoriales</strong> à partir de leurs programmes et prises de position publiques. Ce ne sont ni des scores donnés par les partis ni des réponses officielles aux formulations du quiz. Elles restent <strong>provisoires</strong> : la plupart des programmes présidentiels 2027 ne sont pas encore publiés. Les statuts des personnes associées aux partis sont actualisés séparément ; une personnalité de référence n’est pas nécessairement candidate.</p>
-          <p>Le pourcentage affiché mesure la proximité moyenne entre vos positions et celles d’un parti, sur les 6 thèmes et sur les questions concrètes, en donnant plus de poids à vos 3 priorités. Un point auquel vous n’avez pas répondu, ou une position non codée pour un parti, est <strong>exclu</strong> du calcul : ni compté pour, ni compté contre, et jamais pris pour un « centre ». Le pourcentage n’est jamais affiché seul : la fiche de chaque parti détaille le calcul, avec les points communs et les différences, et renvoie vers son programme.</p>
-          <p><strong>Comparaison partielle.</strong> Certains partis (par exemple MoDem, UDI, UDR) n’ont presque aucune position codée sur les questions concrètes. Comparés seulement sur les 6 thèmes, ils auraient mécaniquement l’air plus proches de tout le monde que les partis confrontés à des propositions précises. Dès que vous avez répondu à quelques questions concrètes, ils ne sont donc plus classés avec les autres : leur fiche l’indique, et donne leur proximité sur les seuls thèmes.</p>
-        </div>
-
-        <div class="method-section">
-          <h2>Sources de recoupement</h2>
-          <p>Les positions ont été recoupées avec les sources suivantes. MonVote2027 est un outil citoyen indépendant : sa licence n’étant pas précisée, ses données n’ont pas été copiées, seulement consultées pour vérifier la cohérence de nos propres codages.</p>
-          <ul id="methodSources"></ul>
-        </div>
-
-        <div class="method-section">
-          <h2>Partis retenus</h2>
-          <p>Les 16 formations de cette sélection sont présentées de façon non exhaustive. Les statuts de candidature sont vérifiés au 14 octobre 2026 ; la liste officielle des candidats à l’élection ne sera publiée qu’en mars 2027. La liste officielle des partis agréés est tenue par la <a href="https://www.cnccfp.fr/" target="_blank" rel="noopener">CNCCFP</a> (Commission nationale des comptes de campagne et des financements politiques). Voir les sources datées sur la page « Les programmes ».</p>
-        </div>
-
-        <div class="method-section">
-          <h2>Portraits</h2>
-          <p>Les portraits viennent de Wikimedia Commons. Chaque image porte un crédit, un lien vers sa source et un lien vers sa licence. La personne présentée peut être une figure du parti sans être sa candidature officielle.</p>
+          <h2>Transparence des données & couverture documentaire</h2>
+          <p>Un parti n’est classé avec un pourcentage que si sa couverture documentaire sur vos réponses et dans la banque est suffisante (seuil de <span data-count="threshold">50</span> %). Les formations dont les positions sont trop peu documentées ne sont pas classées avec un indice trompeur : leur fiche indique clairement l’état incomplet des données disponibles. La liste exacte des formations concernées est recalculée à chaque ouverture de l’écran « Radar d’audit ».</p>
         </div>
 
         <div class="method-section">
           <h2>Vos réponses restent sur votre appareil</h2>
-          <p>Aucun compte : vos réponses sont enregistrées uniquement dans le stockage local de votre navigateur et ne sont pas envoyées au site. Les portraits sont chargés depuis Wikimedia Commons. Effacer les données du site ou vider le stockage de votre navigateur supprime définitivement votre progression.</p>
+          <p>Aucun compte : vos réponses sont enregistrées uniquement dans le stockage local (localStorage) de votre navigateur et ne sont jamais transmises à aucun serveur. Effacer les données de navigation supprime définitivement votre progression.</p>
+        </div>
+
+        <div class="method-section">
+          <h2>Sources de recoupement</h2>
+          <ul id="methodSources"></ul>
         </div>
       </section>
 
@@ -314,18 +399,34 @@
   </main>
 
   <footer>
-    Votez bien ! — outil indépendant d’aide à la compréhension politique. Ne remplace pas la lecture des programmes officiels.
+    Votez bien ! — outil indépendant d’aide à la compréhension politique pour la présidentielle 2027. Ne remplace pas la lecture des programmes officiels. 100 % local, respectueux de la vie privée.
   </footer>
 </div>
 
 <div class="drawer-backdrop" id="drawerBackdrop"></div>
-<aside class="drawer" id="partyDrawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawerTitle"></aside>
+<aside class="drawer" id="partyDrawer" role="dialog" aria-modal="true" aria-labelledby="partyDrawerTitle" aria-label="Fiche détaillée de la formation politique" aria-hidden="true" tabindex="-1"></aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Modal / Export Canvas pour le badge de profil -->
+<div class="modal-backdrop" id="exportModalBackdrop" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+    <div class="modal-head">
+      <h3 id="exportModalTitle">Votre boussole électorale 2027</h3>
+      <button class="modal-close" id="btnExportModalClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="profileCanvas" width="600" height="750"></canvas>
+    </div>
+    <div class="btn-row modal-actions">
+      <button class="btn btn-brass" id="btnDownloadCard">Télécharger l’image (PNG)</button>
+      <button class="btn btn-ghost" id="btnCopyCardText">Copier le résumé texte</button>
+    </div>
+  </div>
+</div>
+
 <script src="./data.js"></script>
-<script src="./themes-and-polls.js"></script>
 <script src="./scoring.js"></script>
+<script src="./radar.js"></script>
 <script src="./app.js"></script>
 </body>
 </html>
-
