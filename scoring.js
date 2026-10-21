@@ -229,11 +229,26 @@
     // questions n'est plus classé (il garderait sinon son score de thèmes,
     // bien plus indulgent que celui des partis réellement confrontés aux
     // propositions) : il est « comparé partiellement ».
+    const totalBankQuestions = bank.length;
+    const partyBankStancesCount = bank.filter(q => q.stances && typeof q.stances[party.id] === 'number').length;
+    const totalDpAttempted = Object.keys(dpAnswers).filter(id => bankById[id]).length;
     const answeredQs = Object.keys(dpAnswers).filter(id => bankById[id] && typeof dpAnswers[id] === 'number');
     const covered = answeredQs.filter(id => bankById[id].stances && typeof bankById[id].stances[party.id] === 'number').length;
     const questionMode = answeredQs.length >= MIN_QUESTIONS_FOR_QUESTION_MODE;
-    const questionCoverage = answeredQs.length ? covered / answeredQs.length : 1;
-    const partial = questionMode && questionCoverage < PARTIAL_COVERAGE;
+    const precisionPhaseEngaged = totalDpAttempted >= MIN_QUESTIONS_FOR_QUESTION_MODE;
+    const questionCoverage = answeredQs.length ? covered / answeredQs.length : (totalBankQuestions ? partyBankStancesCount / totalBankQuestions : 1);
+    const partial = (questionMode && questionCoverage < PARTIAL_COVERAGE) || (precisionPhaseEngaged && partyBankStancesCount < 3);
+
+    const dataCoverage = {
+      themeKnown: partyKnownCount,
+      totalThemes: DIM_KEYS.length,
+      precisionKnown: partyBankStancesCount,
+      totalPrecisionBank: totalBankQuestions,
+      comparedThemes: comparable.length,
+      comparedQuestions: qComparable.length,
+      level: (partyKnownCount >= 5 && partyBankStancesCount >= 10) ? 'complete' : (partyKnownCount >= 4 && partyBankStancesCount >= 3) ? 'moyenne' : 'faible',
+      label: (partyKnownCount >= 5 && partyBankStancesCount >= 10) ? 'Données complètes' : (partyKnownCount >= 4 && partyBankStancesCount >= 3) ? 'Données moyennes' : 'Données partielles'
+    };
 
     const dimsOk = comparable.length >= 3;
     const matchPercent = (dimsOk && !partial) ? Math.round(sortScore * 100) : null;
@@ -245,6 +260,7 @@
       questionComparableCount: qComparable.length,
       questionCloseCount: qComparable.filter(p => p.category.key === 'proche' || p.category.key === 'assez-proche').length,
       questionCoverage, questionAnsweredCount: answeredQs.length, partial,
+      dataCoverage,
       sortScore, themeScore, matchPercent, themePercent
     };
   }
@@ -413,13 +429,66 @@
     return order;
   }
 
+  /* ----------------------------------------------------------------------
+     computeCandidacyMatches(partyMatches) — regroupe les partis par
+     candidat unique (ex. Glucksmann = PS + Place publique après primaire).
+     ------------------------------------------------------------------- */
+  function computeCandidacyMatches(partyMatches) {
+    const list = [];
+    const seen = new Set();
+    partyMatches.forEach(m => {
+      const cid = m.party.jointCandidacyId || m.party.id;
+      if (seen.has(cid)) return;
+      seen.add(cid);
+      if (m.party.jointCandidacyId) {
+        const partners = partyMatches.filter(x => x.party.jointCandidacyId === cid);
+        partners.sort((a, b) => ((b.matchPercent !== null ? b.matchPercent : -1) - (a.matchPercent !== null ? a.matchPercent : -1)) || (b.sortScore - a.sortScore));
+        const lead = partners[0];
+        list.push({
+          isJointCandidacy: true,
+          candidacyId: cid,
+          candidateName: lead.party.personName,
+          candidateRole: lead.party.personRole,
+          portraitFile: lead.party.portraitFile,
+          color: lead.party.color,
+          leadMatch: lead,
+          partyMatches: partners,
+          jointLabel: lead.party.jointCandidacyLabel || partners.map(p => p.party.name).join(' · '),
+          matchPercent: lead.matchPercent,
+          themePercent: lead.themePercent,
+          sortScore: lead.sortScore,
+          partial: lead.partial,
+          dataCoverage: lead.dataCoverage
+        });
+      } else {
+        list.push({
+          isJointCandidacy: false,
+          candidacyId: cid,
+          candidateName: m.party.personName,
+          candidateRole: m.party.personRole,
+          portraitFile: m.party.portraitFile,
+          color: m.party.color,
+          leadMatch: m,
+          partyMatches: [m],
+          jointLabel: m.party.name,
+          matchPercent: m.matchPercent,
+          themePercent: m.themePercent,
+          sortScore: m.sortScore,
+          partial: m.partial,
+          dataCoverage: m.dataCoverage
+        });
+      }
+    });
+    return list;
+  }
+
   const api = {
     LABEL_BANDS, MIN_ANSWERED_RATIO_FOR_LABEL, MIN_CONFIDENCE_FOR_LABEL,
     PRIORITY_BOOSTS, MAX_PRIORITIES, MAX_DEPARTAGE, MIN_DEPARTAGE, CLEAR_LEAD_POINTS,
     MAX_PER_GROUP, PARTIAL_COVERAGE, NEAR_TIE_POINTS,
     computeDimensionResults, computeOverall, priorityMultipliers,
     optionRange, stanceProximity, stanceLabel, proximityCategory, questionCategory,
-    computePartyMatch, computePartyMatches, findNearTie, selectNextDepartage,
+    computePartyMatch, computePartyMatches, computeCandidacyMatches, findNearTie, selectNextDepartage,
     seededRandom, makeBalancedFlips, makeOptionOrder
   };
 

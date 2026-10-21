@@ -11,12 +11,13 @@
    3) Stratégie "network-first" : les visites connectées reçoivent la
       dernière version publiée ; le cache prend le relais en cas de coupure.
    ========================================================================= */
-const CACHE_VERSION = 'v7.4.2';
+const CACHE_VERSION = 'v7.5.0';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
   './index.html',
   './styles.css',
   './data.js',
+  './themes-and-polls.js',
   './scoring.js',
   './app.js',
   './manifest.json',

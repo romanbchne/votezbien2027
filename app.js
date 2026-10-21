@@ -22,6 +22,9 @@
   let lastFocusedEl = null;
   let programPhase = 'main';
   let programPartyFilter = 'all';
+  let activeThemeId = 'eco';
+  let activePollHyp = 'philippe';
+  let resultsViewMode = 'candidacies';
 
   function freshState() {
     return {
@@ -123,9 +126,10 @@
   }
 
   /* ================================================================
-     NAVIGATION ENTRE ÉCRANS
+     NAVIGATION ENTRE ÉCRANS & ROUTING
      ================================================================ */
-  function showScreen(name) {
+  function showScreen(name, updateHistory) {
+    if (updateHistory === undefined) updateHistory = true;
     document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
     const el = document.getElementById('screen-' + name);
     if (el) el.classList.add('active');
@@ -134,11 +138,21 @@
     if (name === 'quizStart') refreshQuizStart();
     window.scrollTo({ top: 0, behavior: 'auto' });
     if (name === 'results') renderResults();
+    if (name === 'themes') renderThemes();
+    if (name === 'sondages') renderPolls();
     if (name === 'programs') renderPrograms();
     if (name === 'parties') renderParties();
     if (name === 'compare') renderCompare();
     if (name === 'method') renderMethod();
     if (name === 'checkpoint') renderCheckpoint();
+
+    if (updateHistory) {
+      try {
+        if (window.location.hash !== '#' + name) {
+          history.pushState({ screen: name }, '', '#' + name);
+        }
+      } catch (e) {}
+    }
   }
 
   document.querySelectorAll('[data-nav]').forEach(btn => {
@@ -150,9 +164,11 @@
   });
 
   function setNavEnabled(enabled) {
-    document.getElementById('navResults').disabled = false;
-    document.getElementById('navParties').disabled = false;
-    document.getElementById('navPrograms').disabled = false;
+    const resNav = document.getElementById('navResults');
+    if (resNav) {
+      resNav.title = enabled ? 'Consulter votre profil' : 'Votre profil se complétera à la fin du quiz';
+      resNav.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+    }
   }
 
   /* ================================================================
@@ -200,6 +216,13 @@
     const stored = loadState();
     if (stored) { state = stored; beginQuiz(); }
   });
+  const btnHeroPrograms = document.getElementById('btnHeroPrograms');
+  if (btnHeroPrograms) btnHeroPrograms.addEventListener('click', () => showScreen('programs'));
+  const btnHeroThemes = document.getElementById('btnHeroThemes');
+  if (btnHeroThemes) btnHeroThemes.addEventListener('click', () => showScreen('themes'));
+  const btnHeroPolls = document.getElementById('btnHeroPolls');
+  if (btnHeroPolls) btnHeroPolls.addEventListener('click', () => showScreen('sondages'));
+
   document.getElementById('btnRestart').addEventListener('click', () => {
     clearState();
     state = freshState();
@@ -540,14 +563,31 @@
 
     // ---- Vos meilleures correspondances (partis) ----
     if (overall.determined) {
-      const matches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
+      const allPartyMatches = Scoring.computePartyMatches(dimResults, PARTIES, matchOpts());
+      const matches = resultsViewMode === 'candidacies'
+        ? Scoring.computeCandidacyMatches(allPartyMatches)
+        : allPartyMatches;
       const ranked = matches.filter(m => m.matchPercent !== null);
       const top = ranked.slice(0, 3);
-      const tiePair = Scoring.findNearTie(matches);
+      const tiePair = Scoring.findNearTie(allPartyMatches);
       const nQ = Object.keys(state.dpAnswers).filter(id => typeof state.dpAnswers[id] === 'number').length;
       html += `<div class="best-matches">
-        <h2>Vos meilleures correspondances</h2>
-        <p class="lede">Calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Le pourcentage compare votre position à celle de chaque parti, en donnant plus de poids à vos priorités — jamais un point auquel vous n’avez pas répondu. Le détail complet, avec les points communs et les différences, est à un clic.</p>
+        <div class="matches-header-row">
+          <div>
+    
+            <p class="lede">Calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Le pourcentage compare votre position à celle de chaque formation ou candidat, en donnant plus de poids à vos priorités — jamais un point auquel vous n’avez pas répondu.</p>
+          </div>
+          <div class="results-view-mode-bar">
+            <span class="view-mode-label">Regrouper par :</span>
+            <div class="btn-group" role="group" aria-label="Affichage des résultats">
+              <button class="btn btn-sm ${resultsViewMode === 'candidacies' ? 'btn-brass active' : 'btn-ghost'}" data-view-mode="candidacies">Candidatures (14)</button>
+              <button class="btn btn-sm ${resultsViewMode === 'parties' ? 'btn-brass active' : 'btn-ghost'}" data-view-mode="parties">Formations (16)</button>
+            </div>
+          </div>
+        </div>
+        <div class="match-grid">`;
+
+
         <div class="match-grid">`;
       top.forEach((m, i) => {
         html += `<button class="match-card${i === 0 ? ' top' : ''}" style="--card-accent:${m.party.color}" data-party="${m.party.id}">
@@ -973,7 +1013,21 @@
       setNavEnabled(true);
       computeResults();
     }
-    showScreen('home');
+    const initialHash = window.location.hash.replace(/^#/, '');
+    const validScreens = ['home', 'quizStart', 'quiz', 'themes', 'sondages', 'results', 'programs', 'parties', 'compare', 'method', 'checkpoint'];
+    if (initialHash && validScreens.includes(initialHash)) {
+      showScreen(initialHash, false);
+    } else {
+      showScreen('home', false);
+    }
+
+    window.addEventListener('popstate', () => {
+      const hash = window.location.hash.replace(/^#/, '') || 'home';
+      if (validScreens.includes(hash)) {
+        showScreen(hash, false);
+      }
+    });
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js').catch(() => { /* PWA hors-ligne indisponible, l’app reste utilisable */ });
     }

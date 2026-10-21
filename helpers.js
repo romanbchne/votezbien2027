@@ -7,9 +7,10 @@
 const { JSDOM } = require('jsdom');
 const fs = require('fs');
 const path = require('path');
-const D = require('../data.js');
-const S = require('../scoring.js');
-const ROOT = path.join(__dirname, '..');
+const ROOT = fs.existsSync(path.join(__dirname, 'data.js')) ? __dirname : path.join(__dirname, '..');
+const D = require(path.join(ROOT, 'data.js'));
+const S = require(path.join(ROOT, 'scoring.js'));
+
 
 function makeDom(opts) {
   opts = opts || {};
@@ -25,7 +26,7 @@ function makeDom(opts) {
   win.scrollTo = () => {};
   // De VRAIES balises <script> (comme un navigateur), pas eval() : eval isole
   // la portée lexicale de chaque fichier et fausserait le partage des `const`.
-  ['data.js', 'scoring.js', 'app.js'].forEach(f => {
+  ['data.js', 'themes-and-polls.js', 'scoring.js', 'app.js'].forEach(f => {
     const el = win.document.createElement('script');
     el.textContent = fs.readFileSync(path.join(ROOT, f), 'utf8');
     win.document.body.appendChild(el);

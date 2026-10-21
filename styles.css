@@ -6,21 +6,21 @@
    politique, jamais comme accent d’interface générale.
    ========================================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap');
+/* Fonts préchargées dans index.html */
 
 :root{
-  --paper:#F3F4F1; --paper-raised:#FFFFFF;
-  --ink:#171B26; --ink-soft:#565F72; --ink-faint:#8A93A3;
-  --brass:#9C6B2E; --brass-deep:#7A5222; --brass-pale:#EFE2CB;
-  --line:#DEDFD9; --line-soft:#EAEBE6;
+  --paper:#F3F6FA; --paper-raised:#FFFFFF;
+  --ink:#14213D; --ink-soft:#59677D; --ink-faint:#8793A5;
+  --brass:#C93948; --brass-deep:#A62534; --brass-pale:#FBE8EA;
+  --line:#DCE3EC; --line-soft:#E9EEF4;
   --left:#A23B57; --left-pale:#F3E1E6;
   --right:#2C5C87; --right-pale:#DEE7EF;
-  --good:#2F6B4F; --warn:#8A5A12;
-  --radius-lg:20px; --radius-md:14px; --radius-sm:9px;
-  --shadow-card: 0 1px 2px rgba(23,27,38,.06);
+  --blue:#244B83; --blue-deep:#152B4D; --red:#C93948; --good:#26734F; --warn:#8A5A12;
+  --radius-lg:24px; --radius-md:17px; --radius-sm:11px;
+  --shadow-card:0 8px 24px rgba(20,33,61,.08);
   --font-display:'Fraunces', ui-serif, Georgia, serif;
   --font-body:'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --maxw: 720px;
+  --maxw: 1120px;
   color-scheme: light;
 }
 
@@ -628,4 +628,577 @@ footer{background:#14213D;color:#D6E0ED;border-top:4px solid transparent;border-
   .duration-card strong{font-size:.68rem}
   .hero-actions .btn{font-size:.82rem}
   .program-question-topic{font-size:.65rem}
+}
+
+/* ============================================================================
+   STYLES ADDITIONNELS â€” THÃˆMES, SONDAGES, CANDIDATURES & MODE SOMBRE
+   ========================================================================= */
+
+/* Navigation mobile amÃ©liorÃ©e */
+.topbar nav {
+  display: flex;
+  gap: .35rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.topbar nav::-webkit-scrollbar { display: none; }
+
+/* Badge de candidature conjointe (PS + Place publique) */
+.joint-candidacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .28rem .65rem;
+  background: #F4E8F8;
+  color: #6B21A8;
+  border: 1px solid #E9D5FF;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  margin-top: .35rem;
+  max-width: fit-content;
+}
+
+/* Commutateur de vue : Formations vs Candidatures */
+.view-toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  flex-wrap: wrap;
+  margin: 1.2rem 0 .9rem;
+  padding: .65rem .85rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.view-toggle-label {
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.view-toggle-btns {
+  display: inline-flex;
+  background: var(--line-soft);
+  padding: 3px;
+  border-radius: 999px;
+  gap: 3px;
+}
+.view-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.view-toggle-btn.active {
+  background: #fff;
+  color: var(--blue-deep);
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+/* Indicateur de couverture documentaire des rÃ©sultats */
+.coverage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 700;
+}
+.coverage-badge-ok {
+  background: #EDF7F1;
+  color: #1E6B42;
+  border: 1px solid #D1EEDB;
+}
+.coverage-badge-low {
+  background: #FEF7E6;
+  color: #9A6208;
+  border: 1px solid #F8DF9E;
+}
+.coverage-note {
+  display: block;
+  font-size: .73rem;
+  color: var(--ink-soft);
+  margin-top: .35rem;
+  line-height: 1.35;
+}
+
+/* ================================================================
+   PAGE THÃˆMES (DÃ‰TAILS DES POSITIONS & CANDIDATS)
+   ================================================================ */
+.themes-nav-bar {
+  display: flex;
+  gap: .5rem;
+  overflow-x: auto;
+  padding: .5rem 0 .8rem;
+  margin-bottom: 1.2rem;
+  scrollbar-width: none;
+}
+.themes-nav-bar::-webkit-scrollbar { display: none; }
+.theme-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .58rem .95rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex: none;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.theme-nav-btn:hover {
+  border-color: var(--blue);
+  color: var(--blue-deep);
+}
+.theme-nav-btn.active {
+  border-color: var(--blue-deep);
+  background: var(--blue-deep);
+  color: #fff;
+}
+.theme-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.theme-hero-box {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.6rem;
+  box-shadow: var(--shadow-card);
+}
+.theme-hero-head {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .6rem;
+}
+.theme-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 14px;
+  background: #EEF3FA;
+  font-size: 1.4rem;
+}
+.theme-hero-title h2 { margin: 0; font-size: 1.45rem; }
+.theme-hero-tagline { color: var(--blue); font-size: .85rem; font-weight: 700; margin: 0; }
+.theme-hero-enjeu {
+  font-size: .95rem;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  margin-top: .8rem;
+}
+.theme-questions-box {
+  background: #F8FAFD;
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+}
+.theme-questions-box h3 {
+  font-size: .88rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--blue-deep);
+  margin-bottom: .5rem;
+}
+.theme-questions-box ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: .88rem;
+  color: var(--ink);
+  line-height: 1.55;
+}
+.theme-questions-box li { margin-bottom: .35rem; }
+
+/* Grille des candidats sur ce thÃ¨me */
+.theme-candidates-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+@media(max-width: 760px) {
+  .theme-candidates-grid { grid-template-columns: 1fr; }
+}
+.theme-cand-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--cand-color, var(--blue));
+  border-radius: var(--radius-md);
+  padding: 1.2rem;
+  box-shadow: 0 4px 16px rgba(20,33,61,.04);
+  display: flex;
+  flex-direction: column;
+  gap: .8rem;
+}
+.theme-cand-head {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+}
+.theme-cand-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #E2E8F0;
+  background: #EDF2F7;
+  flex: none;
+}
+.theme-cand-meta strong {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.theme-cand-meta span {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.theme-cand-badge {
+  display: inline-block;
+  padding: .24rem .65rem;
+  background: #EFF4FA;
+  color: var(--blue-deep);
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 800;
+  align-self: flex-start;
+}
+.theme-cand-proposals {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: .84rem;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.theme-cand-proposals li { margin-bottom: .35rem; }
+.theme-cand-quote {
+  margin: 0;
+  padding: .65rem .85rem;
+  background: #FBFBFC;
+  border-left: 3px solid var(--cand-color, var(--line));
+  font-style: italic;
+  font-size: .79rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  border-radius: 0 8px 8px 0;
+}
+
+/* ================================================================
+   PAGE SONDAGES
+   ================================================================ */
+.polls-chart-section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.6rem;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 2rem;
+}
+.polls-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+.polls-chart-head h2 { margin: 0; font-size: 1.35rem; }
+.polls-update-date {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+.poll-bars-list {
+  display: flex;
+  flex-direction: column;
+  gap: .9rem;
+}
+.poll-bar-row {
+  display: grid;
+  grid-template-columns: 140px 1fr 52px;
+  align-items: center;
+  gap: .9rem;
+}
+@media(max-width: 540px) {
+  .poll-bar-row {
+    grid-template-columns: 110px 1fr 44px;
+    gap: .5rem;
+  }
+}
+.poll-cand-name {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .84rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.poll-cand-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+.poll-bar-track {
+  height: 20px;
+  background: #F1F4F9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.poll-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width .8s cubic-bezier(.2,.8,.2,1);
+}
+.poll-score-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .98rem;
+  text-align: right;
+  color: var(--ink);
+}
+
+/* Grille des duels de second tour */
+.polls-duels-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+@media(max-width: 680px) {
+  .polls-duels-grid { grid-template-columns: 1fr; }
+}
+.duel-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+.duel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .9rem;
+}
+.duel-head h3 { font-size: .95rem; margin: 0; }
+.duel-status-tag {
+  font-size: .68rem;
+  font-weight: 700;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: #FEF7E6;
+  color: #9A6208;
+}
+.duel-bars {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+}
+.duel-competitor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  font-size: .88rem;
+}
+.duel-competitor strong { color: var(--ink); }
+.duel-bar-split {
+  height: 12px;
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+  background: #E2E8F0;
+  margin-top: .4rem;
+}
+.duel-source-foot {
+  font-size: .72rem;
+  color: var(--ink-faint);
+  margin-top: .75rem;
+}
+
+/* Tableau des derniers sondages */
+.polls-table-wrap {
+  overflow-x: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.polls-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .84rem;
+  min-width: 620px;
+}
+.polls-table th, .polls-table td {
+  padding: .85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line-soft);
+}
+.polls-table th {
+  background: #F8FAFD;
+  color: var(--ink-soft);
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.polls-table tr:hover td {
+  background: #F9FBFE;
+}
+.polls-lead-cell {
+  font-weight: 700;
+  color: #173f70;
+}
+
+/* Notice lÃ©gale Commission des sondages */
+.polls-notice-box {
+  background: #F7F9FC;
+  border: 1px solid var(--line);
+  border-left: 4px solid #64748B;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 1.1rem 1.3rem;
+  font-size: .82rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.polls-notice-box strong { color: var(--ink); }
+
+/* ================================================================
+   MODE SOMBRE (PREFERS-COLOR-SCHEME: DARK)
+   ================================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0B1120;
+    --paper-raised: #131E33;
+    --ink: #F8FAFC;
+    --ink-soft: #94A3B8;
+    --ink-faint: #64748B;
+    --brass: #E64C5D;
+    --brass-deep: #F05C6C;
+    --brass-pale: #2A171B;
+    --line: #22324F;
+    --line-soft: #18243B;
+    --blue: #38BDF8;
+    --blue-deep: #0284C7;
+    --red: #FB7185;
+    --good: #34D399;
+    --warn: #FBBF24;
+    --shadow-card: 0 8px 24px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+  body {
+    background: linear-gradient(180deg, #070B14 0%, #0B1120 100%);
+    color: var(--ink);
+  }
+  .topbar {
+    background: rgba(11, 17, 32, 0.95);
+    border-bottom-color: var(--line);
+  }
+  .navlink { color: var(--ink-soft); }
+  .navlink:hover:not(:disabled) {
+    background: #18243B;
+    color: #fff;
+  }
+  .navlink.active {
+    background: var(--blue-deep);
+    color: #fff;
+  }
+  .q-card, .party-card, .quiz-intro-card, .how-it-works, .method-section,
+  .program-question, .program-answer, .match-card, .prio-card, .prop,
+  .theme-hero-box, .theme-cand-card, .polls-chart-section, .duel-card,
+  .polls-table-wrap, .view-toggle-wrap, .depart-box {
+    background: var(--paper-raised);
+    border-color: var(--line);
+    color: var(--ink);
+  }
+  .drawer {
+    background: #090E1A;
+    border-left-color: var(--line);
+  }
+  .scale-btn, .choice-btn, .filter-chip, .program-tab, .theme-nav-btn {
+    background: #131E33;
+    color: var(--ink);
+    border-color: var(--line);
+  }
+  .scale-btn.sel, .choice-btn.sel, .filter-chip.sel, .program-tab.active, .theme-nav-btn.active {
+    background: var(--blue-deep);
+    border-color: var(--blue-deep);
+    color: #fff;
+  }
+  .theme-hero-icon {
+    background: #18253E;
+  }
+  .theme-questions-box {
+    background: #0F182A;
+  }
+  .theme-cand-quote {
+    background: #0F182A;
+  }
+  .theme-cand-badge {
+    background: #18253E;
+    color: #38BDF8;
+  }
+  .polls-table th {
+    background: #111A2D;
+    color: var(--ink-soft);
+  }
+  .polls-table tr:hover td {
+    background: #142038;
+  }
+  .poll-bar-track {
+    background: #18243B;
+  }
+  .polls-notice-box {
+    background: #0F182A;
+    border-color: var(--line);
+  }
+  .view-toggle-btns {
+    background: #0B1120;
+  }
+  .view-toggle-btn.active {
+    background: #1E293B;
+    color: #fff;
+  }
+  .programs-note {
+    background: #101B2E;
+    border-left-color: #38BDF8;
+    color: #94A3B8;
+  }
+  .program-options > div {
+    background: #101C30;
+    color: #CBD5E1;
+  }
+  .program-options > div > span {
+    background: #182740;
+    color: #38BDF8;
+  }
 }

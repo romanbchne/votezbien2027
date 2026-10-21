@@ -232,8 +232,8 @@ const DEPARTAGE = [
     options:[
       { pos:0, short:'60 ans', text:'Revenir à 60 ans, avec 40 ans de cotisation.' },
       { pos:1, short:'62 ans', text:'Revenir à 62 ans, en annulant le passage à 64 ans.' },
-      { pos:2, short:'64 ans, ou durée de cotisation seule', text:'Garder 64 ans, ou supprimer l’âge légal et ne regarder que la durée de cotisation.' },
-      { pos:3, short:'65 ans ou plus', text:'Reculer l’âge de départ vers 65 ans ou plus, ou l’indexer sur l’espérance de vie.' }
+      { pos:2, short:'64 ans (cadre légal actuel)', text:'Maintenir l’âge légal de départ à 64 ans fixé par la réforme de 2023.' },
+      { pos:3, short:'65 ans ou plus', text:'Reporter progressivement l’âge légal vers 65 ans ou plus pour équilibrer les régimes.' }
     ],
     stances:{ lfi:0.25, pcf:0, lo:0, ecolo:0.75, ps:1, pp:1.5, rn:1, renaissance:2, reconquete:2, horizons:3, lr:3, dlf:0.5 },
     basis:'Propositions déclarées des candidats (JDD, 20 Minutes, septembre 2026).' },
@@ -324,7 +324,7 @@ const DEPARTAGE = [
     plain:'L’Union européenne a décidé d’interdire, à partir de 2035, la vente de voitures neuves à moteur essence ou diesel ; une exception est prévue pour les carburants de synthèse.',
     options:[
       { pos:0, short:'La maintenir', text:'Maintenir l’interdiction en 2035.' },
-      { pos:1, short:'L’assouplir', text:'L’assouplir (hybrides, carburants de synthèse, report de la date).' },
+      { pos:1, short:'Reporter et assouplir', text:'Reporter l’échéance de 2035 et autoriser durablement les véhicules hybrides et carburants de synthèse.' },
       { pos:2, short:'La supprimer', text:'La supprimer.' }
     ],
     stances:{ ecolo:0, pp:0, lfi:0, ps:0.5, pcf:0.5, renaissance:0.5, horizons:1.5, lr:2, rn:2, reconquete:2, dlf:2 },
@@ -499,7 +499,55 @@ const DEPARTAGE = [
       { pos:2, short:'Service militaire', text:'Rétablir un service militaire obligatoire.' }
     ],
     stances:{ lfi:0, pcf:0, lo:0, ps:0, ecolo:0.25, lr:0.25, horizons:0.5, pp:1, renaissance:1, rn:1.25, dlf:1.25, reconquete:1.5 },
-    basis:'Positions déclarées des candidats sur le SNU obligatoire (septembre 2026).' }
+    basis:'Positions déclarées des candidats sur le SNU obligatoire (septembre 2026).' },
+
+  { id:'dp-logement', dim:'eco', group:'logement', topic:'Logement et loyers',
+    q:'Comment résoudre la crise du logement et l’accès au toit ?',
+    plain:'La politique du logement oppose l’encadrement des loyers et le développement du parc social d’un côté, à la défiscalisation et l’allègement des règles de construction de l’autre.',
+    options:[
+      { pos:0, short:'Encadrement strict et réquisitions', text:'Encadrer strictement les loyers dans toutes les zones tendues, réquisitionner les logements vacants et suspendre les expulsions sans relogement.' },
+      { pos:1, short:'Construction de logements sociaux', text:'Financer prioritairement la construction de logements sociaux publics et faire respecter fermement les quotas de la loi SRU.' },
+      { pos:2, short:'Rénovation et accession ciblée', text:'Soutenir la rénovation thermique et cibler les aides à l’accession à la propriété, sans blocage généralisé des loyers.' },
+      { pos:3, short:'Choc d’offre et incitations privées', text:'Alléger les normes de construction, accélérer les procédures contre les squats et inciter l’investissement locatif privé par des baisses d’impôts.' }
+    ],
+    stances:{ lfi:0, pcf:0.25, lo:0, ecolo:0.5, ps:1, pp:1, renaissance:2.25, horizons:2.5, lr:3, reconquete:3, rn:2.75, dlf:2.5, modem:2, udi:2.5 },
+    basis:'Propositions et votes parlementaires sur le budget du logement et les règles locatives (septembre 2026).' },
+
+  { id:'dp-sante', dim:'eco', group:'sante', topic:'Santé et déserts médicaux',
+    q:'Comment remédier au manque de soignants et aux déserts médicaux ?',
+    plain:'Les déserts médicaux désignent les territoires où les délais pour consulter un médecin généraliste ou un spécialiste deviennent excessifs.',
+    options:[
+      { pos:0, short:'Régulation obligatoire de l’installation', text:'Réguler obligatoirement l’installation des médecins en zones déficitaires et salarier des praticiens dans des centres publics.' },
+      { pos:1, short:'Réinvestissement massif à l’hôpital', text:'Revaloriser fortement les carrières hospitalières, recruter des soignants et rouvrir des lits d’urgences de proximité.' },
+      { pos:2, short:'Incitations financières et délégations', text:'Maintenir la liberté d’installation en renforçant les primes d’exercice et en déléguant certains actes aux infirmiers et pharmaciens.' },
+      { pos:3, short:'Recours accru au secteur privé et téléconsultation', text:'Développer la télémédecine, faire appel aux cliniques privées pour désengorger le public et réduire les tâches administratives.' }
+    ],
+    stances:{ lfi:0.25, pcf:0.5, lo:0, ecolo:0.5, ps:1, pp:1, renaissance:2, horizons:2, lr:2.25, rn:1.75, reconquete:2.5, dlf:2, modem:2 },
+    basis:'Débats parlementaires sur la régulation de l’installation médicale et le soutien à l’hôpital (septembre 2026).' },
+
+  { id:'dp-ecole', dim:'soc', group:'education', topic:'École et instruction',
+    q:'Quelle doit être la priorité pour redresser l’école ?',
+    plain:'Les débats scolaires opposent la réduction des inégalités sociales et la mixité, à l’exigence de discipline, d’uniforme et d’accent mis sur les savoirs fondamentaux.',
+    options:[
+      { pos:0, short:'Moyens accrus et mixité obligatoire', text:'Augmenter massivement les postes, conditionner les aides des établissements privés au respect de la mixité sociale et supprimer les filières sélectives précoces.' },
+      { pos:1, short:'Revalorisation et soutien ciblé', text:'Revaloriser inconditionnellement les salaires enseignants et dédoubler les classes dans les quartiers et zones rurales prioritaires.' },
+      { pos:2, short:'Fondamentaux et groupes de niveau', text:'Concentrer les programmes sur le français et les mathématiques, organiser des groupes selon le niveau des élèves et valoriser le mérite.' },
+      { pos:3, short:'Autorité, uniforme et libre choix', text:'Instaurer le port de l’uniforme, rétablir une discipline stricte, sanctionner les manquements et faciliter le libre choix de l’établissement scolaire.' }
+    ],
+    stances:{ lfi:0, pcf:0.25, lo:0, ecolo:0.5, ps:1, pp:1, renaissance:2, horizons:2.25, lr:2.75, rn:3, reconquete:3, dlf:2.75, udr:3 },
+    basis:'Débats sur le choc des savoirs, l’expérimentation de l’uniforme et les financements éducatifs (septembre 2026).' },
+
+  { id:'dp-pouvoir-achat', dim:'eco', group:'eco-social', topic:'Pouvoir d’achat et salaires',
+    q:'Quel moyen faut-il privilégier pour améliorer le pouvoir d’achat ?',
+    plain:'Le pouvoir d’achat mesure la quantité de biens et de services qu’un ménage peut acquérir avec l’ensemble de ses revenus nets.',
+    options:[
+      { pos:0, short:'Hausse du SMIC et blocage des prix', text:'Porter le SMIC à 1 600 € net, indexer les salaires sur l’inflation et bloquer temporairement les prix des produits de première nécessité.' },
+      { pos:1, short:'Négociations salariales et surtaxe des profits', text:'Conditionner les aides publiques aux entreprises à des hausses de salaires et taxer les superprofits pour redistribuer aux ménages modestes.' },
+      { pos:2, short:'Baisse des charges et primes défiscalisées', text:'Réduire les cotisations salariales pour augmenter le salaire net (« désmicardisation ») et encourager le versement de primes sans impôt.' },
+      { pos:3, short:'Baisse de la TVA sur l’énergie et carburants', text:'Abaisser la TVA à 5,5 % sur les carburants, l’électricité et le gaz, et défiscaliser intégralement les heures supplémentaires.' }
+    ],
+    stances:{ lfi:0, pcf:0.25, lo:0, ecolo:0.75, ps:1, pp:1, renaissance:2, horizons:2, lr:2.25, rn:2.75, reconquete:2.5, dlf:2.5, modem:2, udi:2 },
+    basis:'Propositions parlementaires d’urgence sur le pouvoir d’achat et la fiscalité des ménages (septembre 2026).' }
 ];
 
 /* Sources consultées pour recouper les positions ci-dessus (septembre 2026).
@@ -521,7 +569,10 @@ const SOURCES = [
   { label:'Positions des candidats en données ouvertes (MonVote2027), consultées pour recoupement uniquement', url:'https://monvote2027.fr/donnees' },
   { label:'Suivi des candidatures à la présidentielle (LCP, mis à jour le 14 octobre 2026)', url:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373' },
   { label:'Résultat de la primaire PS–Place publique (LCP, 11 octobre 2026)', url:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la' },
-  { label:'Calendrier officiel de la présidentielle 2027 (Gouvernement)', url:'https://www.info.gouv.fr/actualite/election-presidentielle-2027' }
+  { label:'Calendrier officiel de la présidentielle 2027 (Gouvernement)', url:'https://www.info.gouv.fr/actualite/election-presidentielle-2027' },
+  { label:'Primaire sociale-démocrate : victoire de Raphaël Glucksmann avec 66 % (Place publique, octobre 2026)', url:'https://action.place-publique.eu/actualite/1pLGM09haM00P1wJaOcI3c/raphael-glucksmann-avec-66-candidat-de-la-gauche-socialiste-et-democratique' },
+  { label:'Liste des sondages sur l’élection présidentielle de 2027 (Wikipédia)', url:'https://fr.wikipedia.org/wiki/Liste_de_sondages_sur_l%27%C3%A9lection_pr%C3%A9sidentielle_fran%C3%A7aise_de_2027' },
+  { label:'Notices et règles des intentions de vote (Commission nationale des sondages)', url:'https://www.commission-des-sondages.fr/' }
 ];
 
 /* ----------------------------------------------------------------------
@@ -560,13 +611,15 @@ const PARTIES = [
     positions:{ eco:-1.8, soc:-1, auth:-0.5, europe:0.5, immig:-1, ecology:-1 } },
   { id:'ps', name:'Parti socialiste', short:'PS', family:'Centre-gauche', color:'#df2160',
     site:'https://parti-socialiste.fr/', program:'https://parti-socialiste.fr/',
-    status:'Le Parti socialiste soutient Raphaël Glucksmann, vainqueur de la primaire sociale-démocrate du 11 octobre 2026.',
+    jointCandidacyId:'glucksmann', jointCandidacyLabel:'Candidature commune PS — Place publique',
+    status:'Le Parti socialiste soutient officiellement Raphaël Glucksmann, vainqueur de la primaire sociale-démocrate du 11 octobre 2026 (avec 66 % des voix). Il n’y a plus de candidature socialiste autonome pour 2027.',
     statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la',
     personName:'Raphaël Glucksmann', personRole:'Candidat commun désigné par la primaire PS–Place publique', portraitFile:'2024-03-03 - Congrès du PSE- 105 - Raphael Glucksmann.jpg', portraitCredit:'Mathieu Delmestre', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:-1, soc:-1.2, auth:-0.3, europe:-1.3, immig:-0.5, ecology:-0.8 } },
   { id:'pp', name:'Place publique', short:'PP', family:'Centre-gauche européen', color:'#6c53a4',
     site:'https://place-publique.eu/', program:'https://place-publique.eu/',
-    status:'Raphaël Glucksmann, fondateur de Place publique, a remporté la primaire sociale-démocrate le 11 octobre 2026. Il est le candidat commun soutenu par Place publique et le Parti socialiste.',
+    jointCandidacyId:'glucksmann', jointCandidacyLabel:'Candidature commune PS — Place publique',
+    status:'Raphaël Glucksmann, président de Place publique, est le candidat commun investi par Place publique et le Parti socialiste après avoir remporté la primaire du 11 octobre 2026 avec 66 % des voix.',
     statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la',
     personName:'Raphaël Glucksmann', personRole:'Candidat commun désigné par la primaire PS–Place publique', portraitFile:'2024-03-03 - Congrès du PSE- 105 - Raphael Glucksmann.jpg', portraitCredit:'Mathieu Delmestre', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:-0.8, soc:-1.2, auth:-0.3, europe:-1.8, immig:-0.5, ecology:-1.3 } },
@@ -614,7 +667,7 @@ const PARTIES = [
     positions:{ eco:1.3, soc:1.3, auth:1.8, europe:1.3, immig:1.8, ecology:1.3 } },
   { id:'rn', name:'Rassemblement National', short:'RN', family:'Droite nationale', color:'#173f70',
     site:'https://rassemblementnational.fr/', program:'https://rassemblementnational.fr/programme/',
-    status:'Marine Le Pen a confirmé sa candidature le 7 juillet 2026. La possibilité de se présenter reste liée à l’issue de sa procédure judiciaire.',
+    status:'Marine Le Pen a confirmé sa candidature le 7 juillet 2026. L’issue de son procès concernant les assistants parlementaires conditionne son éligibilité ; Jordan Bardella constitue le recours désigné du mouvement.',
     statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
     personName:'Marine Le Pen', personRole:'Candidate déclarée selon le statut indiqué', portraitFile:'Marine Le Pen in 2026.jpg', portraitCredit:'Elekes Andor', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.3, soc:1.3, auth:1.8, europe:1.3, immig:2, ecology:0.8 } },
