@@ -92,7 +92,7 @@ section('Priorités');
 {
   const withP = makeDom({ seed: 12 }); const l1 = drive(withP, { scale: persona(mid), choice: q => nearestOption(q, q.stances.ecolo), priorities: ['ecology'] });
   const without = makeDom({ seed: 12 }); const l2 = drive(without, { scale: persona(mid), choice: q => nearestOption(q, q.stances.ecolo) });
-  test('une priorité choisie s’affiche dans « Vos priorités »', () => assert.ok(l1.resultsText.includes('1. Écologie & énergie')));
+  test('une priorité choisie s’affiche dans « Vos priorités »', () => assert.ok(l1.resultsText.includes('1. Écologie et énergie')));
   test('sans priorité, l’application le dit : tous les thèmes comptent autant', () => assert.ok(l2.resultsText.includes('Vous n’avez pas désigné de priorité')));
   test('la priorité ne modifie jamais l’orientation gauche-droite affichée', () => {
     const lab = t => (t.match(/Plutôt à (gauche|droite)|Centre-gauche|Centre-droit|Plutôt au centre/) || [])[0];

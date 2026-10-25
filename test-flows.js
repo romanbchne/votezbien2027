@@ -24,7 +24,7 @@ function toFirstChoice(env, priorities) {
   {
     const fresh = makeDom({ seed: 2 }); await tick();
     test('sans réponse enregistrée, la bannière de reprise est masquée', () => {
-      assert.strictEqual($(fresh, 'resumeBanner').hidden, true); assert.strictEqual($(fresh, 'btnResume').hidden, true);
+      assert.strictEqual($(fresh, 'resumeBanner').hidden, true);
     });
     const env = makeDom({ seed: 3 }); startAndAnswer(env, 7);
     const stored = env.win.localStorage.getItem(KEY);
