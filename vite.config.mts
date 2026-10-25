@@ -23,7 +23,6 @@ const SITE_FILES = [
   'styles.css',
   'data.js',
   'scoring.js',
-  'radar.js',
   'app.js',
   'service-worker.js',
   'manifest.json',

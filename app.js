@@ -7,7 +7,7 @@
 
   const STORAGE_KEY = 'votezbien:v7:state';
   const SCALE_LABELS = ['Beaucoup plus A', 'Plutôt A', 'Entre les deux', 'Plutôt B', 'Beaucoup plus B'];
-  const VALID_SCREENS = ['home', 'quizStart', 'quiz', 'checkpoint', 'results', 'themes', 'polls', 'programs', 'parties', 'compare', 'candidatures', 'radar', 'method'];
+  const VALID_SCREENS = ['home', 'quizStart', 'quiz', 'checkpoint', 'results', 'themes', 'polls', 'programs', 'parties', 'compare', 'candidatures', 'method'];
 
   const qById = {};
   QUESTIONS.forEach(q => { qById[q.id] = q; });
@@ -142,7 +142,7 @@
       if (m.questionAnsweredCount >= Scoring.MIN_QUESTIONS_FOR_QUESTION_MODE && m.questionComparableCount < Scoring.MIN_COMPARABLE_QUESTIONS) {
         return 'Pas de score classé : seulement ' + m.questionComparableCount + ' de vos réponses précises sont comparables ; ' + coverage + ' dans la banque.';
       }
-      if (m.questionAnsweredCount >= Scoring.MIN_QUESTIONS_FOR_QUESTION_MODE && m.questionCoverage < Scoring.PARTIAL_COVERAGE) {
+      if (m.questionAnsweredCount >= Scoring.MIN_QUESTIONS_FOR_QUESTION_MODE && m.questionCoverage < Scoring.MIN_ANSWERED_COVERAGE) {
         return 'Pas de score classé : données manquantes sur vos réponses précises (' + Math.round(m.questionCoverage * 100) + ' % couvertes) ; ' + coverage + ' dans la banque.';
       }
       return 'Pas de score classé : ' + coverage + ' dans la banque de précision. Les thèmes seuls ne suffisent pas à comparer cette formation.';
@@ -197,7 +197,6 @@
     if (name === 'parties') renderParties();
     if (name === 'compare') renderCompare();
     if (name === 'candidatures') renderCandidatures();
-    if (name === 'radar') renderRadar();
     if (name === 'method') renderMethod();
     if (name === 'checkpoint') renderCheckpoint();
   }
@@ -219,7 +218,7 @@
 
   function setNavEnabled(enabled) {
     const res = document.getElementById('navResults');
-    if (res) res.disabled = false;
+    if (res) res.disabled = !enabled;
   }
 
   /* ================================================================
@@ -611,7 +610,7 @@
       const nQ = Object.keys(state.dpAnswers).filter(id => typeof state.dpAnswers[id] === 'number').length;
       html += `<div class="best-matches">
         <h2>Les formations les plus proches de vos réponses</h2>
-        <p class="lede">Indice éditorial sur 100, calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Ce n’est ni une probabilité, ni une intention de vote, ni une mesure de soutien. Les formations sont classées seulement si au moins la moitié des positions de la banque de précision est renseignée et si la comparaison porte sur assez de réponses communes.</p>
+        <p class="lede">Indice éditorial sur 100, calculé à partir de vos ${overall.totalAnswered} réponses générales${nQ ? ' et de vos ' + nQ + ' réponses aux questions de précision' : ''}. Ce n’est ni une probabilité, ni une intention de vote, ni une mesure de soutien. Un score est affiché si au moins ${Math.round(Scoring.PARTIAL_COVERAGE * 100)} % des positions du parti sont documentées, avec au moins ${Scoring.MIN_COMPARABLE_QUESTIONS} réponses précises communes; après trois réponses, au moins ${Math.round(Scoring.MIN_ANSWERED_COVERAGE * 100)} % des vôtres doivent être couvertes.</p>
         <div class="match-grid">`;
       top.forEach((m, i) => {
         html += `<button class="match-card${i === 0 ? ' top' : ''}" style="--card-accent:${m.party.color}" data-party="${m.party.id}">
@@ -903,7 +902,7 @@
       <div class="theme-cleavages-tag"><strong>Lignes de fracture 2027 :</strong> ${currentTheme.cleavages}</div>
     </article>`;
 
-    html += `<h3 style="margin-top:1.2rem; font-size:1.25rem">Positions & mesures des candidats déclarés</h3>
+    html += `<h3 style="margin-top:1.2rem; font-size:1.25rem">Positions et propositions des formations et candidats</h3>
     <div class="theme-candidates-grid">`;
 
     currentTheme.candidates.forEach(c => {
@@ -918,6 +917,7 @@
         <ul class="tc-proposals">
           ${c.proposals.map(p => `<li>${p}</li>`).join('')}
         </ul>
+        ${c.sourceUrl ? `<p class="confidence-note tc-source" style="margin:.5rem 0 0"><a href="${c.sourceUrl}" target="_blank" rel="noopener">${c.sourceLabel || 'Source du programme'}</a></p>` : ''}
       </div>`;
     });
 
@@ -951,7 +951,7 @@
         <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:.5rem">
           <div>
             <h2 style="margin:0">Moyenne agrégée du 1er tour</h2>
-            <p class="confidence-note" style="margin:.2rem 0 0">Mise à jour du ${POLLS.updatedAt} · moyenne de ${POLLS.waves.length} vagues d’enquêtes publiées, dont les ${inScope.length} candidats comparés sur ce site. <a href="${POLLS.sourceUrl}" target="_blank" rel="noopener">Source</a></p>
+            <p class="confidence-note" style="margin:.2rem 0 0">Mise à jour du ${POLLS.updatedAt} · ${POLLS.aggregationNote} <a href="${POLLS.sourceUrl}" target="_blank" rel="noopener">Source de l’agrégat</a></p>
           </div>
           <span class="quiz-duration">Élection présidentielle 2027</span>
         </div>
@@ -996,7 +996,7 @@
             <span style="color:${d.candidateA.color}">${d.candidateA.name} : ${d.candidateA.score} %</span>
             <span style="color:${d.candidateB.color}">${d.candidateB.name} : ${d.candidateB.score} %</span>
           </div>
-          ${d.detail && d.detail.length ? `<details class="duel-detail"><summary>Détail des ${d.detail.length} mesures</summary><ul>${d.detail.map(x => `<li><span>${x.institute}</span><span>${x.date}</span><strong>${x.a} – ${x.b}</strong></li>`).join('')}</ul></details>` : ''}
+          ${d.detail && d.detail.length ? `<details class="duel-detail"><summary>Détail des ${d.detail.length} mesures</summary><ul>${d.detail.map(x => `<li><span>${x.institute}</span><span>${x.date}</span><strong>${x.a} – ${x.b}</strong>${x.notice ? `<a href="${x.notice}" target="_blank" rel="noopener">notice</a>` : ''} </li>`).join('')}</ul></details>` : ''}
         </div>`;
       });
 
@@ -1013,6 +1013,7 @@
             <div>
               <h3 style="font-size:1.05rem; margin-bottom:.15rem">${w.institute}${w.sponsor ? ' pour ' + w.sponsor : ''}</h3>
               <p class="confidence-note" style="margin:0">Publiée le ${w.publishedAt} · terrain du ${w.terrain} · ${w.sampleSize.toLocaleString('fr-FR')} personnes inscrites</p>
+              ${w.sampleNote ? `<p class="confidence-note" style="margin:.2rem 0 0">${w.sampleNote}</p>` : ''}
               ${w.sponsorNote ? `<p class="confidence-note" style="margin:.2rem 0 0">${w.sponsorNote}</p>` : ''}
             </div>
             <span class="tc-party-badge">${w.scenario}</span>
@@ -1473,7 +1474,7 @@
     const isDepartage = programPhase === 'departage';
     const questions = isDepartage ? DEPARTAGE : QUESTIONS;
     phaseIntro.textContent = isDepartage
-      ? `La banque contient ${DEPARTAGE.length} questions concrètes ; le quiz en pose jusqu’à 15, choisies selon vos réponses. Les positions sont des estimations éditoriales sur des choix concrets, pas des réponses officielles.`
+      ? `La banque contient ${DEPARTAGE.length} questions concrètes ; le quiz en pose jusqu’à ${Scoring.MAX_DEPARTAGE}, choisies selon vos réponses. Si deux formations restent proches, il privilégie une question documentée qui les distingue. Les positions sont des estimations éditoriales, pas des réponses officielles.`
       : 'Chaque repère rapproche le profil thématique d’une formation de la proposition A ou B. Il ne signifie pas que la personne citée a répondu mot pour mot à la question.';
 
     list.innerHTML = questions.map((question, index) => {
@@ -1522,338 +1523,6 @@
 
 
   /* ================================================================
-     RADAR INTELLIGENT DES BIAIS & QUALITÉ
-     Tout ce qui est affiché sur cet écran est CALCULÉ à l'ouverture par
-     radar.js (window.Radar.audit()), qui rejoue réellement les contrôles
-     sur les données et sur le moteur de calcul. Aucun score n'est écrit
-     à la main : si une donnée change, l'écran change avec elle.
-     ================================================================ */
-  let radarAudit = null;
-
-  function getRadarAudit() {
-    if (radarAudit) return radarAudit;
-    if (typeof Radar === 'undefined' || !Radar.audit) return null;
-    radarAudit = Radar.audit({ seeds: 120, profiles: 40, simRuns: 400 });
-    /* L'audit exécuté est exposé publiquement : le lecteur peut le vérifier
-       lui-même dans la console (Radar.audit() refait exactement le même
-       calcul). Rien n'est caché derrière le score affiché. */
-    try { window.votezAudit = radarAudit; } catch (e) {}
-    return radarAudit;
-  }
-
-  const RADAR_LEVELS = {
-    ok:    { label: 'Audit conforme',            note: 'Tous les contrôles contrôlés passent.' },
-    warn:  { label: 'Audit : points à corriger', note: 'Des écarts réels ont été détectés et sont listés ci-dessous.' },
-    error: { label: 'Audit : anomalies',          note: 'Des anomalies bloquantes ont été détectées et sont listées ci-dessous.' }
-  };
-
-  function renderRadarScore(audit) {
-    const num = document.getElementById('radarScoreNumber');
-    if (num) num.innerHTML = audit.score + '<small>/100</small>';
-    const badge = document.getElementById('radarScoreBadge');
-    if (badge) {
-      const lvl = RADAR_LEVELS[audit.level] || RADAR_LEVELS.ok;
-      badge.textContent = lvl.label;
-      badge.dataset.level = audit.level;
-    }
-    const headline = document.getElementById('radarScoreHeadline');
-    if (headline) {
-      headline.innerHTML = '<strong>Score pondéré de ' + audit.score + '/100</strong>, obtenu en exécutant ' +
-        audit.axes.length + ' axes de contrôle sur ' + audit.counts.questions + ' questions d’orientation, ' +
-        audit.counts.departage + ' questions de départage, ' + audit.counts.parties + ' formations et ' +
-        audit.counts.sources + ' sources. Poids des axes : ' +
-        audit.axes.map(a => a.short + ' ' + Math.round(audit.axisWeights[a.key] * 100) + ' %').join(' · ') + '.';
-    }
-    const stamp = document.getElementById('radarGeneratedAt');
-    if (stamp) {
-      const d = new Date(audit.generatedAt);
-      stamp.textContent = 'Contrôles exécutés le ' + d.toLocaleString('fr-FR') + ' dans votre navigateur.';
-    }
-    /* La liste de contrôle reprend les axes réellement joués : rien n'y est
-       écrit à la main, chaque ligne est le résultat d'un calcul. */
-    const checkList = document.getElementById('radarCheckList');
-    if (checkList) {
-      checkList.innerHTML = audit.axes.map(ax => {
-        const level = ax.level || 'ok';
-        const mark = level === 'error' ? '✕' : (level === 'warn' ? '!' : '✓');
-        return '<li><span class="check-icon" data-level="' + level + '" aria-hidden="true">' + mark + '</span>' +
-          '<span>' + ax.label + ' — ' + ax.score + '/100</span></li>';
-      }).join('');
-    }
-  }
-
-  function renderRadarChart(audit) {
-    const svgWrapper = document.getElementById('radarSvgWrapper');
-    if (!svgWrapper) return;
-    const axes = audit.axes;
-    const cx = 175, cy = 175, r = 100;
-    const N = axes.length;
-
-    let gridSvg = '';
-    [0.2, 0.4, 0.6, 0.8, 1.0].forEach(level => {
-      const pts = [];
-      for (let i = 0; i < N; i++) {
-        const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
-        pts.push((cx + r * level * Math.cos(angle)).toFixed(1) + ',' + (cy + r * level * Math.sin(angle)).toFixed(1));
-      }
-      gridSvg += '<polygon class="grid-line' + (level < 1 ? ' dashed' : '') + '" points="' + pts.join(' ') + '" fill="none"/>';
-    });
-
-    let spokesSvg = '', labelsSvg = '', dataPts = [];
-    axes.forEach((ax, i) => {
-      const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
-      const x2 = cx + r * Math.cos(angle);
-      const y2 = cy + r * Math.sin(angle);
-      spokesSvg += '<line class="spoke" x1="' + cx + '" y1="' + cy + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '"/>';
-
-      const lx = cx + (r + 30) * Math.cos(angle);
-      const ly = cy + (r + 18) * Math.sin(angle);
-      const textAnchor = Math.abs(Math.cos(angle)) < 0.2 ? 'middle' : (Math.cos(angle) > 0 ? 'start' : 'end');
-      labelsSvg += '<text class="axis-label" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + textAnchor + '">' + ax.short + '</text>';
-      labelsSvg += '<text class="axis-value" x="' + lx.toFixed(1) + '" y="' + (ly + 12).toFixed(1) + '" text-anchor="' + textAnchor + '">' + ax.score + '%</text>';
-
-      const scoreR = r * (Math.max(0, Math.min(100, ax.score)) / 100);
-      dataPts.push((cx + scoreR * Math.cos(angle)).toFixed(1) + ',' + (cy + scoreR * Math.sin(angle)).toFixed(1));
-    });
-
-    const polySvg = '<polygon class="shape" points="' + dataPts.join(' ') + '"/>';
-    const dotsSvg = axes.map((ax, i) => {
-      const angle = -Math.PI / 2 + (i * 2 * Math.PI / N);
-      const scoreR = r * (Math.max(0, Math.min(100, ax.score)) / 100);
-      const px = cx + scoreR * Math.cos(angle);
-      const py = cy + scoreR * Math.sin(angle);
-      return '<circle class="dot" cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4"/>';
-    }).join('');
-
-    svgWrapper.innerHTML = '<svg viewBox="0 0 350 350" class="radar-svg" role="img" aria-label="Boussole d’intégrité civique, ' + N + ' axes calculés">' +
-      '<defs>' +
-        '<linearGradient id="radarGrad" x1="0" y1="0" x2="1" y2="1">' +
-          '<stop offset="0%" style="stop-color:var(--blue);stop-opacity:.45"/>' +
-          '<stop offset="100%" style="stop-color:var(--right);stop-opacity:.18"/>' +
-        '</linearGradient>' +
-      '</defs>' +
-      gridSvg + spokesSvg + polySvg + dotsSvg + labelsSvg +
-    '</svg>';
-  }
-
-  function renderRadarAxes(audit) {
-    const axisListEl = document.getElementById('radarAxisList');
-    if (!axisListEl) return;
-    axisListEl.innerHTML = audit.axes.map(ax =>
-      '<div class="radar-axis-card">' +
-        '<div class="axis-card-top">' +
-          '<strong>' + ax.label + '</strong>' +
-          '<span class="axis-score">' + ax.score + ' / 100</span>' +
-        '</div>' +
-        '<p>' + ax.summary + '</p>' +
-        '<div class="axis-bar-track">' +
-          '<div class="axis-bar-fill" style="width:' + ax.score + '%"></div>' +
-        '</div>' +
-        '<ul class="axis-metrics">' +
-          ax.metrics.map(m => '<li><span>' + m.label + '</span><strong>' + m.value + '</strong></li>').join('') +
-        '</ul>' +
-      '</div>'
-    ).join('');
-  }
-
-  function renderRadarFindings(audit) {
-    const wrap = document.getElementById('radarFindings');
-    if (!wrap) return;
-    const order = { error: 0, warn: 1, ok: 2 };
-    const sorted = audit.findings.slice().sort((a, b) => order[a.level] - order[b.level]);
-    const counts = { error: 0, warn: 0, ok: 0 };
-    sorted.forEach(f => { counts[f.level] = (counts[f.level] || 0) + 1; });
-
-    const summary = document.getElementById('radarFindingsSummary');
-    if (summary) {
-      summary.textContent = counts.error + ' anomalie' + (counts.error > 1 ? 's' : '') + ', ' +
-        counts.warn + ' point' + (counts.warn > 1 ? 's' : '') + ' d\'amélioration, ' +
-        counts.ok + ' contrôle' + (counts.ok > 1 ? 's' : '') + ' conforme' + (counts.ok > 1 ? 's' : '') + '.';
-    }
-
-    wrap.innerHTML = sorted.map(f => {
-      const mark = f.level === 'error' ? '✕' : (f.level === 'warn' ? '!' : '✓');
-      return '<article class="radar-finding ' + f.level + '">' +
-        '<span class="finding-mark" aria-hidden="true">' + mark + '</span>' +
-        '<div><h3>' + f.title + '</h3><p>' + f.message + '</p>' +
-        '<span class="finding-axis">' + (audit.axes.find(a => a.key === f.axis) ? audit.axes.find(a => a.key === f.axis).label : f.axis) + '</span></div>' +
-      '</article>';
-    }).join('');
-  }
-
-  function renderRadarParties(audit) {
-    const tbody = document.getElementById('radarPartiesTbody');
-    if (!tbody) return;
-    const cov = audit.axes.find(a => a.key === 'coverage');
-    const rows = cov ? cov.detail.parties : PARTIES.map(p => Object.assign({ short: p.short, name: p.name }, partyCoverage(p)));
-    tbody.innerHTML = rows.map(r => {
-      const pct = r.total ? Math.round((r.coded / r.total) * 100) : 0;
-      const statusBadge = r.partial
-        ? '<span class="status-chip partial">Sous le seuil (' + pct + ' %) — non classée</span>'
-        : '<span class="status-chip ready">Comparable (' + pct + ' % documenté)</span>';
-      const party = PARTIES.find(p => p.id === r.id);
-      return '<tr>' +
-        '<td><span class="party-dot" style="background:' + r.color + '"></span> <strong>' + r.name + '</strong> (' + r.short + ')</td>' +
-        '<td>' + r.personName + ' <small class="text-muted">· ' + r.personRole + '</small></td>' +
-        '<td>' + r.family + '</td>' +
-        '<td><strong>' + r.coded + '</strong> / ' + r.total + ' questions</td>' +
-        '<td>' + statusBadge + '</td>' +
-      '</tr>';
-    }).join('');
-  }
-
-  function renderRadarSim(sim) {
-    const statusText = document.getElementById('simStatusText');
-    if (statusText) {
-      statusText.innerHTML = '<strong>' + sim.runs.toLocaleString('fr-FR') + ' profils aléatoires simulés en ' +
-        sim.elapsedMs + ' ms.</strong> ' + sim.scored + ' profils ont pu être classés, ' +
-        sim.ties + ' quasi-égalités honnêtes (' + Math.round(sim.tieRate * 100) + ' %), ' +
-        sim.noWinner + ' sans classement possible. ' +
-        sim.everWon + ' formations sur ' + sim.eligible + ' classables ont été winner au moins une fois : ' +
-        'aucune formation n’est favorisée par construction.';
-    }
-    const bars = document.getElementById('radarSimBars');
-    if (!bars) return;
-    const max = sim.distribution.length ? Math.max.apply(null, sim.distribution.map(d => d.wins)) : 0;
-    bars.innerHTML = sim.distribution.map(d => {
-      const pct = sim.scored ? (d.wins / sim.scored) * 100 : 0;
-      const width = max ? (d.wins / max) * 100 : 0;
-      return '<div class="sim-bar-row">' +
-        '<div class="sim-bar-label">' +
-          '<span class="party-dot" style="background:' + d.color + '"></span>' +
-          '<strong>' + d.short + '</strong> <small class="text-muted">(' + d.name + ')</small>' +
-        '</div>' +
-        '<div class="sim-bar-track">' +
-          '<div class="sim-bar-fill" style="width:' + Math.max(width, d.wins > 0 ? 2 : 0) + '%; background:' + d.color + '"></div>' +
-        '</div>' +
-        '<div class="sim-bar-val"><strong>' + pct.toFixed(1) + '%</strong> <span class="text-muted">(' + d.wins + ')</span></div>' +
-      '</div>';
-    }).join('');
-  }
-
-  function renderRadar() {
-    const audit = getRadarAudit();
-    if (!audit) {
-      const num = document.getElementById('radarScoreNumber');
-      if (num) num.innerHTML = '—<small>/100</small>';
-      const badge = document.getElementById('radarScoreBadge');
-      if (badge) { badge.textContent = 'Audit indisponible'; badge.dataset.level = 'error'; }
-      return;
-    }
-    renderRadarScore(audit);
-    renderRadarChart(audit);
-    renderRadarAxes(audit);
-    renderRadarFindings(audit);
-    renderRadarParties(audit);
-    renderRadarSim(audit.simulation);
-    renderRadarReflexive(audit);
-
-    const btnSim = document.getElementById('btnRunRadarSimulations');
-    if (btnSim && !btnSim.dataset.bound) {
-      btnSim.dataset.bound = '1';
-      btnSim.addEventListener('click', runRadarSimulation);
-    }
-  }
-
-  /* Les quatre contrôles de qualité permanent : leur contenu est produit
-     par l'audit, jamais écrit à la main. */
-  function renderRadarReflexive(audit) {
-    const checks = audit.findings.length;
-    const errors = audit.findings.filter(f => f.level === 'error').length;
-    const warns = audit.findings.filter(f => f.level === 'warn').length;
-
-    const nChecks = document.getElementById('rfChecksCount');
-    if (nChecks) nChecks.textContent = '· ' + checks + (checks > 1 ? ' contrôles' : ' contrôle');
-
-    const ethics = document.getElementById('rfEthicsText');
-    if (ethics) {
-      const external = externalResources();
-      ethics.innerHTML = 'Zéro compte, zéro cookie de suivi, zéro balise publicitaire : vos ' +
-        QUESTIONS.length + ' réponses et vos ' + Scoring.MAX_PRIORITIES + ' priorités restent dans le stockage ' +
-        'local de cet appareil. Contrôle effectué à l\'instant : ' + external.length +
-        ' ressource(s) externe(s) chargée(s) par cette page' +
-        (external.length ? ' (' + external.join(', ') + ')' : '') +
-        ' — aucune ne reçoit de donnée du questionnaire.';
-    }
-
-    const reliability = document.getElementById('rfReliabilityText');
-    if (reliability) {
-      reliability.innerHTML = checks + ' contrôles automatisés sont exécutés à l\'ouverture de cet écran, sur les données et sur le moteur de calcul lui-même. Résultat de cette exécution : ' +
-        errors + ' anomalie' + (errors > 1 ? 's' : '') + ', ' + warns + ' point' + (warns > 1 ? 's' : '') + ' d\'amélioration. ' +
-        'Le départage s\'arrête dès qu\'un leader net ressort (écart de ' + Scoring.CLEAR_LEAD_POINTS + ' points) et refuse de fabriquer un gagnant lorsque l\'écart est inférieur à la marge de ' + Scoring.NEAR_TIE_POINTS + ' points.';
-    }
-
-    const neutrality = document.getElementById('rfNeutralityText');
-    if (neutrality) {
-      const dup = audit.axes.find(a => a.key === 'pluralism');
-      const trace = audit.axes.find(a => a.key === 'traceability');
-      neutrality.innerHTML = 'Le contrôle de doublons est exécuté sur les ' + audit.counts.parties +
-        ' formations à chaque ouverture : ' + (dup ? dup.summary : '') + ' Chaque personne et chaque couleur n\'apparaissent qu\'une fois. ' +
-        'Sur les ' + audit.counts.departage + ' questions de départage, ' + (trace ? trace.summary : '') + '.';
-    }
-
-    const coverage = document.getElementById('rfCoverageText');
-    if (coverage) {
-      const cov = audit.axes.find(a => a.key === 'coverage');
-      coverage.innerHTML = cov ? cov.summary + '. ' + cov.metrics.map(m => m.label + ' : ' + m.value).join(' · ') + '.' : '';
-    }
-
-    const ergonomy = document.getElementById('rfErgonomyText');
-    if (ergonomy) {
-      const layout = (typeof Radar !== 'undefined' && Radar.auditLayout) ? Radar.auditLayout() : null;
-      if (!layout) {
-        ergonomy.textContent = 'La mesure de mise en page n\'est disponible que dans un navigateur.';
-      } else if (!layout.overflow && layout.offenderCount === 0) {
-        ergonomy.textContent = 'Mesure de mise en page exécutée à l\'instant sur cet écran : aucun débordement horizontal ' +
-          '(fenêtre de ' + layout.viewport + ' px, largeur du document ' + layout.documentWidth + ' px) et aucun élément hors cadre.';
-      } else {
-        ergonomy.textContent = 'Mesure de mise en page exécutée à l\'instant sur cet écran : ' + layout.offenderCount +
-          ' élément(s) dépassent la fenêtre de ' + layout.viewport + ' px' +
-          (layout.offenders.length
-            ? ' (' + layout.offenders.map(o => o.tag + (o.cls ? '.' + o.cls.split(' ')[0] : '')).join(', ') + ')'
-            : '') + '.';
-      }
-    }
-  }
-
-  /* Ressources externes réellement chargées par la page : la liste est
-     calculée à partir du DOM, pas recopiée dans un texte. */
-  function externalResources() {
-    if (typeof document === 'undefined') return [];
-    const hosts = [];
-    const nodes = document.querySelectorAll('script[src], link[href], iframe[src], img[src], source[src]');
-    Array.prototype.forEach.call(nodes, el => {
-      const raw = el.getAttribute('src') || el.getAttribute('href') || '';
-      if (!/^https?:\/\//i.test(raw)) return;
-      try {
-        const host = new URL(raw, window.location.href).hostname;
-        if (host && hosts.indexOf(host) === -1) hosts.push(host);
-      } catch (e) { /* URL illisible : ignorée */ }
-    });
-    return hosts;
-  }
-
-  function runRadarSimulation() {
-    const btnSim = document.getElementById('btnRunRadarSimulations');
-    const barsContainer = document.getElementById('radarSimBars');
-    if (!barsContainer || typeof Radar === 'undefined') return;
-
-    if (btnSim) {
-      btnSim.disabled = true;
-      btnSim.innerHTML = '<span aria-hidden="true">⏳</span> Simulation en cours...';
-    }
-
-    setTimeout(() => {
-      const sim = Radar.simulate({ runs: 2000, seed: (Date.now() % 100000) + 1 });
-      if (btnSim) {
-        btnSim.disabled = false;
-        btnSim.innerHTML = '<span aria-hidden="true">🔄</span> Re-lancer 2 000 simulations';
-      }
-      renderRadarSim(sim);
-    }, 20);
-  }
-
-  /* ================================================================
      TOAST
      ================================================================ */
   let toastTimer = null;
@@ -1881,7 +1550,8 @@
       candidates: typeof CANDIDATURES !== 'undefined' ? CANDIDATURES.length : 0,
       calendar: typeof CALENDAR !== 'undefined' ? CALENDAR.length : 0,
       dimensions: DIM_KEYS.length,
-      threshold: Math.round(Scoring.PARTIAL_COVERAGE * 100)
+      threshold: Math.round(Scoring.PARTIAL_COVERAGE * 100),
+      answerThreshold: Math.round(Scoring.MIN_ANSWERED_COVERAGE * 100)
     };
     document.querySelectorAll('[data-count]').forEach(el => {
       const v = counts[el.dataset.count];
@@ -1911,9 +1581,9 @@
     initMobileNav();
     refreshResumeBanner();
     const stored = loadState();
+    setNavEnabled(!!(stored && stored.completed));
     if (stored && stored.completed) {
       state = stored;
-      setNavEnabled(true);
       computeResults();
     }
     const hash = window.location.hash.replace('#', '');

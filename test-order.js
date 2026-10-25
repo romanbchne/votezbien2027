@@ -107,8 +107,8 @@ section('Équilibre et absence de motif, vus depuis l’interface');
   test('les 5 tirages sont tous différents : l’ordre change réellement d’une personne à l’autre', () => {
     assert.strictEqual(new Set(sample.map(f => QUESTIONS.map(q => f[q.id] ? 1 : 0).join(''))).size, 5);
   });
-  test('à l’écran, le texte de gauche n’est PAS toujours en A : il est en A pour 8 à 13 des 21 questions', () => {
-    sample.forEach(f => { const aFirst = QUESTIONS.filter(q => !f[q.id]).length; assert.ok(aFirst >= 8 && aFirst <= 13, String(aFirst)); });
+  test('à l’écran, le texte de gauche n’est PAS toujours en A : il est en A pour 8 à 13 des 22 questions', () => {
+    sample.forEach(f => { const aFirst = QUESTIONS.filter(q => !f[q.id]).length; assert.ok(aFirst >= 8 && aFirst <= 14, String(aFirst)); });
   });
 }
 

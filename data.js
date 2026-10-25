@@ -190,16 +190,17 @@ const DEPARTAGE = [
       { pos:2, short:'64 ans', text:'Maintenir un âge légal de 64 ans.' },
       { pos:3, short:'65 ans ou plus', text:'Fixer l’âge légal à 65 ans ou plus.' }
     ],
-    stances:{ lfi:0, pcf:0, lo:0, ecolo:0.75, pp:1, rn:1, reconquete:2, horizons:3, lr:1.5, dlf:0.5, ne:3 },
+    stances:{ lfi:0, pcf:0, lo:0, ecolo:0.75, pp:1, rn:1, reconquete:2, horizons:3, lr:1.5, dlf:0.5, ne:3, udi: 2 },
     stanceNotes:{
       lfi:'Rétablir le droit à la retraite à 60 ans (programme « L’avenir en commun », septembre 2026).',
       pp:'Abroger la réforme de 2023 pour ramener l’âge légal à 62 ans (déclaration du 5 octobre 2026).',
       lr:'Fixer un âge minimal de départ à 63 ans, avec un taux plein à 65 ans.',
       ne:'Porter l’âge légal à 65 ans (programme « Réussir une nouvelle ambition française », octobre 2026).',
-      reconquete:'Allonger la durée de cotisation à 44-46 ans ; l’âge légal de 64 ans n’est pas modifié.'
+      reconquete:'Allonger la durée de cotisation à 44-46 ans ; l’âge légal de 64 ans n’est pas modifié.',
+      udi: "Le 27 juin 2025, l’UDI dit ne pas vouloir rouvrir l’âge légal de 64 ans. Codage sur l’âge légal uniquement; la déclaration traite séparément du financement et des négociations sur la durée de cotisation."
     },
     basis:'Positions reprises de la page « Retraites » d’Élections 2027, qui renvoie pour chaque candidat à sa source et à sa date, complétées par les propositions publiques des formations ; l’âge et la durée de cotisation sont séparés dans l’énoncé.',
-    sourceIds:['prog-retraites','retraites-jdd'] },
+    sourceIds:['prog-retraites', 'retraites-jdd', 'udi-retirement-2025'] },
 
   { id:'dp-fortune', dim:'eco', group:'fiscal', topic:'Très grandes fortunes',
     q:'Faut-il taxer davantage les très grandes fortunes ?',
@@ -352,14 +353,15 @@ const DEPARTAGE = [
       { pos:2, short:'Garder, en construire, et renouvelables', text:'Garder les réacteurs actuels, en construire quelques nouveaux et développer aussi les renouvelables.' },
       { pos:3, short:'Construire beaucoup de nouveaux réacteurs', text:'Construire un grand nombre de nouveaux réacteurs et développer les renouvelables en complément.' }
     ],
-    stances:{ lfi:0, ecolo:0.5, pp:2, renaissance:3, horizons:2, lr:2.5, pcf:2.5, dlf:2.5, rn:3, reconquete:3 },
+    stances:{ lfi:0, ecolo:0.5, pp:2, renaissance:3, horizons:2, lr:2.5, pcf:2.5, dlf:2.5, rn:3, reconquete:3, udi: 2.5 },
     stanceNotes:{
       lfi:'Planifier la sortie du nucléaire dans le cadre d’une planification écologique (programme « L’avenir en commun »).',
       renaissance:'Sécuriser la construction de 14 réacteurs EPR au rythme d’un par an (« Messmer II », 23 septembre 2026).',
-      horizons:'Relancer le nucléaire et électrifier massivement les usages (programme de campagne, octobre 2026).'
+      horizons:'Relancer le nucléaire et électrifier massivement les usages (programme de campagne, octobre 2026).',
+      udi: "Le programme européen veut renforcer la place du nucléaire et tripler la production européenne d’ici 2050. Le codage reste intermédiaire car le texte ne fixe pas un nombre de nouveaux réacteurs en France."
     },
     basis:'Positions reprises de la page « Écologie et énergie » d’Élections 2027, et recoupées avec les deux sources sectorielles sur le mix électrique.',
-    sourceIds:['prog-ecologie','nucleaire-sfen','energie-revolution'] },
+    sourceIds:['prog-ecologie', 'nucleaire-sfen', 'energie-revolution', 'udi-europe-2024'] },
 
   { id:'dp-carbone', dim:'ecology', group:'ecologie', topic:'Taxe carbone',
     q:'Que faire de la taxe carbone ?',
@@ -411,16 +413,17 @@ const DEPARTAGE = [
       { pos:2, short:'La Constitution avant le droit européen', text:'Rester dans l’Union, mais faire passer la Constitution française avant le droit européen.' },
       { pos:3, short:'Quitter l’UE', text:'Quitter l’Union européenne.' }
     ],
-    stances:{ pp:0, renaissance:0, modem:0, udi:0.25, ecolo:0.25, horizons:0.5, lfi:1.25, pcf:1.25, lr:2, rn:2, reconquete:2, dlf:3, upr:3 },
+    stances:{ pp:0, renaissance:0, modem:0, udi:0.25, ecolo:0.25, horizons:0.5, lfi:1.25, pcf:1.25, lr:2, rn:2, reconquete:2, dlf:3, upr:3, udi: 0.25 },
     stanceNotes:{
       pp:'Supprimer le droit de veto au sein de l’Union européenne et lancer un grand emprunt européen (mai 2026).',
       renaissance:'Bâtir des « États-Unis d’Europe » avec un noyau de pays volontaires (discours de Reims, 17 septembre 2026).',
       lfi:'Désobéir aux décisions européennes jugées contraires aux intérêts des Français et modifier les traités (débat Medef, 27 août 2026).',
       lr:'Inscrire dans la Constitution la primauté de la Constitution française sur le droit de l’Union européenne (3 septembre 2026).',
-      dlf:'Cesser de verser chaque année environ dix milliards d’euros nets de contribution au budget de l’Union européenne (8 mars 2025).'
+      dlf:'Cesser de verser chaque année environ dix milliards d’euros nets de contribution au budget de l’Union européenne (8 mars 2025).',
+      udi: "L’UDI défend une intégration politique européenne et la suppression de vetos qui paralysent les décisions. Codage de son orientation générale en faveur d’une UE plus intégrée."
     },
     basis:'Positions reprises de la page « Europe et international » d’Élections 2027, recoupées avec le programme de la France insoumise et une analyse indépendante des positions européennes.',
-    sourceIds:['prog-europe','lfi-europe','europe-elyseescope'] },
+    sourceIds:['prog-europe', 'lfi-europe', 'europe-elyseescope', 'udi-values', 'udi-veto', 'udi-europe-2024'] },
 
   { id:'dp-otan', dim:'europe', group:'defense', topic:'OTAN',
     q:'Quelle place pour la France dans l’OTAN ?',
@@ -445,13 +448,14 @@ const DEPARTAGE = [
       { pos:1, short:'Maintenir l’aide actuelle', text:'Maintenir l’aide actuelle, sans l’augmenter et sans envoyer de soldats français.' },
       { pos:2, short:'Augmenter l’aide militaire', text:'Augmenter l’aide militaire (y compris armements lourds) et garantir durablement la sécurité de l’Ukraine.' }
     ],
-    stances:{ lfi:0.25, reconquete:0, dlf:0, upr:0, rn:0.75, pcf:0.5, ecolo:1.75, pp:2, renaissance:2, horizons:2, lr:2 },
+    stances:{ lfi:0.25, reconquete:0, dlf:0, upr:0, rn:0.75, pcf:0.5, ecolo:1.75, pp:2, renaissance:2, horizons:2, lr:2, udi: 1 },
     stanceNotes:{
       pcf:'Œuvrer à un cessez-le-feu rapide entre l’Ukraine et la Russie afin de réorienter une partie des dépenses militaires vers les services publics (septembre 2026).',
-      pp:'Saisir les avoirs publics russes pour financer le soutien à l’Ukraine et renforcer l’aide apportée à Kiev (déclaration du 5 octobre 2026).'
+      pp:'Saisir les avoirs publics russes pour financer le soutien à l’Ukraine et renforcer l’aide apportée à Kiev (déclaration du 5 octobre 2026).',
+      udi: "Le programme appelle à poursuivre le soutien militaire à l’Ukraine, sans chiffrer de hausse. Codage prudent sur l’option la plus proche, « maintenir l’aide actuelle »."
     },
     basis:'Positions reprises de la page « Europe et international » d’Élections 2027, qui indique pour chaque candidat la mesure retenue, sa source et sa date.',
-    sourceIds:['prog-europe'] },
+    sourceIds:['prog-europe', 'udi-europe-2024'] },
 
   { id:'dp-defense', dim:'europe', group:'defense', topic:'Budget de la défense',
     q:'Quel budget pour l’armée ?',
@@ -462,13 +466,14 @@ const DEPARTAGE = [
       { pos:2, short:'Augmenter modérément', text:'L’augmenter modérément.' },
       { pos:3, short:'3 % du PIB ou plus', text:'Le porter à 3 % du PIB ou plus.' }
     ],
-    stances:{ lfi:0, lo:0, pcf:0.75, ecolo:0.75, pp:2.5, horizons:2.75, dlf:2.75, renaissance:3, lr:3, rn:3, reconquete:3 },
+    stances:{ lfi:0, lo:0, pcf:0.75, ecolo:0.75, pp:2.5, horizons:2.75, dlf:2.75, renaissance:3, lr:3, rn:3, reconquete:3, udi: 3 },
     stanceNotes:{
       horizons:'Dépasser 100 000 obus produits par an, porter les réservistes de 45 000 à 250 000 et adopter une loi de programmation militaire de « massification » (octobre 2026).',
-      pcf:'Réorienter une partie des dépenses militaires vers les services publics (septembre 2026).'
+      pcf:'Réorienter une partie des dépenses militaires vers les services publics (septembre 2026).',
+      udi: "Le programme européen de l’UDI vise un budget de défense de 3 % du PIB d’ici 2030."
     },
     basis:'Positions reprises de la page « Europe et international » d’Élections 2027, et estimées pour les autres formations à partir des sources listées sur l’objectif de 3 % du PIB.',
-    sourceIds:['prog-europe'] },
+    sourceIds:['prog-europe', 'udi-europe-2024'] },
 
   { id:'dp-armee', dim:'europe', group:'defense', topic:'Défense européenne',
     q:'Faut-il une armée européenne ?',
@@ -478,13 +483,14 @@ const DEPARTAGE = [
       { pos:1, short:'Coopération renforcée', text:'Renforcer la coopération entre armées nationales (achats communs, industrie, commandement coordonné), sans armée unique.' },
       { pos:2, short:'Chaque pays garde sa défense', text:'Garder une défense nationale, avec une coopération au cas par cas.' }
     ],
-    stances:{ pp:0, renaissance:0, ecolo:0.5, horizons:0.5, lr:1.5, lfi:2, pcf:2, rn:2, reconquete:2, dlf:2 },
+    stances:{ pp:0, renaissance:0, ecolo:0.5, horizons:0.5, lr:1.5, lfi:2, pcf:2, rn:2, reconquete:2, dlf:2, udi: 1 },
     stanceNotes:{
       pp:'Supprimer le droit de veto au sein de l’Union européenne et lancer un grand emprunt européen (mai 2026).',
-      renaissance:'Bâtir des « États-Unis d’Europe » avec une union bancaire et des marchés de capitaux communs (17 septembre 2026).'
+      renaissance:'Bâtir des « États-Unis d’Europe » avec une union bancaire et des marchés de capitaux communs (17 septembre 2026).',
+      udi: "Le programme propose une force européenne de réaction rapide et une coopération renforcée; il ne propose pas une armée unique avec commandement commun."
     },
     basis:'Positions reprises de la page « Europe et international » d’Élections 2027, et estimées pour les autres formations à partir des sources listées sur la défense européenne.',
-    sourceIds:['prog-europe'] },
+    sourceIds:['prog-europe', 'udi-europe-2024'] },
 
   { id:'dp-dissuasion', dim:'europe', group:'defense', topic:'Armes nucléaires',
     q:'Que faire de la dissuasion nucléaire française ?',
@@ -645,8 +651,8 @@ const SOURCES = [
   { id:'candidatures-lcp', label:'Suivi des candidatures à la présidentielle (LCP, mis à jour le 14 octobre 2026)', url:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373', type:'Presse' },
   { id:'primaire-lcp', label:'Primaire « Choisir 2027 » (PS, Place publique, GRS) : 1er tour les 9 et 10 octobre 2026, résultat proclamé le 11 octobre (LCP)', url:'https://lcp.fr/actualites/primaire-socialiste-vainqueur-des-le-1er-tour-raphael-glucksmann-sera-le-candidat-de-la', type:'Presse' },
   { id:'primaire-guide', label:'Primaire « Choisir 2027 » : dates, règles de vote et issue (guide vérifié le 6 octobre 2026)', url:'https://www.elections2027.com/guides/primaire-gauche-2027', type:'Guide sourcé' },
-  { id:'sondages-2027', label:'Moyenne agrégée des intentions de vote au 1er tour (Élections 2027, mise à jour le 21 octobre 2026 à 16:53)', url:'https://www.elections2027.com/sondages', type:'Agrégateur indépendant' },
-  { id:'second-tour-2027', label:'Duels de second tour testés par les instituts (Élections 2027, mise à jour le 21 octobre 2026)', url:'https://www.elections2027.com/sondages/second-tour', type:'Agrégateur indépendant' },
+  { id:'sondages-2027', label:'Moyenne des intentions de vote au 1er tour (Élections 2027, 24 octobre 2026)', url:'https://www.elections2027.com/sondages', type:'Agrégateur indépendant' },
+  { id:'second-tour-2027', label:'Duels de second tour testés par les instituts (Élections 2027, mise à jour le 24 octobre 2026)', url:'https://www.elections2027.com/sondages/second-tour', type:'Agrégateur indépendant' },
   { id:'election-calendar', label:'Calendrier de l’élection présidentielle 2027 (Élections 2027, d’après les décisions du Conseil des ministres)', url:'https://www.elections2027.com/calendrier', type:'Source officielle' },
   { id:'prog-hub', label:'Programmes 2027 : toutes les propositions, mesure par mesure, avec leurs sources (Élections 2027)', url:'https://elections2027.com/programmes', type:'Agrégateur indépendant' },
   { id:'prog-pouvoir-achat', label:'Pouvoir d’achat : ce que proposent les candidats (Élections 2027)', url:'https://elections2027.com/programmes/pouvoir-achat', type:'Agrégateur indépendant' },
@@ -674,7 +680,20 @@ const SOURCES = [
   { id:'notice-elabe-1610', label:'Notice officielle de l’enquête Elabe du 16 octobre 2026 (Commission des sondages)', url:'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10324-pres-iv-elabe-17-octobre.pdf', type:'Notice officielle' },
   { id:'notice-cluster17-1510', label:'Notice officielle de l’enquête Cluster17 du 15 octobre 2026 (Commission des sondages)', url:'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10325-pres-focus-droite-et-centre-cluster17-le-point-18-octobre.pdf', type:'Notice officielle' },
   { id:'notice-opinionway-1410', label:'Notice officielle de l’enquête OpinionWay du 14 octobre 2026 (Commission des sondages)', url:'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10319-pres-iv-opinionway-cnews-15-octobre.pdf', type:'Notice officielle' },
-  { id:'notice-ifop-1410', label:'Notice officielle de l’enquête IFOP du 14 octobre 2026 (Commission des sondages)', url:'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10314-pres-climat-politique-post-primaire-ps-pp-ifop-lci-14-octobre.pdf', type:'Notice officielle' }
+  { id:'notice-ifop-1410', label:'Notice officielle de l’enquête IFOP du 14 octobre 2026 (Commission des sondages)', url:'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10314-pres-climat-politique-post-primaire-ps-pp-ifop-lci-14-octobre.pdf', type:'Notice officielle' },
+  {"id":"udi-retirement-2025","label":"UDI — Retraites : des annonces qui vont dans le bon sens (27 juin 2025)","url":"https://parti-udi.fr/actualites/retraites-des-annonces-qui-vont-dans-le-bon-sens","type":"Source primaire · UDI"},
+  {"id":"udi-europe-2024","label":"UDI — L’UDI engagée dans la liste Besoin d’Europe (programme européen, 2024)","url":"https://parti-udi.fr/actualites/ludi-engagee-dans-la-liste-besoin-deurope","type":"Source primaire · UDI"},
+  {"id":"udi-values","label":"UDI — Nos valeurs","url":"https://www.parti-udi.fr/valeurs","type":"Source primaire · UDI"},
+  {"id":"udi-veto","label":"UDI — Pour la suppression des vetos qui paralysent l’Europe","url":"https://parti-udi.fr/actualites/pour-la-suppression-des-vetos-qui-paralysent-leurope","type":"Source primaire · UDI"},
+  {"id":"opinionway-oct22","label":"OpinionWay pour CNEWS — Notice présidentielle (22 octobre 2026)","url":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352","type":"Notice officielle · Commission des sondages"},
+  {"id":"toluna-oct23","label":"Toluna Harris pour M6 et RTL — Notice présidentielle (23 octobre 2026)","url":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351","type":"Notice officielle · Commission des sondages"},
+  { id:'status-renaissance', label:'Gabriel Attal — candidature présidentielle, site officiel de campagne', url:'https://attalpresident.fr/', type:'Source officielle · statut de candidature' },
+  { id:'status-horizons', label:'Édouard Philippe — comité de campagne présidentielle, 8 septembre 2026', url:'https://www.edouardphilippe.fr/actualites/le-comite-de-campagne-est-lance', type:'Source officielle · statut de candidature' },
+  { id:'status-lr', label:'Les Républicains — désignation de Bruno Retailleau, 20 avril 2026', url:'https://republicains.fr/actualites/2026/04/20/bruno-retailleau-largement-designe-comme-candidat-des-republicains-pour-lelection-presidentielle/', type:'Source officielle · statut de candidature' },
+  { id:'status-reconquete', label:'LCP — Éric Zemmour officialise sa candidature, 17 septembre 2026', url:'https://lcp.fr/actualites/presidentielle-2027-eric-zemmour-officialise-sa-candidature-441871', type:'Source de presse vérifiée · statut de candidature' },
+  { id:'status-dlf', label:'Debout la France — annonce de candidature de Nicolas Dupont-Aignan', url:'https://www.debout-la-france.fr/actualite/je-suis-candidat-pour/', type:'Source officielle · statut de candidature' },
+  { id:'status-upr', label:'UPR — François Asselineau, candidat à la présidentielle 2027', url:'https://upr.fr/medias/francois-asselineau-recoit-georges-kuzmanovic-de-frequence-populaire-11-09-2026', type:'Source officielle · statut de candidature' },
+  { id:'status-lo', label:'Nathalie Arthaud — site officiel de campagne présidentielle 2027', url:'https://www.nathalie-arthaud.info/', type:'Source officielle · statut de candidature' },
 ];
 
 /* ----------------------------------------------------------------------
@@ -720,7 +739,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://parti-renaissance.fr/', program:'https://parti-renaissance.fr/',
     status:'Gabriel Attal a officialisé sa candidature le 22 mai 2026.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://attalpresident.fr/',
     personName:'Gabriel Attal', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Gabriel Attal 2025 (close crop).jpg', portraitCredit:'Ismail Aissoub', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.8, soc:-0.3, auth:0.3, europe:-1.5, immig:0.3, ecology:0 } },
   { id:'modem', name:'Mouvement Démocrate', short:'MD', family:'Centre', color:'#4c67c7',
@@ -734,7 +753,7 @@ const PARTIES = [
   { id:'udi', name:'Union des Démocrates et Indépendants', short:'UDI', family:'Centre-droit', color:'#0b5fae',
     candidacyId:'marseille',
     candidacyStatus:'reference',
-    site:'https://www.parti-udi.fr/', program:'https://www.parti-udi.fr/',
+    site:'https://www.parti-udi.fr/', program:'https://www.parti-udi.fr/nos-idees/',
     status:'Aucune candidature présidentielle de l’UDI n’est annoncée dans le suivi du 14 octobre 2026. Hervé Marseille est présenté comme personnalité de référence du parti.',
     statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-la-liste-des-candidats-deja-en-lice-et-des-pretendants-436373',
     personName:'Hervé Marseille', personRole:'Président de l’UDI · pas de candidat annoncé', portraitFile:'Herve Marseille-IMG 4093.jpg', portraitCredit:'Rama', portraitLicense:'CC BY-SA 2.0 France', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/2.0/fr/',
@@ -744,7 +763,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://horizonsleparti.fr/', program:'https://horizonsleparti.fr/le-manifeste/',
     status:'Édouard Philippe, président d’Horizons, est candidat déclaré à la présidentielle.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://www.edouardphilippe.fr/actualites/le-comite-de-campagne-est-lance',
     personName:'Édouard Philippe', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Édouard Philippe MSC 2018 (cropped).jpg', portraitCredit:'Mueller / MSC', portraitLicense:'CC BY 3.0 Allemagne', portraitLicenseUrl:'https://creativecommons.org/licenses/by/3.0/de/',
     positions:{ eco:1, soc:-0.2, auth:0.5, europe:-1, immig:0.5, ecology:-0.2 } },
   { id:'lr', name:'Les Républicains', short:'LR', family:'Droite', color:'#1d4f91',
@@ -752,7 +771,7 @@ const PARTIES = [
     candidacyStatus:'official',
     site:'https://republicains.fr/', program:'https://republicains.fr/nos-propositions/',
     status:'Bruno Retailleau a été désigné candidat des Républicains par un vote des adhérents en avril 2026.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://republicains.fr/actualites/2026/04/20/bruno-retailleau-largement-designe-comme-candidat-des-republicains-pour-lelection-presidentielle/',
     personName:'Bruno Retailleau', personRole:'Candidat désigné par les adhérents selon le statut indiqué', portraitFile:"Bruno Retailleau - Ministre de l'Intérieur français (3x4 cropped).jpg", portraitCredit:'Anthony Montardy', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:1.5, soc:0.8, auth:1.3, europe:0.3, immig:1.5, ecology:1 } },
   { id:'udr', name:'Union des droites pour la République', short:'UDR', family:'Droite nationale', color:'#203552',
@@ -776,7 +795,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://www.parti-reconquete.fr/', program:'https://www.parti-reconquete.fr/programme',
     status:'Éric Zemmour a officialisé sa candidature le 17 septembre 2026.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://lcp.fr/actualites/presidentielle-2027-eric-zemmour-officialise-sa-candidature-441871',
     personName:'Éric Zemmour', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Portrait Éric Zemmour, avril 2022 cropped.jpg', portraitCredit:'Anh De France', portraitLicense:'CC0 1.0', portraitLicenseUrl:'https://creativecommons.org/publicdomain/zero/1.0/',
     positions:{ eco:1, soc:1.8, auth:2, europe:1.8, immig:2, ecology:0.8 } },
   { id:'dlf', name:'Debout la France', short:'DLF', family:'Droite souverainiste', color:'#1683b5',
@@ -784,7 +803,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://www.debout-la-france.fr/', program:'https://www.debout-la-france.fr/notre-projet/',
     status:'Nicolas Dupont-Aignan est candidat déclaré à la présidentielle.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://www.debout-la-france.fr/actualite/je-suis-candidat-pour/',
     personName:'Nicolas Dupont-Aignan', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Nicolas Dupont-Aignan in 2014.jpg', portraitCredit:'Laurence de Terline', portraitLicense:'CC BY-SA 2.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/2.0/',
     positions:{ eco:0.5, soc:0.8, auth:1.3, europe:2, immig:1.5, ecology:0.5 } },
   { id:'ne', name:'Nouvelle Énergie', short:'NE', family:'Droite libérale', color:'#0f766e',
@@ -802,7 +821,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://upr.fr/', program:'https://upr.fr/notre-programme',
     status:'François Asselineau et l’UPR sont candidats déclarés à la présidentielle. Les positions du parti sur certains thèmes ne sont pas codées dans cette version ; la comparaison peut donc être partielle.',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://upr.fr/medias/francois-asselineau-recoit-georges-kuzmanovic-de-frequence-populaire-11-09-2026',
     personName:'François Asselineau', personRole:'Président de l’UPR', portraitFile:'François ASSELINEAU.jpg', portraitCredit:'Union Populaire Républicaine', portraitLicense:'CC BY-SA 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/4.0/',
     positions:{ eco:null, soc:null, auth:null, europe:2, immig:null, ecology:null } },
   { id:'lo', name:'Lutte Ouvrière', short:'LO', family:'Extrême gauche', color:'#c81f1f',
@@ -810,7 +829,7 @@ const PARTIES = [
     candidacyStatus:'declared',
     site:'https://www.lutte-ouvriere.org/', program:'https://www.lutte-ouvriere.org/',
     status:'Nathalie Arthaud est candidate pour Lutte ouvrière. Le parti se définit comme internationaliste ; sa position ne se lit pas sur l’axe « intégration européenne / souveraineté nationale ».',
-    statusDate:'2026-10',
+    statusDate:'2026-10', statusSource:'https://www.nathalie-arthaud.info/',
     personName:'Nathalie Arthaud', personRole:'Porte-parole de Lutte Ouvrière', portraitFile:'Nathalie Arthaud.png', portraitCredit:'Minamonoch', portraitLicense:'CC BY-SA 3.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by-sa/3.0/',
     positions:{ eco:-2, soc:-1, auth:-1, europe:null, immig:-1.5, ecology:-0.5 } }
 ];
@@ -867,7 +886,8 @@ const THEMES = [
         proposals: ['Perspective d’un âge de référence relevé à 65 ans pour équilibrer durablement les régimes', 'Création d’un véritable pilier de retraite par capitalisation collective', 'Simplification radicale des 42 régimes spéciaux vers un système unifié'] },
       { candidateName: 'Marine Le Pen', partyShort: 'RN', partyName: 'Rassemblement National', color: '#173f70',
         stance: 'Retraite à 60 ans pour ceux ayant commencé à travailler avant 20 ans avec 40 annuités, et 62 ans pour les autres.',
-        proposals: ['Retraite anticipée dès 60 ans pour les carrières longues (début avant 20 ans, 40 annuités)', 'Refus du départ à 64 ans et révision des critères de pénibilité', 'Revalorisation des pensions de réversion pour les conjoints survivants'] }
+        proposals: ['Retraite anticipée dès 60 ans pour les carrières longues (début avant 20 ans, 40 annuités)', 'Refus du départ à 64 ans et révision des critères de pénibilité', 'Revalorisation des pensions de réversion pour les conjoints survivants'] },
+      {"candidateName":"Position de l’UDI · aucun candidat annoncé","partyShort":"UDI","partyName":"Union des Démocrates et Indépendants","color":"#0b5fae","stance":"Ne pas rouvrir l’âge légal fixé à 64 ans, tout en discutant du financement et des modalités de la réforme.","proposals":["Maintenir l’âge légal à 64 ans; la déclaration de l’UDI ne tranche pas à elle seule la durée de cotisation.","Poursuivre la discussion sur la soutenabilité financière du système."],"sourceUrl":"https://parti-udi.fr/actualites/retraites-des-annonces-qui-vont-dans-le-bon-sens","sourceLabel":"UDI · 27 juin 2025"}
     ]
   },
   {
@@ -936,7 +956,8 @@ const THEMES = [
         proposals: ['Construction confirmée des 6 premiers réacteurs nucléaires EPR2 et études pour 8 supplémentaires', 'Leasing social de voitures électriques à 100 € par mois pour les actifs modestes', 'Soutien aux technologies de décarbonation industrielle et à l’hydrogène vert'] },
       { candidateName: 'Marine Le Pen', partyShort: 'RN', partyName: 'Rassemblement National', color: '#173f70',
         stance: 'Moratoire immédiat sur les éoliennes terrestres, démantèlement des parcs existants et tout-nucléaire souverain.',
-        proposals: ['Arrêt total de toute nouvelle implantation d’éoliennes et suppression progressive des subventions', 'Prolongation de tous les réacteurs nucléaires jusqu’à 60 ans minimum', 'Refus de l’interdiction européenne des moteurs thermiques en 2035'] }
+        proposals: ['Arrêt total de toute nouvelle implantation d’éoliennes et suppression progressive des subventions', 'Prolongation de tous les réacteurs nucléaires jusqu’à 60 ans minimum', 'Refus de l’interdiction européenne des moteurs thermiques en 2035'] },
+      {"candidateName":"Position de l’UDI · aucun candidat annoncé","partyShort":"UDI","partyName":"Union des Démocrates et Indépendants","color":"#0b5fae","stance":"Renforcer la place du nucléaire dans le mix énergétique européen, en complément des autres sources d’énergie.","proposals":["Le programme européen de l’UDI appelle à tripler la production nucléaire en Europe d’ici 2050.","L’objectif porte sur l’échelle européenne; le programme ne fixe pas un nombre de réacteurs à construire en France."],"sourceUrl":"https://parti-udi.fr/actualites/ludi-engagee-dans-la-liste-besoin-deurope","sourceLabel":"UDI · programme européen 2024"}
     ]
   },
   {
@@ -1002,7 +1023,8 @@ const THEMES = [
         proposals: ['Sortie de la France du commandement intégré de l’OTAN pour retrouver une voix indépendante', 'Dénonciation des traités budgétaires européens d’austérité (pacte de stabilité)', 'Initiatives diplomatiques pour un cessez-le-feu immédiat et négociations de paix en Ukraine'] },
       { candidateName: 'Marine Le Pen', partyShort: 'RN', partyName: 'Rassemblement National', color: '#173f70',
         stance: 'L’Europe des nations contre le fédéralisme bruxellois, refus d’envoyer des troupes ou des missiles longue portée en Ukraine.',
-        proposals: ['Remplacement de l’Union européenne par une Alliance européenne des nations libres et souveraines', 'Refus absolu de toute participation à une armée européenne ou partage de la dissuasion nucléaire', 'Refus de livraisons d’armes susceptibles de frapper le sol russe pour éviter l’escalade'] }
+        proposals: ['Remplacement de l’Union européenne par une Alliance européenne des nations libres et souveraines', 'Refus absolu de toute participation à une armée européenne ou partage de la dissuasion nucléaire', 'Refus de livraisons d’armes susceptibles de frapper le sol russe pour éviter l’escalade'] },
+      {"candidateName":"Position de l’UDI · aucun candidat annoncé","partyShort":"UDI","partyName":"Union des Démocrates et Indépendants","color":"#0b5fae","stance":"Renforcer la coopération européenne de défense, continuer le soutien à l’Ukraine et investir davantage dans les capacités militaires.","proposals":["Viser 3 % du PIB pour la défense d’ici 2030.","Créer une force européenne de réaction rapide.","Poursuivre l’aide militaire à l’Ukraine; le texte ne chiffre pas d’augmentation."],"sourceUrl":"https://parti-udi.fr/actualites/ludi-engagee-dans-la-liste-besoin-deurope","sourceLabel":"UDI · programme européen 2024"}
     ]
   }
 ];
@@ -1013,26 +1035,27 @@ const THEMES = [
    de second tour, avec les notices publiées par la Commission des sondages.
    ------------------------------------------------------------------- */
 const POLLS = {
-  updatedAt: '21 octobre 2026 à 16:53',
-  sourceLabel: 'Moyenne agrégée des intentions de vote (Élections 2027)',
+  updatedAt: '24 octobre 2026 à 17:19',
+  sourceLabel: 'Moyenne simple des cinq enquêtes présidentielles les plus récentes',
+  aggregationNote: 'Moyenne descriptive par candidature des cinq vagues les plus récentes recensées. Les listes et scénarios diffèrent d’une enquête à l’autre; les scores ne sont ni normalisés entre scénarios ni une prévision.',
   sourceUrl: 'https://www.elections2027.com/sondages',
   secondRoundSourceUrl: 'https://www.elections2027.com/sondages/second-tour',
-  legalNotice: 'Conformément à la loi n° 77-808 du 19 juillet 1977 modifiée, les intentions de vote ne constituent pas une prévision du résultat électoral : elles donnent une indication de l’état des rapports de force au jour de la réalisation de l’enquête. Chaque vague est affectée d’une marge d’erreur propre, liée à l’échantillon ; l’institut reste seul juge de lickets. Cette page ne contient aucune estimation maison : toutes les valeurs proviennent d’enquêtes publiées et de leurs notices.',
+  legalNotice: 'Les intentions de vote ne constituent pas une prévision du résultat électoral. Chaque enquête a son propre échantillon, sa méthode et sa marge d’incertitude; consultez la notice de l’institut. La moyenne est descriptive et ne corrige pas les différences de scénarios entre enquêtes.',
   averageFirstRound: [
-    { candidate: 'Marine Le Pen', partyShort: 'RN', family: 'Droite nationale', score: 32.9, trend: -0.9, waves: 5, color: '#173f70', inScope: true },
-    { candidate: 'Jean-Luc Mélenchon', partyShort: 'LFI', family: 'Gauche', score: 15.8, trend: -1.4, waves: 5, color: '#7b5dc8', inScope: true },
-    { candidate: 'Édouard Philippe', partyShort: 'H', family: 'Centre-droit', score: 14.1, trend: -1.3, waves: 5, color: '#111827', inScope: true },
-    { candidate: 'Raphaël Glucksmann', partyShort: 'PP', family: 'Centre-gauche européen', score: 12.6, trend: 2.5, waves: 5, color: '#df2160', inScope: true, note: 'Candidat de Place publique, issu de la primaire « Choisir 2027 » du 9-10 octobre 2026.' },
-    { candidate: 'Bruno Retailleau', partyShort: 'LR', family: 'Droite', score: 6.1, trend: -0.5, waves: 5, color: '#1d4f91', inScope: true },
-    { candidate: 'David Lisnard', partyShort: 'NE', family: 'Droite libérale', score: 5.6, trend: 2.1, waves: 4, color: '#0f766e', inScope: true, note: 'Candidat de Nouvelle Énergie.' },
-    { candidate: 'Gabriel Attal', partyShort: 'RE', family: 'Centre', score: 4.7, trend: -1, waves: 3, color: '#0b2d4f', inScope: true },
-    { candidate: 'Éric Zemmour', partyShort: 'R', family: 'Droite nationale', score: 3.5, trend: -0.9, waves: 5, color: '#a93f4b', inScope: true },
-    { candidate: 'Marine Tondelier', partyShort: 'LE', family: 'Écologie', score: 2.3, trend: -0.4, waves: 5, color: '#1e9b58', inScope: true },
-    { candidate: 'Dominique de Villepin', partyShort: '—', family: 'Indépendant', score: 1.8, trend: null, waves: 3, color: '#64748b', inScope: false, note: 'Candidature indépendante (« La France humaniste ») : hors du périmètre de comparaison de ce site, aucune formation de ce site ne porte cette candidature.' },
-    { candidate: 'Nicolas Dupont-Aignan', partyShort: 'DLF', family: 'Droite souverainiste', score: 1.6, trend: -0.4, waves: 5, color: '#1683b5', inScope: true },
-    { candidate: 'Fabien Roussel', partyShort: 'PCF', family: 'Gauche', score: 1.6, trend: -0.4, waves: 5, color: '#b5193f', inScope: true },
-    { candidate: 'Karim Bouamrane', partyShort: 'PS', family: 'Gauche', score: 1.0, trend: null, waves: 1, color: '#64748b', inScope: false, note: 'Candidature testée hors primaire « Choisir 2027 » : elle n’est pas une formation comparée ici, Place publique porte la candidature issue de cette primaire.' },
-    { candidate: 'Nathalie Arthaud', partyShort: 'LO', family: 'Extrême gauche', score: 0.5, trend: -0.2, waves: 5, color: '#c81f1f', inScope: true }
+    {"candidate":"Marine Le Pen","partyShort":"RN","family":"Droite nationale","score":33.3,"trend":-0.7,"waves":5,"color":"#173f70","inScope":true},
+    {"candidate":"Jean-Luc Mélenchon","partyShort":"LFI","family":"Gauche","score":16.2,"trend":0,"waves":5,"color":"#7b5dc8","inScope":true},
+    {"candidate":"Édouard Philippe","partyShort":"H","family":"Centre-droit","score":14.5,"trend":0.5,"waves":5,"color":"#111827","inScope":true},
+    {"candidate":"Raphaël Glucksmann","partyShort":"PP","family":"Centre-gauche européen","score":12.7,"trend":2.1,"waves":5,"color":"#df2160","inScope":true,"note":"Candidat de Place publique issu de la primaire « Choisir 2027 »."},
+    {"candidate":"David Lisnard","partyShort":"NE","family":"Droite libérale","score":6.4,"trend":1.9,"waves":4,"color":"#0f766e","inScope":true,"note":"Candidat de Nouvelle Énergie."},
+    {"candidate":"Bruno Retailleau","partyShort":"LR","family":"Droite","score":5.9,"trend":0,"waves":5,"color":"#1d4f91","inScope":true},
+    {"candidate":"Gabriel Attal","partyShort":"RE","family":"Centre","score":4,"trend":-1.5,"waves":3,"color":"#0b2d4f","inScope":true},
+    {"candidate":"Éric Zemmour","partyShort":"R","family":"Droite nationale","score":3.7,"trend":-0.6,"waves":5,"color":"#a93f4b","inScope":true},
+    {"candidate":"Marine Tondelier","partyShort":"LE","family":"Écologie","score":2.1,"trend":-0.3,"waves":5,"color":"#1e9b58","inScope":true},
+    {"candidate":"Nicolas Dupont-Aignan","partyShort":"DLF","family":"Droite souverainiste","score":1.6,"trend":0.2,"waves":5,"color":"#1683b5","inScope":true},
+    {"candidate":"Fabien Roussel","partyShort":"PCF","family":"Gauche","score":1.6,"trend":-0.2,"waves":5,"color":"#b5193f","inScope":true},
+    {"candidate":"Nathalie Arthaud","partyShort":"LO","family":"Extrême gauche","score":0.7,"trend":0.1,"waves":5,"color":"#c81f1f","inScope":true},
+    {"candidate":"Dominique de Villepin","partyShort":"—","family":"Indépendant","score":1.5,"trend":-0.5,"waves":3,"color":"#64748b","inScope":false,"note":"Candidature indépendante, hors du périmètre des formations comparées sur ce site."},
+    {"candidate":"Karim Bouamrane","partyShort":"PS","family":"Gauche","score":1,"trend":0,"waves":1,"color":"#64748b","inScope":false,"note":"Mesure publiée dans un scénario de candidature distinct de la candidature portée par Place publique."}
   ],
   secondRoundDuels: [
     {
@@ -1050,41 +1073,47 @@ const POLLS = {
     },
     {
       duel: 'Marine Le Pen vs Raphaël Glucksmann',
-      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 55.7 },
-      candidateB: { name: 'Raphaël Glucksmann', partyShort: 'PP', color: '#df2160', score: 44.3 },
-      waves: 5,
+      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 56.2 },
+      candidateB: { name: 'Raphaël Glucksmann', partyShort: 'PP', color: '#df2160', score: 43.8 },
+      waves: 7,
       detail: [
         { institute: 'IFOP', date: '19 octobre 2026', a: 57, b: 43 },
         { institute: 'Elabe', date: '16 octobre 2026', a: 53.5, b: 46.5 },
         { institute: 'OpinionWay', date: '14 octobre 2026', a: 56, b: 44 },
         { institute: 'Elabe', date: '28 août 2026', a: 57, b: 43 },
-        { institute: 'IFOP', date: '25 août 2026', a: 55, b: 45 }
+        { institute: 'IFOP', date: '25 août 2026', a: 55, b: 45 },
+        {"institute":"OpinionWay","date":"22 octobre 2026","a":56,"b":44,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352"},
+        {"institute":"Toluna Harris","date":"23 octobre 2026","a":59,"b":41,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351"}
       ]
     },
     {
       duel: 'Marine Le Pen vs Jean-Luc Mélenchon',
-      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 68 },
-      candidateB: { name: 'Jean-Luc Mélenchon', partyShort: 'LFI', color: '#7b5dc8', score: 32 },
-      waves: 5,
+      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 68.4 },
+      candidateB: { name: 'Jean-Luc Mélenchon', partyShort: 'LFI', color: '#7b5dc8', score: 31.6 },
+      waves: 7,
       detail: [
         { institute: 'IFOP', date: '19 octobre 2026', a: 68, b: 32 },
         { institute: 'Elabe', date: '16 octobre 2026', a: 69, b: 31 },
         { institute: 'OpinionWay', date: '14 octobre 2026', a: 68, b: 32 },
         { institute: 'Toluna Harris', date: '8 octobre 2026', a: 67, b: 33 },
-        { institute: 'Odoxa', date: '7 octobre 2026', a: 68, b: 32 }
+        { institute: 'Odoxa', date: '7 octobre 2026', a: 68, b: 32 },
+        {"institute":"OpinionWay","date":"22 octobre 2026","a":69,"b":31,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352"},
+        {"institute":"Toluna Harris","date":"23 octobre 2026","a":70,"b":30,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351"}
       ]
     },
     {
       duel: 'Marine Le Pen vs Édouard Philippe',
-      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 54.7 },
-      candidateB: { name: 'Édouard Philippe', partyShort: 'H', color: '#111827', score: 45.3 },
-      waves: 5,
+      candidateA: { name: 'Marine Le Pen', partyShort: 'RN', color: '#173f70', score: 55.2 },
+      candidateB: { name: 'Édouard Philippe', partyShort: 'H', color: '#111827', score: 44.8 },
+      waves: 7,
       detail: [
         { institute: 'IFOP', date: '19 octobre 2026', a: 56, b: 44 },
         { institute: 'Elabe', date: '16 octobre 2026', a: 52.5, b: 47.5 },
         { institute: 'OpinionWay', date: '14 octobre 2026', a: 56, b: 44 },
         { institute: 'Toluna Harris', date: '8 octobre 2026', a: 56, b: 44 },
-        { institute: 'Odoxa', date: '7 octobre 2026', a: 53, b: 47 }
+        { institute: 'Odoxa', date: '7 octobre 2026', a: 53, b: 47 },
+        {"institute":"OpinionWay","date":"22 octobre 2026","a":56,"b":44,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352"},
+        {"institute":"Toluna Harris","date":"23 octobre 2026","a":57,"b":43,"notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351"}
       ]
     },
     {
@@ -1163,6 +1192,8 @@ const POLLS = {
     }
   ],
   waves: [
+    {"institute":"Toluna Harris Interactive","publishedAt":"23 octobre 2026","terrain":"19 octobre 2026 → 21 octobre 2026","sampleSize":2094,"sampleNote":"2 500 adultes interrogés au total; 2 094 inscrits sur les listes électorales.","sponsor":"M6 et RTL","sponsorNote":"Les intentions de vote sont une photographie de l’opinion, pas une prévision.","scenario":"1er tour · hypothèse Édouard Philippe, avec D. de Villepin et D. Lisnard","notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351","results":[{"candidate":"Nathalie Arthaud","partyShort":"LO","score":1},{"candidate":"Jean-Luc Mélenchon","partyShort":"LFI","score":17},{"candidate":"Fabien Roussel","partyShort":"PCF","score":2},{"candidate":"Marine Tondelier","partyShort":"LE","score":2},{"candidate":"Raphaël Glucksmann","partyShort":"PP","score":12},{"candidate":"Édouard Philippe","partyShort":"H","score":15},{"candidate":"Dominique de Villepin","score":1},{"candidate":"David Lisnard","partyShort":"NE","score":7},{"candidate":"Bruno Retailleau","partyShort":"LR","score":4},{"candidate":"Nicolas Dupont-Aignan","partyShort":"DLF","score":1},{"candidate":"Marine Le Pen","partyShort":"RN","score":33},{"candidate":"Éric Zemmour","partyShort":"R","score":5}]},
+    {"institute":"OpinionWay","publishedAt":"22 octobre 2026","terrain":"21 octobre 2026 → 22 octobre 2026","sampleSize":973,"sampleNote":"1 033 adultes interrogés au total; 731 inscrits certains d’aller voter et 680 exprimant une intention.","sponsor":"CNEWS","scenario":"1er tour · hypothèse publiée dans la notice","notice":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352","results":[{"candidate":"Marine Le Pen","partyShort":"RN","score":36},{"candidate":"Jean-Luc Mélenchon","partyShort":"LFI","score":16},{"candidate":"Raphaël Glucksmann","partyShort":"PP","score":13},{"candidate":"Édouard Philippe","partyShort":"H","score":12}]},
     {
       id: 'ifop-2026-10-19',
       institute: 'IFOP',
@@ -1224,48 +1255,6 @@ const POLLS = {
         { candidate: 'Bruno Retailleau', partyShort: 'LR', score: 7 },
         { candidate: 'Éric Zemmour', partyShort: 'R', score: 3 },
         { candidate: 'Marine Tondelier', partyShort: 'LE', score: 2 }
-      ]
-    },
-    {
-      id: 'ifop-2026-10-14',
-      institute: 'IFOP',
-      sponsor: 'LCI',
-      sponsorNote: 'Commanditaire indiqué dans la notice publiée',
-      publishedAt: '14 octobre 2026',
-      terrain: '12 octobre 2026 → 14 octobre 2026',
-      sampleSize: 1390,
-      scenario: '1er tour',
-      notice: 'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10314-pres-climat-politique-post-primaire-ps-pp-ifop-lci-14-octobre.pdf',
-      results: [
-        { candidate: 'Marine Le Pen', partyShort: 'RN', score: 32 },
-        { candidate: 'Jean-Luc Mélenchon', partyShort: 'LFI', score: 16 },
-        { candidate: 'Édouard Philippe', partyShort: 'H', score: 13 },
-        { candidate: 'Raphaël Glucksmann', partyShort: 'PP', score: 11.5 },
-        { candidate: 'David Lisnard', partyShort: 'NE', score: 6 },
-        { candidate: 'Gabriel Attal', partyShort: 'RE', score: 5 },
-        { candidate: 'Bruno Retailleau', partyShort: 'LR', score: 5 },
-        { candidate: 'Éric Zemmour', partyShort: 'R', score: 3 }
-      ]
-    },
-    {
-      id: 'opinionway-2026-10-14',
-      institute: 'OpinionWay',
-      sponsor: 'CNEWS',
-      sponsorNote: 'Commanditaire indiqué dans la notice publiée',
-      publishedAt: '14 octobre 2026',
-      terrain: '13 octobre 2026 → 14 octobre 2026',
-      sampleSize: 1043,
-      scenario: '1er tour',
-      notice: 'https://www.commission-des-sondages.fr/notices/files/notices/2026/octobre/10319-pres-iv-opinionway-cnews-15-octobre.pdf',
-      results: [
-        { candidate: 'Marine Le Pen', partyShort: 'RN', score: 35 },
-        { candidate: 'Jean-Luc Mélenchon', partyShort: 'LFI', score: 15 },
-        { candidate: 'Raphaël Glucksmann', partyShort: 'PP', score: 13 },
-        { candidate: 'Édouard Philippe', partyShort: 'H', score: 12 },
-        { candidate: 'Bruno Retailleau', partyShort: 'LR', score: 6 },
-        { candidate: 'Gabriel Attal', partyShort: 'RE', score: 5 },
-        { candidate: 'Éric Zemmour', partyShort: 'R', score: 5 },
-        { candidate: 'David Lisnard', partyShort: 'NE', score: 4 }
       ]
     }
   ]

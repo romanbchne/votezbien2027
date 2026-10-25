@@ -69,7 +69,7 @@ function toFirstChoice(env, priorities) {
     drive(makeDom({ seed: 1 }), {}); // (parcours indépendant, vérifié par ailleurs)
     const e2 = makeDom({ seed: 11 }); toFirstChoice(e2);
     test('depuis la 1re question concrète, « Précédent » ramène au palier', () => { back(e2); assert.ok(isActive(e2, 'checkpoint')); });
-    test('« Revoir mes réponses précédentes » ramène à la 21ᵉ question', () => { click(e2, $(e2, 'btnBackToMain')); assert.ok(isActive(e2, 'quiz')); assert.ok($(e2, 'progressLabel').textContent.startsWith('21 /')); });
+    test('« Revoir mes réponses précédentes » ramène à la 22ᵉ question', () => { click(e2, $(e2, 'btnBackToMain')); assert.ok(isActive(e2, 'quiz')); assert.ok($(e2, 'progressLabel').textContent.startsWith('22 /')); });
     const e3 = makeDom({ seed: 12 }); toFirstChoice(e3); answerChoice(e3, 0); next(e3);
     test('« Précédent » entre deux questions concrètes ré-affiche la 1re avec le choix conservé', () => { back(e3); assert.ok(e3.doc.querySelector('#choiceList .choice-btn.sel')); });
   }
@@ -144,14 +144,14 @@ function toFirstChoice(env, priorities) {
     test('tout en « je ne sais pas » : le palier annonce honnêtement qu’aucune tendance fiable n’apparaît', () => assert.ok(/ne suffisent pas encore/.test(log.checkpointText)));
     test('… des questions concrètes sont quand même proposées (au moins 4)', () => assert.ok(log.choice.length >= 4, String(log.choice.length)));
     test('… et le résultat est « Profil non déterminé », sans correspondances inventées', () => {
-      assert.ok(log.resultsText.includes('Profil non déterminé')); assert.ok(!log.resultsText.includes('Vos meilleures correspondances'));
+      assert.ok(log.resultsText.includes('Profil non déterminé')); assert.ok(!log.resultsText.includes('Les formations les plus proches de vos réponses'));
     });
     const envSkip = makeDom({ seed: 21 }); drive(envSkip, { scale: () => -1, stopAt: 'checkpoint' });
     click(envSkip, $(envSkip, 'btnSkipDiag'));
     test('« Voir un résultat préliminaire sans ces questions » mène aux résultats, sans question concrète', () => {
       assert.ok(isActive(envSkip, 'results')); assert.strictEqual(savedState(envSkip).dp.length, 0);
       assert.ok(!/réponses aux questions de précision/.test($(envSkip, 'resultsContent').textContent)); // aucune réponse concrète n'est annoncée
-      assert.ok(/Vos meilleures correspondances/.test($(envSkip, 'resultsContent').textContent));
+      assert.ok(/Les formations les plus proches de vos réponses/.test($(envSkip, 'resultsContent').textContent));
     });
     test('« Refaire le test » efface la sauvegarde, désactive les écrans de résultats et revient à l’accueil', () => {
       click(envSkip, $(envSkip, 'btnRedo')); assert.strictEqual(savedState(envSkip), null); assert.ok(isActive(envSkip, 'home')); assert.strictEqual($(envSkip, 'navResults').disabled, true);

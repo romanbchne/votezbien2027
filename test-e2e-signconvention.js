@@ -7,10 +7,10 @@ const H = require('./helpers.js');
 const { D, makeDom, drive, nearestOption, runner } = H;
 const T = runner('Convention gauche/droite (bout en bout)');
 const { section, test } = T;
-const LEFT = ['La France insoumise', 'Parti communiste français', 'Lutte Ouvrière', 'Les Écologistes', 'Parti socialiste', 'Place publique'];
+const LEFT = ['La France insoumise', 'Parti communiste français', 'Lutte Ouvrière', 'Les Écologistes', 'Place publique'];
 const RIGHT = ['Rassemblement National', 'Reconquête', 'Union des droites pour la République', 'Debout la France', 'Les Républicains'];
 const label = t => (t.match(/Plutôt à gauche|Centre-gauche|Plutôt au centre|Centre-droit|Plutôt à droite|Profil non déterminé/) || [])[0];
-const top = html => { const m = html.match(/(?:Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]{0,400}?<h3>([^<]+)<\/h3>/); return m ? m[1] : null; };
+const top = html => { const m = html.match(/<span class="top-badge">(?:Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]*?<h3>([^<]+)<\/h3>/); return m ? m[1] : null; };
 
 const seeds = [1, 2, 3, 4, 5, 6, 7, 8];
 const runs = { left: [], right: [] };
@@ -20,7 +20,7 @@ seeds.forEach(seed => {
   const log = drive(env, { scale: () => -2, choice: q => nearestOption(q, q.stances.lfi) });
   runs.left.push({ seed, lab: label(log.resultsText), top: top(log.resultsHtml), flips: log.scale.filter(x => x.flip).length });
 });
-runs.left.forEach(r => test('ordre n°' + r.seed + ' (' + r.flips + ' questions inversées sur 21) → « ' + r.lab + ' » · parti en tête : ' + r.top, () => {
+runs.left.forEach(r => test('ordre n°' + r.seed + ' (' + r.flips + ' questions inversées sur 22) → « ' + r.lab + ' » · parti en tête : ' + r.top, () => {
   assert.strictEqual(r.lab, 'Plutôt à gauche'); assert.ok(LEFT.includes(r.top), r.top);
 }));
 test('les 8 ordres affichent bien des nombres différents de questions inversées (l’ordre varie réellement)', () => assert.ok(new Set(runs.left.map(r => r.flips)).size >= 2));
