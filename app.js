@@ -1581,9 +1581,9 @@
     initMobileNav();
     refreshResumeBanner();
     const stored = loadState();
+    setNavEnabled(!!(stored && stored.completed));
     if (stored && stored.completed) {
       state = stored;
-      setNavEnabled(true);
       computeResults();
     }
     const hash = window.location.hash.replace('#', '');
