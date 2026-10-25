@@ -80,9 +80,9 @@ section('TEST J — réponses contradictoires au sein de chaque thème');
 /* ===================== Intégrité des données ===================== */
 section('Intégrité des données');
 const camps = new Set(PARTIES.map(p => p.id));
-test('6 thèmes, poids somment à 1 ; 21 questions principales ; 16 partis', () => {
+test('6 thèmes, poids somment à 1 ; 22 questions d’orientation ; 16 partis', () => {
   assert.strictEqual(DIM_KEYS.length, 6); assert.ok(Math.abs(DIM_KEYS.reduce((a, k) => a + DIMENSIONS[k].weight, 0) - 1) < 1e-9);
-  assert.strictEqual(QUESTIONS.length, 21); assert.strictEqual(PARTIES.length, 16);
+  assert.strictEqual(QUESTIONS.length, 22); assert.strictEqual(PARTIES.length, 16);
 });
 test('chaque position de parti par thème est un nombre dans [-2, 2] ou un null explicite', () => {
   PARTIES.forEach(p => DIM_KEYS.forEach(k => { assert.ok(k in p.positions, p.id + '.' + k); const v = p.positions[k]; assert.ok(v === null || (typeof v === 'number' && v >= -2 && v <= 2), p.id + '.' + k); }));
@@ -91,11 +91,11 @@ test('les seuls null de thème sont ceux documentés (LO sur l’Europe, UPR hor
   const nulls = []; PARTIES.forEach(p => DIM_KEYS.forEach(k => { if (p.positions[k] === null) nulls.push(p.id + '.' + k); }));
   assert.deepStrictEqual(nulls.sort(), ['lo.europe', 'upr.auth', 'upr.eco', 'upr.ecology', 'upr.immig', 'upr.soc'].sort());
 });
-test('identifiants de questions uniques et valides (21 générales + départage)', () => {
+test('identifiants de questions uniques et valides (22 générales + départage)', () => {
   const ids = QUESTIONS.concat(DEPARTAGE).map(q => q.id); assert.strictEqual(new Set(ids).size, ids.length);
   QUESTIONS.concat(DEPARTAGE).forEach(q => assert.ok(DIM_KEYS.includes(q.dim), q.id));
 });
-test('les 21 questions ont deux propositions et une explication ; « plain » sans apostrophe droite', () => {
+test('les 22 questions ont deux propositions et une explication ; « plain » sans apostrophe droite', () => {
   QUESTIONS.forEach(q => { assert.ok(q.a && q.b && q.why, q.id); if (q.plain) assert.ok(!q.plain.includes("'"), q.id); });
   DIM_KEYS.forEach(k => assert.ok(DIMENSIONS[k].plain && DIMENSIONS[k].plain.length > 20, k));
 });
@@ -137,9 +137,10 @@ test('SOURCES : adresses https valides, au moins 8', () => {
 
 // Couples de partis susceptibles de rester proches l'un de l'autre : la banque existe pour les départager.
 const RIVAL_PAIRS = [
-  ['lfi', 'ps'], ['lfi', 'ecolo'], ['lfi', 'pcf'], ['ps', 'ecolo'], ['ps', 'pp'], ['ecolo', 'pp'], ['pcf', 'ps'], ['pcf', 'ecolo'], ['lfi', 'pp'], ['pcf', 'pp'],
-  ['renaissance', 'horizons'], ['renaissance', 'ps'], ['renaissance', 'pp'], ['renaissance', 'lr'], ['horizons', 'lr'],
-  ['lr', 'rn'], ['lr', 'reconquete'], ['rn', 'reconquete'], ['rn', 'dlf'], ['reconquete', 'dlf'], ['lr', 'dlf']
+  ['lfi', 'ecolo'], ['lfi', 'pcf'], ['lfi', 'pp'], ['ecolo', 'pp'], ['pcf', 'ecolo'], ['pcf', 'pp'],
+  ['renaissance', 'horizons'], ['renaissance', 'pp'], ['renaissance', 'lr'], ['horizons', 'lr'],
+  ['lr', 'rn'], ['lr', 'reconquete'], ['rn', 'reconquete'], ['rn', 'dlf'], ['lr', 'dlf'],
+  ['pp', 'udi'], ['ecolo', 'udi'], ['pcf', 'udi']
 ];
 test('les options ne sont pas rangées « de gauche à droite » : chaque question sépare au moins un couple de rivaux plausibles', () => {
   DEPARTAGE.forEach(q => {
@@ -152,7 +153,7 @@ section('Banque de départage : capacité à départager les paires proches');
 {
   const sepCount = (a, b) => DEPARTAGE.filter(q => typeof q.stances[a] === 'number' && typeof q.stances[b] === 'number' && Math.abs(q.stances[a] - q.stances[b]) / (q.options.length - 1) >= 0.33).length;
   RIVAL_PAIRS.forEach(([a, b]) => test(P(a).short + ' – ' + P(b).short + ' : au moins 3 questions les séparent', () => assert.ok(sepCount(a, b) >= 3, sepCount(a, b) + ' seulement')));
-  test('Écologistes – PS (l’exemple demandé) : au moins 5 questions les séparent', () => assert.ok(sepCount('ecolo', 'ps') >= 5));
+  test('Écologistes – PP (l’exemple demandé) : au moins 5 questions les séparent', () => assert.ok(sepCount('ecolo', 'pp') >= 5));
 }
 
 /* ===================== Comparaison aux partis ===================== */
@@ -222,30 +223,35 @@ section('Comparaison équitable : parti peu codé = « comparaison partielle »'
   const dr = dimAll(0);
   const answers = {}; ['dp-retraites', 'dp-nucleaire', 'dp-europe', 'dp-fortune'].forEach(id => { answers[id] = 1; });
   const ranked = S.computePartyMatches(dr, PARTIES, { departageAnswers: answers });
-  test('avec ≥ 3 réponses concrètes, MoDem / UDI / UDR (quasi non codés) sont « partiels », sans pourcentage ni classement', () => {
-    ['modem', 'udi', 'udr'].forEach(id => { const m = ranked.find(x => x.party.id === id); assert.strictEqual(m.partial, true, id); assert.strictEqual(m.matchPercent, null, id); assert.ok(m.themePercent !== null, id); });
+  test('MoDem et UDR restent sans indice, tandis que les positions UDI sourcées suffisent ici', () => {
+    ['modem', 'udr'].forEach(id => { const m = ranked.find(x => x.party.id === id); assert.strictEqual(m.partial, true, id); assert.strictEqual(m.matchPercent, null, id); assert.ok(m.themePercent !== null, id); });
+    const udi = ranked.find(x => x.party.id === 'udi'); assert.strictEqual(udi.partial, false); assert.notStrictEqual(udi.matchPercent, null); assert.strictEqual(udi.questionComparableCount, 3);
   });
   test('ils sont classés après tous les partis qui ont un pourcentage', () => {
     const firstPartial = ranked.findIndex(m => m.partial); ranked.slice(0, firstPartial).forEach(m => assert.notStrictEqual(m.matchPercent, null));
   });
-  test('les partis bien codés gardent leur pourcentage', () => assert.notStrictEqual(ranked.find(m => m.party.id === 'ps').matchPercent, null));
-  test('avant les questions concrètes (ou avec moins de 3 réponses), personne n’est « partiel » : base de comparaison identique pour tous', () => {
-    S.computePartyMatches(dr, PARTIES, { departageAnswers: { 'dp-retraites': 1 } }).forEach(m => assert.strictEqual(m.partial, false, m.party.id));
+  test('les partis bien codés gardent leur pourcentage', () => assert.notStrictEqual(ranked.find(m => m.party.id === 'pp').matchPercent, null));
+  test('une seule réponse ne déclenche pas la pénalité de couverture; les lacunes de banque restent signalées', () => {
+    const oneAnswer = S.computePartyMatches(dr, PARTIES, { departageAnswers: { 'dp-retraites': 1 } });
+    oneAnswer.forEach(m => {
+      if (m.databaseCoverage < S.PARTIAL_COVERAGE) assert.strictEqual(m.partial, true, m.party.id);
+      else assert.strictEqual(m.partial, false, m.party.id);
+    });
   });
 }
 
 /* ===================== Sélection séquentielle des questions de départage ===================== */
 section('Sélection des questions de départage');
 {
-  const ps = P('ps'), eco = P('ecolo');
-  const mid = {}; DIM_KEYS.forEach(k => { mid[k] = { score: (ps.positions[k] + eco.positions[k]) / 2, n: 4, nDK: 0, nTotal: 4, confidence: 1 }; });
+  const pp = P('pp'), eco = P('ecolo');
+  const mid = {}; DIM_KEYS.forEach(k => { mid[k] = { score: (pp.positions[k] + eco.positions[k]) / 2, n: 4, nDK: 0, nTotal: 4, confidence: 1 }; });
   const first = S.selectNextDepartage({ dimResults: mid, answers: {} });
-  test('à égalité PS / Écologistes, la 1re question sépare réellement ces deux partis (≥ 1/3 de l’échelle)', () => {
-    assert.ok(first); assert.ok(Math.abs(first.stances.ps - first.stances.ecolo) / (first.options.length - 1) >= 0.33, first.id);
+  test('à égalité PP / Écologistes, la 1re question sépare réellement ces deux partis (≥ 1/3 de l’échelle)', () => {
+    assert.ok(first); assert.ok(Math.abs(first.stances.pp - first.stances.ecolo) / (first.options.length - 1) >= 0.33, first.id);
   });
   test('la sélection ne repose jamais une question déjà posée, et s’arrête à 8', () => {
     const answers = {}; const seen = new Set();
-    const noEarlyStop = { minQuestions: 8 }; // neutralise l'arrêt anticipé pour vérifier le seul plafond
+    const noEarlyStop = { minQuestions: 100, maxQuestions: 8 }; // neutralise l'arrêt anticipé pour vérifier le seul plafond
     for (let i = 0; i < 8; i++) { const q = S.selectNextDepartage(Object.assign({ dimResults: mid, answers }, noEarlyStop)); assert.ok(q, 'question ' + i); assert.ok(!seen.has(q.id)); seen.add(q.id); answers[q.id] = 0; }
     assert.strictEqual(S.selectNextDepartage(Object.assign({ dimResults: mid, answers }, noEarlyStop)), null);
   });
@@ -275,6 +281,19 @@ section('Sélection des questions de départage');
   const mkParty = id => ({ id, name: id, short: id, positions: { eco: 0, soc: 0, auth: 0, europe: 0, immig: 0, ecology: 0 } });
   const synth = [mkParty('p1'), mkParty('p2'), mkParty('p3')];
   const zero = {}; DIM_KEYS.forEach(k => { zero[k] = { score: 0, n: 3, nDK: 0, nTotal: 3, confidence: 1 }; });
+  test('égalité ≤ 6 points : la question suivante vise une position connue et différente pour les deux partis', () => {
+    const a = mkParty('a'), b = mkParty('b');
+    const bank = Array.from({ length: 8 }, (_, i) => ({
+      id: 'pair-' + i, dim: DIM_KEYS[i % DIM_KEYS.length], group: 'g' + i,
+      topic: 'sujet ' + i, q: 'question ' + i, plain: '',
+      options: [{ pos: 0, short: 'a', text: 'A' }, { pos: 1, short: 'b', text: 'B' }, { pos: 2, short: 'c', text: 'C' }],
+      stances: { a: i === 4 ? 0 : 0, b: i === 4 ? 2 : (i === 5 ? 1 : 0) }, basis: 'source'
+    }));
+    const answers = { 'pair-0': 0, 'pair-1': 0, 'pair-2': 0, 'pair-3': 0 };
+    const next = S.selectNextDepartage({ dimResults: zero, parties: [a, b], bank, answers });
+    assert.strictEqual(next.id, 'pair-4');
+  });
+
   const sq = (id, dim, group, st) => ({ id, dim, group, topic: id, q: id, plain: '', options: [{ pos: 0, short: 'a', text: 'a' }, { pos: 1, short: 'b', text: 'b' }], stances: st, basis: '' });
   test('logique : la question qui sépare le plus de partis probables est posée en premier', () => {
     const bank = [sq('A', 'eco', 'g1', { p1: 0, p2: 1, p3: 0.5 }), sq('B', 'ecology', 'g2', { p1: 0, p2: 0.5, p3: 0.9 })];

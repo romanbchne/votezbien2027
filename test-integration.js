@@ -1,4 +1,4 @@
-/* Parcours complet dans un DOM réel (jsdom) : 21 questions, palier, questions
+/* Parcours complet dans un DOM réel (jsdom) : 22 questions, palier, questions
    de départage, résultats, partis, fiche, comparateur, méthode. */
 const assert = require('assert');
 const H = require('./helpers.js');
@@ -17,12 +17,12 @@ const log = drive(env, {
   priorities: ['ecology', 'eco']
 });
 
-section('Parcours : accueil → 21 questions → palier → questions concrètes → résultats');
+section('Parcours : accueil → 22 questions → palier → questions concrètes → résultats');
 test('le parcours se termine sur l’écran des résultats', () => assert.ok(isActive(env, 'results')));
-test('21 questions générales ont été posées, chacune une seule fois', () => {
-  assert.strictEqual(log.scale.length, 21); assert.strictEqual(new Set(log.scale.map(x => x.q.id)).size, 21);
+test('22 questions générales ont été posées, chacune une seule fois', () => {
+  assert.strictEqual(log.scale.length, 22); assert.strictEqual(new Set(log.scale.map(x => x.q.id)).size, 22);
 });
-test('entre 4 et 15 questions concrètes ont été posées, sans doublon', () => {
+test('entre 4 et 18 questions concrètes ont été posées, sans doublon', () => {
   assert.ok(log.choice.length >= S.MIN_DEPARTAGE && log.choice.length <= S.MAX_DEPARTAGE, String(log.choice.length));
   assert.strictEqual(new Set(log.choice.map(x => x.q.id)).size, log.choice.length);
 });
@@ -52,8 +52,8 @@ section('Écran des partis, fiche détaillée, comparateur, méthode');
     labels.forEach(t => { const n = parseInt(t, 10); if (t.endsWith('%')) { assert.ok(!sawNonNum, 'pourcentage après un parti sans pourcentage'); nums.push(n); } else sawNonNum = true; });
     assert.ok(nums.length >= 8, String(nums.length)); nums.forEach((v, i) => { if (i) assert.ok(v <= nums[i - 1]); });
   });
-  test('MoDem, UDI et UDR sont signalés « comparaison partielle » après les questions concrètes', () => {
-    const grid = decode(env.doc.getElementById('partyGrid').textContent); assert.ok(grid.includes('Comparaison partielle'));
+  test('MoDem et UDR restent partiels, tandis que l’UDI reçoit un indice quand les réponses couvrent ses positions', () => {
+    const grid = decode(env.doc.getElementById('partyGrid').textContent); assert.ok(grid.includes('Comparaison partielle')); const udi = env.doc.querySelector('[data-party="udi"]'); assert.ok(udi && !udi.textContent.includes('Comparaison partielle'));
   });
   test('chaque carte a une légende explicative (jamais un pourcentage nu)', () => cards.forEach(c => assert.ok(c.querySelector('.match-caption').textContent.length > 20)));
   click(env, cards[0]);
@@ -70,11 +70,11 @@ section('Écran des partis, fiche détaillée, comparateur, méthode');
   test('la fiche se ferme', () => assert.ok(!drawer.classList.contains('show')));
 
   const cb = env.doc.querySelector('[data-compare="ecolo"]'); cb.checked = true; cb.dispatchEvent(new env.win.Event('change', { bubbles: true }));
-  const cb2 = env.doc.querySelector('[data-compare="ps"]'); cb2.checked = true; cb2.dispatchEvent(new env.win.Event('change', { bubbles: true }));
+  const cb2 = env.doc.querySelector('[data-compare="pp"]'); cb2.checked = true; cb2.dispatchEvent(new env.win.Event('change', { bubbles: true }));
   click(env, env.doc.querySelector('[data-nav="compare"]'));
   test('le comparateur affiche les 6 thèmes ET une ligne par question concrète répondue', () => {
     const rows = env.doc.querySelectorAll('#compareContent tbody tr'); assert.strictEqual(rows.length, DIM_KEYS.length + log.choice.filter(c => c.pos !== 'dk').length);
-    assert.ok(env.doc.getElementById('compareContent').innerHTML.includes('<th>LE</th>') && env.doc.getElementById('compareContent').innerHTML.includes('<th>PS</th>'));
+    assert.ok(env.doc.getElementById('compareContent').innerHTML.includes('<th>LE</th>') && env.doc.getElementById('compareContent').innerHTML.includes('<th>PP</th>'));
   });
   click(env, env.doc.querySelector('[data-nav="method"]'));
   test('la page Méthode liste les 6 thèmes et toutes les sources de recoupement (liens https)', () => {
