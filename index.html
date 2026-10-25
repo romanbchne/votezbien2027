@@ -42,7 +42,6 @@
       <button class="navlink" data-nav="programs" id="navPrograms">Les programmes</button>
       <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="candidatures" id="navCandidatures">Candidatures</button>
-      <button class="navlink" data-nav="radar" id="navRadar"><span aria-hidden="true">🛡️</span> Radar d’audit</button>
       <button class="navlink" data-nav="method">Méthode</button>
     </nav>
   </header>
@@ -74,7 +73,6 @@
               <button class="btn btn-brass" id="btnStart">Faire le quiz <span aria-hidden="true">→</span></button>
               <button class="btn btn-ghost" data-nav="themes">Explorer les <span data-count="themes">8</span> thèmes</button>
               <button class="btn btn-ghost" data-nav="polls">Baromètre des sondages</button>
-              <button class="btn btn-ghost" data-nav="radar"><span aria-hidden="true">🛡️</span> Radar des biais</button>
             </div>
             <div class="trust-row">
               <div><strong data-count="questions">22</strong>questions d’orientation</div>
@@ -244,111 +242,7 @@
         <div id="compareContent"></div>
       </section>
 
-            <!-- ============ RADAR INTELLIGENT DES BIAIS & QUALITÉ ============ -->
-      <section class="screen" id="screen-radar" aria-labelledby="radarTitle">
-        <div class="section-kicker">Audit d'intégrité civique & neutralité algorithmique</div>
-        <h1 id="radarTitle">Radar intelligent des biais & conformité</h1>
-        <p class="lede">Ce radar n'affiche aucun score écrit à l'avance. À l'ouverture de cet écran, il rejoue réellement ses contrôles dans votre navigateur sur le <span data-count="questions">22</span> questions d’orientation, les <span data-count="departage">27</span> questions concrètes de départage, les <span data-count="parties">16</span> formations politiques et les <span data-count="sources">43</span> sources référencées, puis affiche les résultats et les anomalies qu'il a réellement détectées.</p>
-
-        <!-- Indice synthétique d'intégrité -->
-        <div class="radar-score-card">
-          <div class="radar-score-val">
-            <span class="score-number" id="radarScoreNumber">—<small>/100</small></span>
-            <span class="score-badge" id="radarScoreBadge">Audit en cours…</span>
-          </div>
-          <div class="radar-score-details">
-            <p id="radarScoreHeadline">Les contrôles sont en cours d'exécution…</p>
-            <ul class="radar-check-list" id="radarCheckList"></ul>
-            <p class="confidence-note" id="radarGeneratedAt"></p>
-          </div>
-        </div>
-
-        <!-- Boussole SVG & axes d'audit -->
-        <div class="radar-visual-grid">
-          <div class="radar-chart-container">
-            <h2>Boussole d’audit des 6 dimensions d'intégrité</h2>
-            <div id="radarSvgWrapper" class="radar-svg-wrapper"></div>
-            <p class="radar-chart-caption">Évaluation multicritère calculée en direct sur l’ensemble des données.</p>
-          </div>
-          <div class="radar-axis-breakdown" id="radarAxisList"></div>
-        </div>
-
-        <!-- Constats réels détectés par l'audit -->
-        <div class="radar-findings-section">
-          <h2>Ce que l'audit a réellement détecté</h2>
-          <p class="confidence-note" id="radarFindingsSummary"></p>
-          <div id="radarFindings" class="radar-findings"></div>
-        </div>
-
-        <!-- Banc d'essai Monte-Carlo en direct -->
-        <div class="radar-sim-box">
-          <div class="radar-sim-header">
-            <div>
-              <h2>Banc d’essai interactif : 2 000 électeurs simulés en direct</h2>
-              <p>Testez en temps réel la résistance aux biais de l'algorithme en générant des profils citoyens synthétiques dans votre navigateur. Chaque profil est tiré au hasard, passe par le même moteur de calcul que le quiz, et le classement obtenu est enregistré.</p>
-            </div>
-            <button class="btn btn-brass" id="btnRunRadarSimulations">
-              <span aria-hidden="true">⚡</span> Lancer 2 000 simulations
-            </button>
-          </div>
-          <div id="radarSimResults" class="radar-sim-results">
-            <div class="sim-status-banner">
-              <span class="sim-pulse"></span>
-              <span id="simStatusText">Les contrôles sont en cours d'exécution…</span>
-            </div>
-            <div class="sim-bars-grid" id="radarSimBars"></div>
-          </div>
-        </div>
-
-        <!-- Les 4 questions de contrôle qualité permanent -->
-        <div class="radar-reflexive-section">
-          <h2>Les 4 questions de contrôle qualité permanent</h2>
-          <div class="reflexive-grid">
-            <article class="reflexive-card">
-              <div class="rf-badge">01 · Éthique</div>
-              <h3>Est-ce que c’est bien ?</h3>
-              <p id="rfEthicsText">Les contrôles automatisés sont en cours d'exécution…</p>
-            </article>
-            <article class="reflexive-card">
-              <div class="rf-badge">02 · Fiabilité <span id="rfChecksCount"></span></div>
-              <h3>Est-ce que ça marche ?</h3>
-              <p id="rfReliabilityText">Les contrôles automatisés sont en cours d'exécution…</p>
-            </article>
-            <article class="reflexive-card">
-              <div class="rf-badge">03 · Neutralité</div>
-              <h3>Y a-t-il une erreur ou un biais ?</h3>
-              <p id="rfNeutralityText">Les contrôles de doublons et de traçabilité sont en cours d'exécution…</p>
-            </article>
-            <article class="reflexive-card">
-              <div class="rf-badge">04 · Équité du classement</div>
-              <h3>Qui est réellement comparable ?</h3>
-              <p id="rfCoverageText">Le calcul de couverture est en cours d'exécution…</p>
-            </article>
-          </div>
-          <p class="confidence-note radar-layout-note" id="rfErgonomyText">La mesure de mise en page est en cours d'exécution…</p>
-        </div>
-
-        <!-- Tableau d'audit des formations -->
-        <div class="radar-parties-audit">
-          <h2>Contrôle de complétude des <span data-count="parties">16</span> formations</h2>
-          <div class="radar-table-wrap">
-            <table class="radar-table">
-              <thead>
-                <tr>
-                  <th scope="col">Formation</th>
-                  <th scope="col">Personnalité de référence</th>
-                  <th scope="col">Sensibilité</th>
-                  <th scope="col">Positions codées</th>
-                  <th scope="col">Statut de comparabilité</th>
-                </tr>
-              </thead>
-              <tbody id="radarPartiesTbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- ============ MÉTHODE ============ -->
+            <!-- ============ MÉTHODE ============ -->
       <section class="screen" id="screen-method" aria-labelledby="methodTitle">
         <h1 id="methodTitle">Méthode & Transparence</h1>
         <p class="lede">Ce que mesure vraiment l’application, comment le score est calculé, et ce que vous devez garder à l’esprit en le lisant.</p>
@@ -381,7 +275,7 @@
 
         <div class="method-section">
           <h2>Transparence des données & couverture documentaire</h2>
-          <p>Un parti n’est classé avec un pourcentage que si sa couverture documentaire sur vos réponses et dans la banque est suffisante (seuil de <span data-count="threshold">50</span> %). Les formations dont les positions sont trop peu documentées ne sont pas classées avec un indice trompeur : leur fiche indique clairement l’état incomplet des données disponibles. La liste exacte des formations concernées est recalculée à chaque ouverture de l’écran « Radar d’audit ».</p>
+          <p>Une formation reçoit un indice si au moins <span data-count="threshold">15</span> % des questions de précision disposent d’une position documentée. À partir de trois questions posées, au moins <span data-count="answerThreshold">25</span> % de vos réponses doivent aussi être comparables, avec un minimum de trois positions communes. Les fiches signalent les données manquantes et leurs sources.</p>
         </div>
 
         <div class="method-section">
@@ -425,8 +319,6 @@
 </div>
 
 <script src="./data.js"></script>
-<script src="./scoring.js"></script>
-<script src="./radar.js"></script>
-<script src="./app.js"></script>
+<script src="./scoring.js"></script> <script src="./app.js"></script>
 </body>
 </html>
