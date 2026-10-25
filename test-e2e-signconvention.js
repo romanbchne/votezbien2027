@@ -10,7 +10,7 @@ const { section, test } = T;
 const LEFT = ['La France insoumise', 'Parti communiste français', 'Lutte Ouvrière', 'Les Écologistes', 'Place publique'];
 const RIGHT = ['Rassemblement National', 'Reconquête', 'Union des droites pour la République', 'Debout la France', 'Les Républicains'];
 const label = t => (t.match(/Plutôt à gauche|Centre-gauche|Plutôt au centre|Centre-droit|Plutôt à droite|Profil non déterminé/) || [])[0];
-const top = html => { const m = html.match(/(?:Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]{0,400}?<h3>([^<]+)<\/h3>/); return m ? m[1] : null; };
+const top = html => { const m = html.match(/<span class="top-badge">(?:Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]*?<h3>([^<]+)<\/h3>/); return m ? m[1] : null; };
 
 const seeds = [1, 2, 3, 4, 5, 6, 7, 8];
 const runs = { left: [], right: [] };

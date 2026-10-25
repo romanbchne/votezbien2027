@@ -93,7 +93,7 @@ function nearestOption(q, target) {
 }
 
 /* Pilote tout le parcours.
-   opts.scale(q)      -> valeur sémantique | 'dk'   (21 questions)
+   opts.scale(q)      -> valeur sémantique | 'dk'   (22 questions)
    opts.choice(q)     -> position d'option | 'dk'   (questions de départage)
    opts.priorities    -> thèmes à toucher au palier
    opts.stopAt        -> 'checkpoint' pour s'arrêter au palier */

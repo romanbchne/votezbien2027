@@ -8,7 +8,7 @@ const T = runner('Départage (interface)');
 const { section, test } = T;
 const P = id => PARTIES.find(p => p.id === id);
 const $ = (env, id) => env.doc.getElementById(id);
-const topOf = html => { const m = html.match(/(Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]{0,400}?<h3>([^<]+)<\/h3>/); return m ? { badge: m[1], name: m[2] } : null; };
+const topOf = html => { const m = html.match(/<span class="top-badge">(Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]*?<h3>([^<]+)<\/h3>/); return m ? { badge: m[1], name: m[2] } : null; };
 function persona(latentFn) { const ans = makeAnswerer(); return q => ans(q.dim, latentFn(q.dim)); }
 
 const pp = P('pp'), eco = P('ecolo'), lr = P('lr');

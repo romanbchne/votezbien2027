@@ -218,7 +218,7 @@
 
   function setNavEnabled(enabled) {
     const res = document.getElementById('navResults');
-    if (res) res.disabled = false;
+    if (res) res.disabled = !enabled;
   }
 
   /* ================================================================

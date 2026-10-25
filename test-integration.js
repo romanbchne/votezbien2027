@@ -7,6 +7,7 @@ const { DIM_KEYS, DIMENSIONS, PARTIES, QUESTIONS, SOURCES } = D;
 const T = runner('Intégration (interface)');
 const { section, test } = T;
 const decode = html => html.replace(/&amp;/g, '&');
+const topParty = html => { const m = html.match(/<span class="top-badge">(?:Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]*?<h3>([^<]+)<\/h3>/); return m ? m[1] : null; };
 
 const eco = PARTIES.find(p => p.id === 'ecolo');
 const ans = makeAnswerer();
@@ -35,9 +36,9 @@ section('Écran résultats');
   const html = log.resultsHtml, text = log.resultsText;
   test('une étiquette d’orientation générale est affichée', () => assert.ok(/Plutôt à|Centre/.test(text)));
   test('les 6 thèmes apparaissent, chacun avec sa définition en une phrase', () => DIM_KEYS.forEach(k => { assert.ok(decode(html).includes(DIMENSIONS[k].name), k); assert.ok(decode(html).includes(DIMENSIONS[k].plain.slice(0, 40)), k); }));
-  test('« Vos meilleures correspondances » avec des pourcentages, et la précision sur le nombre de réponses', () => { assert.ok(/Vos meilleures correspondances/.test(text)); assert.ok(/\d+%/.test(text)); assert.ok(/réponses aux questions de précision/.test(text)); });
+  test('« Les formations les plus proches de vos réponses » avec des pourcentages, et la précision sur le nombre de réponses', () => { assert.ok(/Les formations les plus proches de vos réponses/.test(text)); assert.ok(/\d+\/100/.test(text)); assert.ok(/réponses aux questions de précision/.test(text)); });
   test('le parti en tête porte un libellé d’écart honnête (« Le plus proche de vous » ou « En tête, de très peu »)', () => assert.ok(html.includes('Le plus proche de vous') || html.includes('En tête, de très peu')));
-  test('un profil calqué sur Les Écologistes les place en tête', () => assert.ok(/(Le plus proche de vous|En tête, de très peu)<\/span>[\s\S]{0,400}?<h3>Les Écologistes<\/h3>/.test(html)));
+  test('un profil calqué sur Les Écologistes les place en tête', () => assert.strictEqual(topParty(html), 'Les Écologistes'));
   test('les priorités choisies s’affichent dans l’ordre', () => { assert.ok(text.includes('1. Écologie & énergie')); assert.ok(text.includes('2. Économie & redistribution')); });
 }
 
@@ -49,14 +50,14 @@ section('Écran des partis, fiche détaillée, comparateur, méthode');
   test('les partis qui ont un pourcentage sont classés du plus élevé au plus faible, et passent AVANT ceux comparés partiellement', () => {
     const labels = Array.from(env.doc.querySelectorAll('#partyGrid .ring-label')).map(e => e.textContent.trim());
     const nums = []; let sawNonNum = false;
-    labels.forEach(t => { const n = parseInt(t, 10); if (t.endsWith('%')) { assert.ok(!sawNonNum, 'pourcentage après un parti sans pourcentage'); nums.push(n); } else sawNonNum = true; });
+    labels.forEach(t => { const n = parseInt(t, 10); if (t.endsWith('/100')) { assert.ok(!sawNonNum, 'pourcentage après un parti sans pourcentage'); nums.push(n); } else sawNonNum = true; });
     assert.ok(nums.length >= 8, String(nums.length)); nums.forEach((v, i) => { if (i) assert.ok(v <= nums[i - 1]); });
   });
   test('MoDem et UDR restent partiels, tandis que l’UDI reçoit un indice quand les réponses couvrent ses positions', () => {
-    const grid = decode(env.doc.getElementById('partyGrid').textContent); assert.ok(grid.includes('Comparaison partielle')); const udi = env.doc.querySelector('[data-party="udi"]'); assert.ok(udi && !udi.textContent.includes('Comparaison partielle'));
+    const udi = env.doc.querySelector('[data-party="udi"]'); const comparable = log.choice.filter(c => c.pos !== 'dk' && typeof c.q.stances.udi === 'number').length; assert.ok(udi); assert.strictEqual(comparable, 1); assert.ok(udi.textContent.includes('Pas de score classé')); assert.ok(env.doc.getElementById('partyGrid').textContent.includes('Pas de score classé'));
   });
   test('chaque carte a une légende explicative (jamais un pourcentage nu)', () => cards.forEach(c => assert.ok(c.querySelector('.match-caption').textContent.length > 20)));
-  click(env, cards[0]);
+  click(env, cards[0].querySelector('.party-card-text'));
   const drawer = env.doc.getElementById('partyDrawer');
   test('la fiche s’ouvre avec les 6 thèmes et la section « Vos réponses aux questions de précision »', () => {
     assert.ok(drawer.classList.contains('show')); const t = decode(drawer.textContent);
@@ -94,17 +95,17 @@ const tick = () => new Promise(r => setTimeout(r, 40));
   {
     const e2 = makeDom({ seed: 2 });
     await tick(); // jsdom déclenche DOMContentLoaded (donc init()) de façon asynchrone ; un navigateur le fait avant toute interaction
-    test('l’accueil est actif, avec la boussole d’illustration et le bouton de départ', () => {
-      assert.ok(isActive(e2, 'home')); assert.ok(e2.doc.querySelectorAll('#compassSpokes line').length === 12); assert.ok(e2.doc.getElementById('btnStart'));
+    test('l’accueil est actif avec le titre et le bouton de départ', () => {
+      assert.ok(isActive(e2, 'home')); assert.ok(e2.doc.getElementById('homeTitle').textContent.includes('Vos idées')); assert.ok(e2.doc.getElementById('btnStart'));
     });
-    test('« Mon profil » et « Les partis » sont désactivés tant que le test n’est pas terminé', () => {
-      assert.strictEqual(e2.doc.getElementById('navResults').disabled, true); assert.strictEqual(e2.doc.getElementById('navParties').disabled, true);
+    test('« Mon profil » reste désactivé; l’annuaire des partis reste consultable', () => {
+      assert.strictEqual(e2.doc.getElementById('navResults').disabled, true); assert.strictEqual(e2.doc.getElementById('navParties').disabled, false);
     });
     test('le premier écran de question affiche le bloc « En clair » quand un terme le demande', () => {
       click(e2, e2.doc.getElementById('btnStart')); assert.strictEqual(e2.doc.getElementById('plainBox').hidden, false);
       assert.ok(e2.doc.getElementById('plainText').textContent.length > 20);
     });
-    test('la vue « échelle » est visible et la vue « choix » masquée pendant les 21 premières questions', () => {
+    test('la vue « échelle » est visible et la vue « choix » masquée pendant les 22 premières questions', () => {
       assert.strictEqual(e2.doc.getElementById('viewScale').hidden, false); assert.strictEqual(e2.doc.getElementById('viewChoice').hidden, true);
       assert.strictEqual(e2.doc.querySelectorAll('#scaleButtons .scale-btn').length, 5);
     });
