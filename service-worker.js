@@ -16,7 +16,7 @@
    5) Seules les requêtes de même origine sont interceptées : les polices
       Google sont laissées au réseau, comme les appels vers un autre site.
    ========================================================================= */
-const CACHE_VERSION = 'v7.6.0';
+const CACHE_VERSION = 'v7.7.0';
 const CACHE_NAME = 'votez-bien-' + CACHE_VERSION;
 const ASSETS = [
   './',
@@ -24,7 +24,6 @@ const ASSETS = [
   './styles.css',
   './data.js',
   './scoring.js',
-  './radar.js',
   './app.js',
   './manifest.json',
   './embleme-citoyen-180.png',
