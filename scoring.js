@@ -39,14 +39,15 @@
 
   // Questions de départage
   const QUESTION_WEIGHT = 1.0;        // poids d'une question de départage, avant boost de priorité
-  const MAX_DEPARTAGE = 15;           // plafond annoncé à la personne
+  const MAX_DEPARTAGE = 18;           // plafond pour permettre un départage adaptatif
   const MIN_DEPARTAGE = 4;            // minimum avant arrêt anticipé
   const CLEAR_LEAD_POINTS = 10;       // un leader net arrête le test dès MIN_DEPARTAGE questions (optimisé de 15 à 10 pour un arrêt anticipé réel)
   const SOFTMAX_BETA = 14;            // concentration de la probabilité « c'est ce parti » sur les premiers
   const SAME_DIM_DECAY = 0.8;         // chaque question déjà posée sur un thème vaut 20 % de moins
   const MAX_PER_GROUP = 2;            // jamais plus de 2 questions du même sujet (ex. défense)
   const MIN_QUESTIONS_FOR_QUESTION_MODE = 3; // seuil pour juger la couverture des questions déjà répondues
-  const PARTIAL_COVERAGE = 0.5;       // couverture minimale, sur la banque complète comme sur les réponses
+  const PARTIAL_COVERAGE = 0.15;      // couverture minimale de la banque complète
+  const MIN_ANSWERED_COVERAGE = 0.25; // couverture minimale des questions déjà posées
   const MIN_COMPARABLE_QUESTIONS = 3; // en dessous, les réponses précises ne suffisent pas à classer
   const NEAR_TIE_POINTS = 6;          // sous cet écart, pas de « gagnant » déclaré
 
@@ -241,7 +242,7 @@
     const questionCoverage = answeredQs.length ? covered / answeredQs.length : 1;
     const insufficientDatabase = databaseCoverage < PARTIAL_COVERAGE;
     const insufficientAnsweredData = questionMode && (
-      questionCoverage < PARTIAL_COVERAGE || covered < MIN_COMPARABLE_QUESTIONS
+      questionCoverage < MIN_ANSWERED_COVERAGE || covered < MIN_COMPARABLE_QUESTIONS
     );
     const partial = insufficientDatabase || insufficientAnsweredData;
 
@@ -307,52 +308,63 @@
     const priorities = args.priorities || [];
     const maxQ = args.maxQuestions || MAX_DEPARTAGE;
     const minQ = args.minQuestions || MIN_DEPARTAGE;
-
     const askedIds = Object.keys(answers);
     if (askedIds.length >= maxQ) return null;
 
     const matches = computePartyMatches(dimResults, parties, { priorities, departageAnswers: answers, departageBank: bank });
     let pool = matches.filter(m => m.matchPercent !== null);
-    if (askedIds.length >= minQ && pool.length >= 2 && (pool[0].matchPercent - pool[1].matchPercent) >= CLEAR_LEAD_POINTS) return null;
-    // Repli (aucun parti comparable : profil non déterminé) : on départage
-    // entre tous les partis suffisamment codés, à probabilités égales.
+    if (askedIds.length >= minQ && pool.length >= 2 && pool[0].matchPercent - pool[1].matchPercent >= CLEAR_LEAD_POINTS) return null;
     if (pool.length < 2) pool = matches.filter(m => m.partyKnownCount >= 3 && !m.partial);
     if (pool.length < 2) return null;
 
-    const maxS = Math.max.apply(null, pool.map(m => m.sortScore));
-    const w = pool.map(m => Math.exp(SOFTMAX_BETA * (m.sortScore - maxS)));
-    const total = w.reduce((a, b) => a + b, 0);
-    const prob = {}; pool.forEach((m, i) => { prob[m.party.id] = w[i] / total; });
-
-    const mult = priorityMultipliers(priorities);
     const dimCount = {}, groupCount = {};
     bank.filter(q => askedIds.indexOf(q.id) !== -1).forEach(q => {
       dimCount[q.dim] = (dimCount[q.dim] || 0) + 1;
       if (q.group) groupCount[q.group] = (groupCount[q.group] || 0) + 1;
     });
+    const mult = priorityMultipliers(priorities);
 
+    // Si deux formations restent proches, proposer en premier une question
+    // sourcée qui possède des positions distinctes pour ces deux formations.
+    const nearPair = askedIds.length >= minQ ? findNearTie(pool) : null;
+    if (nearPair) {
+      let focused = null;
+      bank.forEach(q => {
+        if (askedIds.indexOf(q.id) !== -1) return;
+        if (q.group && (groupCount[q.group] || 0) >= MAX_PER_GROUP) return;
+        const stances = q.stances || {};
+        const a = stances[nearPair[0].party.id], b = stances[nearPair[1].party.id];
+        if (typeof a !== 'number' || typeof b !== 'number' || a === b) return;
+        const value = Math.min(1, Math.abs(a - b) / optionRange(q)) *
+          mult[q.dim] * Math.pow(SAME_DIM_DECAY, dimCount[q.dim] || 0);
+        if (!focused || value > focused.value + 1e-12) focused = { question: q, value };
+      });
+      if (focused) return focused.question;
+    }
+
+    // Sans question propre à la paire, mesurer la valeur d’information sur
+    // les autres formations encore plausibles.
+    const maxS = Math.max.apply(null, pool.map(m => m.sortScore));
+    const weights = pool.map(m => Math.exp(SOFTMAX_BETA * (m.sortScore - maxS)));
+    const total = weights.reduce((a, b) => a + b, 0);
+    const prob = {}; pool.forEach((m, i) => { prob[m.party.id] = weights[i] / total; });
     let best = null;
     bank.forEach(q => {
       if (askedIds.indexOf(q.id) !== -1) return;
       if (q.group && (groupCount[q.group] || 0) >= MAX_PER_GROUP) return;
       const range = optionRange(q);
-      let v = 0;
-      for (let i = 0; i < pool.length; i++) {
-        for (let j = i + 1; j < pool.length; j++) {
-          const a = q.stances[pool[i].party.id], b = q.stances[pool[j].party.id];
-          if (typeof a === 'number' && typeof b === 'number') {
-            v += prob[pool[i].party.id] * prob[pool[j].party.id] * Math.min(1, Math.abs(a - b) / range);
-          }
-        }
+      let value = 0;
+      for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) {
+        const a = q.stances && q.stances[pool[i].party.id], b = q.stances && q.stances[pool[j].party.id];
+        if (typeof a === 'number' && typeof b === 'number')
+          value += prob[pool[i].party.id] * prob[pool[j].party.id] * Math.min(1, Math.abs(a - b) / range);
       }
-      v *= mult[q.dim] * Math.pow(SAME_DIM_DECAY, dimCount[q.dim] || 0);
-      if (!best || v > best.v + 1e-12) best = { q, v };
+      value *= mult[q.dim] * Math.pow(SAME_DIM_DECAY, dimCount[q.dim] || 0);
+      if (!best || value > best.value + 1e-12) best = { question: q, value };
     });
-    if (!best) return null;
-    if (best.v <= 0 && askedIds.length >= minQ) return null;
-    return best.q;
+    if (!best || (best.value <= 0 && askedIds.length >= minQ)) return null;
+    return best.question;
   }
-
   /* ----------------------------------------------------------------------
      Ordre d'affichage aléatoire — sans jamais modifier le résultat.
      L'ordre n'est QU'UNE présentation : la valeur enregistrée reste liée au
@@ -427,7 +439,7 @@
   const api = {
     LABEL_BANDS, MIN_ANSWERED_RATIO_FOR_LABEL, MIN_CONFIDENCE_FOR_LABEL,
     PRIORITY_BOOSTS, MAX_PRIORITIES, MAX_DEPARTAGE, MIN_DEPARTAGE, CLEAR_LEAD_POINTS,
-    MAX_PER_GROUP, PARTIAL_COVERAGE, MIN_COMPARABLE_QUESTIONS, NEAR_TIE_POINTS,
+    MAX_PER_GROUP, PARTIAL_COVERAGE, MIN_ANSWERED_COVERAGE, MIN_COMPARABLE_QUESTIONS, NEAR_TIE_POINTS,
     computeDimensionResults, computeOverall, priorityMultipliers,
     optionRange, stanceProximity, stanceLabel, proximityCategory, questionCategory,
     computePartyMatch, computePartyMatches, findNearTie, selectNextDepartage,
