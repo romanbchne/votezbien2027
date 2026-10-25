@@ -95,7 +95,15 @@ p{margin:0 0 .9em; max-width:64ch}
 @media (prefers-color-scheme: dark) {
   .navlink.active{background:var(--blue); color:#fff}
 }
+.donate-quick{display:none}
 .navlink:disabled{opacity:.4; cursor:not-allowed}
+.navlink.navlink-donate,.navlink.navlink-donate.active{background:var(--brass); color:#fff; font-weight:800; box-shadow:0 3px 12px rgba(201,57,72,.25)}
+.navlink.navlink-donate:hover:not(:disabled){background:var(--brass-deep); color:#fff}
+.donation-panel{max-width:780px; margin:1.4rem auto; padding:clamp(1.4rem,4vw,2.6rem); background:var(--paper-raised); border:1px solid var(--line); border-top:4px solid var(--brass); border-radius:var(--radius-lg); box-shadow:var(--shadow-card)}
+.donation-panel h1{margin-top:0}
+.donation-panel .lede{margin-bottom:1.1rem}
+.btn-donate{display:inline-flex; align-items:center; gap:.65rem; margin-top:.5rem; background:var(--brass); color:#fff; font-weight:800; box-shadow:0 4px 14px rgba(201,57,72,.22)}
+.btn-donate:hover{background:var(--brass-deep); color:#fff}
 
 main{flex:1; width:100%}
 .wrap{max-width:var(--maxw); margin:0 auto; padding:1.8rem 1.2rem 4rem}
@@ -162,6 +170,7 @@ main{flex:1; width:100%}
 @media (prefers-color-scheme: dark) {
   .resume-banner{background:#261E14; border-color:#664D1E; color:#F5E6CC}
 }
+.resume-banner[hidden]{display:none}
 .resume-banner p{margin:0; max-width:none}
 
 .how-it-works{margin-top:2rem; padding:1.8rem 1.8rem 2rem; background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow-card)}
@@ -854,7 +863,7 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2){opacity:0}
 .nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
-@media (max-width:900px){
+@media (max-width:1100px){
   .nav-toggle{display:flex}
   .topbar nav{
     position:absolute; top:100%; left:0; right:0;
@@ -866,6 +875,7 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
   .topbar nav.open{display:flex}
   .navlink{width:100%; text-align:left; padding:.7rem .8rem; border-radius:var(--radius-sm); font-size:.95rem}
   .navlink.active{box-shadow:none}
+  .donate-quick{display:inline-flex; width:auto; text-align:center; padding:.52rem .72rem; font-size:.82rem; flex:none}
 }
 
 /* ================================================================

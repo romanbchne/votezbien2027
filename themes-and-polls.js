@@ -6,7 +6,7 @@
 const THEMES_DATA = [
   {
     id: 'eco',
-    name: 'Économie, redistribution & fiscalité',
+    name: 'Économie, redistribution et fiscalité',
     icon: '💼',
     tagline: 'Impôts, partage des richesses, retraites et rôle de l’État',
     enjeu: 'Le quinquennat 2027-2032 s’ouvre dans un contexte de dette publique record (plus de 3 200 milliards d’euros) et d’exigence de réindustrialisation décarbonée. Le grand clivage oppose la relance par l’investissement public, la justice fiscale et la redistribution des superprofits d’un côté, au rétablissement de la compétitivité par la baisse des dépenses publiques, l’allègement des cotisations et la flexibilité du travail de l’autre.',
@@ -21,8 +21,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Rupture & redistribution radicale',
-        badge: 'Planification écologique & fiscale',
+        orientation: 'Rupture et redistribution radicale',
+        badge: 'Planification écologique et fiscale',
         proposals: [
           'Rétablissement de l’ISF avec barème progressif jusqu’à 3 % et taxation des superprofits.',
           'Retraite à 60 ans à taux plein après 40 annuités de cotisation.',
@@ -36,7 +36,7 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Social-démocratie & justice fiscale',
+        orientation: 'Social-démocratie et justice fiscale',
         badge: 'Candidature commune de la gauche démocrate',
         proposals: [
           'Soutien à la « taxe Zucman » : impôt minimal de 2 % sur les patrimoines supérieurs à 100 millions d’euros.',
@@ -51,7 +51,7 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Politique de l’offre & valorisation du travail',
+        orientation: 'Politique de l’offre et valorisation du travail',
         badge: 'Continuité réformatrice pro-entreprises',
         proposals: [
           'Maintien de la réforme des retraites à 64 ans pour préserver l’équilibre financier du système par répartition.',
@@ -66,8 +66,8 @@ const THEMES_DATA = [
         candidate: 'Édouard Philippe',
         party: 'Horizons',
         color: '#111827',
-        orientation: 'Rigueur budgétaire & vision à long terme',
-        badge: 'Réformes structurelles & effort collectif',
+        orientation: 'Rigueur budgétaire et vision à long terme',
+        badge: 'Réformes structurelles et effort collectif',
         proposals: [
           'Trajectoire stricte de réduction des dépenses publiques pour ramener le déficit sous 3 % d’ici 2029.',
           'Recul progressif de l’âge de départ à la retraite si l’évolution démographique et financière l’impose.',
@@ -81,8 +81,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Libéralisme économique & réduction de l’État',
-        badge: 'Choc de compétitivité & coupe dans la dépense',
+        orientation: 'Libéralisme économique et réduction de l’État',
+        badge: 'Choc de compétitivité et coupe dans la dépense',
         proposals: [
           'Plan d’économies massif de 50 milliards d’euros sur les dépenses de fonctionnement de l’État.',
           'Repousser l’âge de départ à la retraite à 65 ans et supprimer les régimes spéciaux résiduels.',
@@ -96,7 +96,7 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Protectionnisme & priorité nationale',
+        orientation: 'Protectionnisme et priorité nationale',
         badge: 'Souverainisme économique populaire',
         proposals: [
           'Remplacement de l’impôt sur la fortune immobilière (IFI) par un impôt sur la fortune financière (IFF) pour encourager l’enracinement.',
@@ -111,8 +111,8 @@ const THEMES_DATA = [
         candidate: 'Éric Zemmour',
         party: 'Reconquête',
         color: '#a93f4b',
-        orientation: 'Ultra-libéralisme national & baisse des charges',
-        badge: 'Capitalisme national & dérégulation',
+        orientation: 'Ultra-libéralisme national et baisse des charges',
+        badge: 'Capitalisme national et dérégulation',
         proposals: [
           'Suppression de l’IFI, de la taxe foncière sur les résidences principales et des droits de succession.',
           'Fin des aides sociales accordées aux personnes étrangères pour financer des baisses massives de cotisations.',
@@ -125,7 +125,7 @@ const THEMES_DATA = [
   },
   {
     id: 'pouvoir-achat',
-    name: 'Pouvoir d’achat, salaires & inflation',
+    name: 'Pouvoir d’achat, salaires et inflation',
     icon: '💶',
     tagline: 'Niveau des salaires, blocage des prix, TVA et factures d’énergie',
     enjeu: 'Préoccupation numéro 1 des Français dans tous les baromètres d’opinion, la question du pouvoir d’achat oppose deux philosophies : l’augmentation directe des salaires nets et l’intervention sur les prix (blocage, baisse de la TVA) face à la modération fiscale et l’incitation au travail supplémentaire.',
@@ -140,8 +140,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Hausse directe & blocage légal',
-        badge: 'SMIC à 1 600 € net & échelle mobile',
+        orientation: 'Hausse directe et blocage légal',
+        badge: 'SMIC à 1 600 € net et échelle mobile',
         proposals: [
           'Augmentation immédiate du SMIC à 1 600 euros net par décret.',
           'Rétablissement de l’échelle mobile des salaires : indexation automatique de toutes les grilles salariales sur les prix.',
@@ -155,7 +155,7 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Baisse de la TVA & exonérations',
+        orientation: 'Baisse de la TVA et exonérations',
         badge: 'Baisse de la TVA énergétique à 5,5 %',
         proposals: [
           'Baisse permanente de la TVA de 20 % à 5,5 % sur tous les produits énergétiques (essence, fioul, gaz, électricité).',
@@ -170,7 +170,7 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Conférence sociale & chèques ciblés',
+        orientation: 'Conférence sociale et chèques ciblés',
         badge: 'Redistribution sociale écologique',
         proposals: [
           'Organisation d’une conférence nationale sur les salaires pour contraindre les branches à revaloriser les grilles sous le SMIC.',
@@ -185,7 +185,7 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Désmicardisation & primes de partage',
+        orientation: 'Désmicardisation et primes de partage',
         badge: 'Augmenter le net sans alourdir le brut',
         proposals: [
           'Refonte de la fiscalité sociale pour supprimer la « trappe à bas salaires » et encourager les augmentations au-dessus du SMIC.',
@@ -199,7 +199,7 @@ const THEMES_DATA = [
   },
   {
     id: 'sante',
-    name: 'Santé, hôpital public & déserts médicaux',
+    name: 'Santé, hôpital public et déserts médicaux',
     icon: '🏥',
     tagline: 'Accès aux soins, crise des urgences et liberté d’installation des médecins',
     enjeu: 'Plus de 6 millions de Français n’ont pas de médecin traitant. Face aux fermetures de lits d’urgence et à l’épuisement des soignants, la campagne de 2027 s’articule autour de la question décisive : faut-il obliger les médecins à s’installer dans les zones sous-dotées ou miser sur des incitations financières et la délégation de tâches ?',
@@ -214,8 +214,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Régulation obligatoire & 100 % Sécu',
-        badge: 'Centres de santé publics & fin du numerus clausus',
+        orientation: 'Régulation obligatoire et 100 % Sécu',
+        badge: 'Centres de santé publics et fin du numerus clausus',
         proposals: [
           'Conventionnement sélectif : interdiction de s’installer en zone surdotée sans départ préalable d’un confrère.',
           'Création d’un réseau de centres de santé municipaux avec médecins et soignants salariés par la Sécurité sociale.',
@@ -229,8 +229,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Plan Marshall hospitalier & régulation concertée',
-        badge: 'Régulation incitative & investissement massif',
+        orientation: 'Plan Marshall hospitalier et régulation concertée',
+        badge: 'Régulation incitative et investissement massif',
         proposals: [
           'Plan d’investissement de 5 milliards d’euros pour moderniser et désengorger les urgences hospitalières.',
           'Régulation territoriale concertée avec les ordres médicaux et obligation de gardes de nuit partagées.',
@@ -244,8 +244,8 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Délégations de tâches & responsabilisation',
-        badge: 'Pragmatique & liberté d’installation',
+        orientation: 'Délégations de tâches et responsabilisation',
+        badge: 'Pragmatique et liberté d’installation',
         proposals: [
           'Instauration de la « taxe lapin » pour pénaliser financièrement les rendez-vous médicaux non honorés.',
           'Délégation d’actes médicaux simples et renouvellements d’ordonnances aux pharmaciens et infirmiers en pratique avancée.',
@@ -259,8 +259,8 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Plan d’urgence & priorité aux soignants nationaux',
-        badge: '20 milliards pour l’hôpital & incitations fiscales',
+        orientation: 'Plan d’urgence et priorité aux soignants nationaux',
+        badge: '20 milliards pour l’hôpital et incitations fiscales',
         proposals: [
           'Plan d’urgence de 20 milliards d’euros sur 5 ans pour moderniser l’hôpital public et réhabiliter les maternités de proximité.',
           'Suppression des agences régionales de santé (ARS), jugées technocratiques, au profit des préfets de département.',
@@ -273,7 +273,7 @@ const THEMES_DATA = [
   },
   {
     id: 'logement',
-    name: 'Logement, loyers & cadre de vie',
+    name: 'Logement, loyers et cadre de vie',
     icon: '🏠',
     tagline: 'Crise immobilière, pénurie de HLM, encadrement des loyers et squat',
     enjeu: 'Le coût du logement pèse jusqu’à 40 % du budget des ménages urbains. Deux visions s’affrontent : contraindre les propriétaires par l’encadrement strict des loyers et le logement social obligatoire, ou au contraire libéraliser le foncier, alléger les normes écologiques et sécuriser les bailleurs face aux impayés.',
@@ -288,8 +288,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Encadrement général & construction publique',
-        badge: 'Droit au toit & réquisition des logements vides',
+        orientation: 'Encadrement général et construction publique',
+        badge: 'Droit au toit et réquisition des logements vides',
         proposals: [
           'Encadrement des loyers à la baisse dans toutes les zones tendues et gel des hausses de loyers.',
           'Construction de 200 000 logements sociaux publics par an et triplement des amendes SRU.',
@@ -303,8 +303,8 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Relance de l’offre & rénovation pragmatique',
-        badge: 'Prêt à taux zéro & simplification des normes',
+        orientation: 'Relance de l’offre et rénovation pragmatique',
+        badge: 'Prêt à taux zéro et simplification des normes',
         proposals: [
           'Élargissement du Prêt à Taux Zéro (PTZ) à tous les primo-accédants sur l’ensemble du territoire national.',
           'Simplification du calendrier d’interdiction de location du DPE pour ne pas bloquer les propriétaires de bonne foi.',
@@ -318,8 +318,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Protection des propriétaires & dérégulation',
-        badge: 'Abrogation de la loi SRU & choc d’offre privée',
+        orientation: 'Protection des propriétaires et dérégulation',
+        badge: 'Abrogation de la loi SRU et choc d’offre privée',
         proposals: [
           'Abrogation définitive des quotas de la loi SRU imposant 25 % de HLM aux maires.',
           'Suppression de l’encadrement des loyers pour restaurer la rentabilité de l’investissement locatif privé.',
@@ -333,7 +333,7 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Priorité nationale & soutien aux primo-accédants',
+        orientation: 'Priorité nationale et soutien aux primo-accédants',
         badge: 'Réservation des HLM aux familles françaises',
         proposals: [
           'Instauration de la priorité nationale dans l’attribution des logements sociaux HLM.',
@@ -347,7 +347,7 @@ const THEMES_DATA = [
   },
   {
     id: 'ecole',
-    name: 'École, jeunesse & éducation',
+    name: 'École, jeunesse et éducation',
     icon: '🎓',
     tagline: 'Discipline, niveau des élèves, statut des professeurs et enseignement privé',
     enjeu: 'Les classements internationaux (PISA) et les crises successives de recrutement enseignant placent l’école au cœur des débats. La controverse oppose les tenants du retour à l’autorité, de l’uniforme et du mérite républicain aux défenseurs de l’égalité des chances, de la gratuité totale et de la mixité sociale.',
@@ -362,8 +362,8 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Choc des savoirs & restauration de l’autorité',
-        badge: 'Groupes de niveau & uniforme obligatoire',
+        orientation: 'Choc des savoirs et restauration de l’autorité',
+        badge: 'Groupes de niveau et uniforme obligatoire',
         proposals: [
           'Généralisation de la tenue unique (uniforme) dans tous les établissements scolaires publics du premier et second degré.',
           'Organisation pérenne des cours de français et de mathématiques en groupes de niveau au collège.',
@@ -377,8 +377,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Revalorisation inconditionnelle & mixité',
-        badge: 'Financement équitable & fin du séparatisme scolaire',
+        orientation: 'Revalorisation inconditionnelle et mixité',
+        badge: 'Financement équitable et fin du séparatisme scolaire',
         proposals: [
           'Revalorisation salariale immédiate de 20 % pour l’ensemble du corps enseignant sans alourdissement du temps de service.',
           'Conditionnement strict des dotations publiques aux établissements privés sous contrat au respect des objectifs de mixité.',
@@ -392,8 +392,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Autorité traditionnelle & mérite',
-        badge: 'Sanctions, vouvoiement & redoublement libre',
+        orientation: 'Autorité traditionnelle et mérite',
+        badge: 'Sanctions, vouvoiement et redoublement libre',
         proposals: [
           'Rétablissement du vouvoiement obligatoire des maîtres et respect du lever au passage de l’enseignant.',
           'Restauration du pouvoir des conseils de classe de décider souverainement du redoublement d’un élève.',
@@ -407,8 +407,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Gratuité totale & émancipation populaire',
-        badge: '50 000 enseignants & fin de Parcoursup',
+        orientation: 'Gratuité totale et émancipation populaire',
+        badge: '50 000 enseignants et fin de Parcoursup',
         proposals: [
           'Gratuité scolaire absolue : cantine bio, fournitures scolaires, transports et sorties culturelles pris en charge par l’État.',
           'Recrutement de 50 000 professeurs supplémentaires et abaissement du nombre maximal d’élèves à 20 par classe.',
@@ -421,7 +421,7 @@ const THEMES_DATA = [
   },
   {
     id: 'soc',
-    name: 'Société, libertés & égalité',
+    name: 'Société, libertés et égalité',
     icon: '👥',
     tagline: 'Laïcité, bioéthique, fin de vie, droits des femmes et libertés individuelles',
     enjeu: 'Le débat sociétal touche aux fondements du pacte républicain : l’application stricte de la laïcité face aux revendications communautaires, l’aide active à mourir (loi sur la fin de vie), et la protection des libertés publiques face aux outils numériques de surveillance.',
@@ -436,8 +436,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Libertés individuelles & progressisme',
-        badge: 'Légalisation du cannabis & fin de vie choisie',
+        orientation: 'Libertés individuelles et progressisme',
+        badge: 'Légalisation du cannabis et fin de vie choisie',
         proposals: [
           'Légalisation du droit à mourir dans la dignité avec ouverture de l’euthanasie et du suicide assisté.',
           'Légalisation et encadrement public de la production et de la distribution du cannabis.',
@@ -451,8 +451,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Humanisme laïque & droits fondamentaux',
-        badge: 'Aide à mourir & égalité femmes-hommes',
+        orientation: 'Humanisme laïque et droits fondamentaux',
+        badge: 'Aide à mourir et égalité femmes-hommes',
         proposals: [
           'Adoption rapide d’une loi équilibrée sur la fin de vie garantissant le droit à une aide active à mourir accompagnée de soins palliatifs universels.',
           'Plan d’action massif doté de 1 milliard d’euros contre les violences intrafamiliales et sexistes.',
@@ -466,8 +466,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Conservatisme moral & laïcité de combat',
-        badge: 'Refus de l’euthanasie & extension de l’interdiction du voile',
+        orientation: 'Conservatisme moral et laïcité de combat',
+        badge: 'Refus de l’euthanasie et extension de l’interdiction du voile',
         proposals: [
           'Opposition absolue à la légalisation de l’euthanasie et du suicide assisté, priorité au développement des soins palliatifs.',
           'Extension de l’interdiction des signes religieux ostensibles aux accompagnatrices scolaires et aux compétitions sportives.',
@@ -481,7 +481,7 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Tradition républicaine & fermeté contre l’islamisme',
+        orientation: 'Tradition républicaine et fermeté contre l’islamisme',
         badge: 'Interdiction du voile dans l’espace public',
         proposals: [
           'Interdiction du port du voile islamique dans l’ensemble de l’espace public comme idéologie politique.',
@@ -495,7 +495,7 @@ const THEMES_DATA = [
   },
   {
     id: 'auth',
-    name: 'Sécurité, autorité & institutions',
+    name: 'Sécurité, autorité et institutions',
     icon: '⚖️',
     tagline: 'Police, peines planchers, narcotrafic, Ve République et contre-pouvoirs',
     enjeu: 'Le maintien de l’ordre républicain face au narcotrafic et aux violences urbaines se double d’un débat institutionnel majeur sur la concentration des pouvoirs présidentiels (article 49.3, régime semi-présidentiel) et l’introduction de la proportionnelle.',
@@ -511,7 +511,7 @@ const THEMES_DATA = [
         party: 'LR',
         color: '#1d4f91',
         orientation: 'Fermeté régalienne totale',
-        badge: 'Majorité pénale à 16 ans & peines planchers',
+        badge: 'Majorité pénale à 16 ans et peines planchers',
         proposals: [
           'Abaissement de la majorité pénale à 16 ans pour que les mineurs coupables de crimes et délits graves soient jugés comme des majeurs.',
           'Rétablissement de peines planchers obligatoires sans aménagement possible pour les récidivistes et agresseurs des forces de l’ordre.',
@@ -525,7 +525,7 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Tolérance zéro & perpétuité réelle',
+        orientation: 'Tolérance zéro et perpétuité réelle',
         badge: 'Présomption de légitime défense pour les policiers',
         proposals: [
           'Instauration d’une présomption de légitime défense au profit des membres des forces de sécurité intérieure.',
@@ -540,8 +540,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'VIe République & police citoyenne',
-        badge: 'Assemblée constituante & fin du 49.3',
+        orientation: 'VIe République et police citoyenne',
+        badge: 'Assemblée constituante et fin du 49.3',
         proposals: [
           'Convocation d’une Assemblée constituante pour rédiger la Constitution de la VIe République et abolir la monarchie présidentielle.',
           'Suppression de l’article 49 alinéa 3 et instauration du droit de révoquer les élus par référendum citoyen.',
@@ -555,7 +555,7 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Ordre républicain & justice des mineurs',
+        orientation: 'Ordre républicain et justice des mineurs',
         badge: 'Comparution immédiate dès 16 ans',
         proposals: [
           'Instauration de la comparution immédiate pour les mineurs récidivistes dès l’âge de 16 ans.',
@@ -569,7 +569,7 @@ const THEMES_DATA = [
   },
   {
     id: 'europe',
-    name: 'Europe, souveraineté & diplomatie',
+    name: 'Europe, souveraineté et diplomatie',
     icon: '🇪🇺',
     tagline: 'Union européenne, OTAN, guerre en Ukraine, défense commune et souverainisme',
     enjeu: 'Face au réarmement mondial et aux tensions géopolitiques majeures, la place de la France dans l’Union européenne et dans l’Alliance atlantique est une ligne de fracture historique. Le débat oppose les partisans d’une Europe fédérale et de la solidarité atlantique aux tenants de la souveraineté nationale et du non-alignement.',
@@ -584,8 +584,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Européisme convaincu & résistance géopolitique',
-        badge: 'Emprunt de défense européen & soutien total à l’Ukraine',
+        orientation: 'Européisme convaincu et résistance géopolitique',
+        badge: 'Emprunt de défense européen et soutien total à l’Ukraine',
         proposals: [
           'Création d’un grand emprunt européen de 100 milliards d’euros pour bâtir une véritable industrie de défense commune.',
           'Soutien militaire inconditionnel et massif à l’Ukraine, y compris par la livraison d’armements stratégiques à longue portée.',
@@ -599,8 +599,8 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Souveraineté européenne & fidélité aux alliances',
-        badge: 'Autonomie stratégique & respect des traités',
+        orientation: 'Souveraineté européenne et fidélité aux alliances',
+        badge: 'Autonomie stratégique et respect des traités',
         proposals: [
           'Poursuite de la stratégie d’autonomie stratégique européenne initiée par la France depuis 2017.',
           'Maintien d’une participation pleine et active au commandement intégré de l’OTAN tout en renforçant le pilier européen.',
@@ -614,8 +614,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Souverainisme de gauche & non-alignement',
-        badge: 'Sortie de l’OTAN & désobéissance aux traités',
+        orientation: 'Souverainisme de gauche et non-alignement',
+        badge: 'Sortie de l’OTAN et désobéissance aux traités',
         proposals: [
           'Sortie immédiate du commandement militaire intégré de l’OTAN et engagement vers un non-alignement diplomatique.',
           'Désobéissance assumée aux règles budgétaires européennes et aux traités de libre-échange qui détruisent l’agriculture.',
@@ -629,8 +629,8 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Europe des nations & primauté juridique',
-        badge: 'Primauté constitutionnelle & retrait du commandement OTAN',
+        orientation: 'Europe des nations et primauté juridique',
+        badge: 'Primauté constitutionnelle et retrait du commandement OTAN',
         proposals: [
           'Inscription dans la Constitution de la primauté absolue du droit français sur les traités et jurisprudences de l’UE.',
           'Remplacement de l’Union européenne supranationale par une « Alliance européenne des nations souveraines ».',
@@ -658,7 +658,7 @@ const THEMES_DATA = [
   },
   {
     id: 'immig',
-    name: 'Immigration, asile & intégration',
+    name: 'Immigration, asile et intégration',
     icon: '🌍',
     tagline: 'Contrôle des frontières, régularisations, droit du sol, OQTF et asile',
     enjeu: 'Le sujet migratoire structure une polarisation intense. Les propositions oscillent entre la régularisation des travailleurs des métiers en tension et le respect inconditionnel de l’asile d’une part, et l’instauration de la priorité nationale, la suppression du droit du sol et l’exécution systématique des OQTF d’autre part.',
@@ -673,8 +673,8 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Priorité nationale & arrêt de l’immigration de masse',
-        badge: 'Référendum constitutionnel & fin du droit du sol',
+        orientation: 'Priorité nationale et arrêt de l’immigration de masse',
+        badge: 'Référendum constitutionnel et fin du droit du sol',
         proposals: [
           'Organisation d’un référendum constitutionnel pour instaurer la priorité nationale pour l’emploi et le logement.',
           'Suppression du droit du sol : la nationalité française ne sera plus acquise que par filiation ou naturalisation méritoire.',
@@ -688,8 +688,8 @@ const THEMES_DATA = [
         candidate: 'Éric Zemmour',
         party: 'Reconquête',
         color: '#a93f4b',
-        orientation: 'Remigration & assimilation intransigeante',
-        badge: 'Zéro immigration & ministère de la remigration',
+        orientation: 'Remigration et assimilation intransigeante',
+        badge: 'Zéro immigration et ministère de la remigration',
         proposals: [
           'Arrêt total et immédiat de toute immigration légale et illégale : zéro entrée économique ou familiale.',
           'Suppression du regroupement familial, du droit d’asile sur le territoire métropolitain et du droit du sol.',
@@ -703,8 +703,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Fermeté républicaine & référendum migratoire',
-        badge: 'Plafonds migratoires stricts & aide d’urgence vitale',
+        orientation: 'Fermeté républicaine et référendum migratoire',
+        badge: 'Plafonds migratoires stricts et aide d’urgence vitale',
         proposals: [
           'Révision de la Constitution par référendum pour déroger aux règles européennes paralysant les expulsions.',
           'Suppression de l’Aide Médicale d’État (AME), remplacée par une simple aide médicale d’urgence vitale.',
@@ -718,8 +718,8 @@ const THEMES_DATA = [
         candidate: 'Jean-Luc Mélenchon',
         party: 'LFI',
         color: '#7b5dc8',
-        orientation: 'Accueil digne, régularisation & droit d’asile',
-        badge: 'Régularisation des sans-papiers & maintien de l’AME',
+        orientation: 'Accueil digne, régularisation et droit d’asile',
+        badge: 'Régularisation des sans-papiers et maintien de l’AME',
         proposals: [
           'Régularisation de l’ensemble des travailleurs sans-papiers présents sur le territoire national.',
           'Garantie inconditionnelle du droit d’asile avec ouverture de voies légales et sûres d’accès.',
@@ -733,8 +733,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Régulation humaine, intégration & fermeté contre les passeurs',
-        badge: 'Solidarité européenne & lutte contre les trafiquants',
+        orientation: 'Régulation humaine, intégration et fermeté contre les passeurs',
+        badge: 'Solidarité européenne et lutte contre les trafiquants',
         proposals: [
           'Création de voies régulières d’immigration professionnelle pour combler les pénuries réelles de main-d’œuvre.',
           'Solidarité européenne obligatoire dans l’accueil et la répartition des demandeurs d’asile.',
@@ -747,7 +747,7 @@ const THEMES_DATA = [
   },
   {
     id: 'ecology',
-    name: 'Écologie, climat & énergie',
+    name: 'Écologie, climat et énergie',
     icon: '🌿',
     tagline: 'Nucléaire, énergies renouvelables, fin du moteur thermique 2035 et pesticides',
     enjeu: 'Atteindre la neutralité carbone en 2050 exige de décarboner massivement l’électricité, l’industrie, le chauffage et les transports. Les débats opposent le choix stratégique entre le tout-nucléaire et le 100 % renouvelable, le rythme d’interdiction des véhicules thermiques et la conciliation entre souveraineté agricole et réduction des pesticides.',
@@ -762,8 +762,8 @@ const THEMES_DATA = [
         candidate: 'Marine Tondelier',
         party: 'Les Écologistes',
         color: '#1e9b58',
-        orientation: 'Transition radicale & 100 % renouvelables',
-        badge: 'Sortie programmée du nucléaire & justice environnementale',
+        orientation: 'Transition radicale et 100 % renouvelables',
+        badge: 'Sortie programmée du nucléaire et justice environnementale',
         proposals: [
           'Arrêt immédiat de tout projet de nouveau réacteur nucléaire (EPR2) et trajectoire de sortie progressive de l’atome.',
           'Plan massif de déploiement des énergies renouvelables (éolien terrestre et marin, solaire, biomasse).',
@@ -777,7 +777,7 @@ const THEMES_DATA = [
         candidate: 'Gabriel Attal',
         party: 'Renaissance',
         color: '#0b2d4f',
-        orientation: 'Écologie industrielle & relance nucléaire',
+        orientation: 'Écologie industrielle et relance nucléaire',
         badge: 'Mix 6 à 14 EPR2 + solaire et éolien en mer',
         proposals: [
           'Construction prioritaire de 6 réacteurs nucléaires EPR2 avec option pour 8 réacteurs supplémentaires d’ici 2045.',
@@ -792,8 +792,8 @@ const THEMES_DATA = [
         candidate: 'Marine Le Pen',
         party: 'RN',
         color: '#173f70',
-        orientation: 'Tout-nucléaire & refus de l’écologie punitive',
-        badge: 'Moratoire sur l’éolien & démantèlement',
+        orientation: 'Tout-nucléaire et refus de l’écologie punitive',
+        badge: 'Moratoire sur l’éolien et démantèlement',
         proposals: [
           'Relance massive et sans équivoque de la filière nucléaire avec au moins 20 nouveaux réacteurs et prolongation des centrales à 60 ans.',
           'Moratoire immédiat sur les nouvelles éoliennes et plan de démantèlement progressif des parcs existants.',
@@ -807,8 +807,8 @@ const THEMES_DATA = [
         candidate: 'Bruno Retailleau',
         party: 'LR',
         color: '#1d4f91',
-        orientation: 'Nucléaire souverain & liberté agricole',
-        badge: 'Abrogation de l’échéance 2035 & soutien aux agriculteurs',
+        orientation: 'Nucléaire souverain et liberté agricole',
+        badge: 'Abrogation de l’échéance 2035 et soutien aux agriculteurs',
         proposals: [
           'Priorité absolue donnée au nucléaire et à l’hydroélectricité comme piliers de la souveraineté énergétique.',
           'Abrogation de l’interdiction de 2035 pour autoriser durablement les moteurs hybrides et les biocarburants.',
@@ -822,8 +822,8 @@ const THEMES_DATA = [
         candidate: 'Raphaël Glucksmann',
         party: 'Place publique / PS',
         color: '#6c53a4',
-        orientation: 'Social-écologie & investissement ferroviaire',
-        badge: 'ISF climatique & rénovation thermique globale',
+        orientation: 'Social-écologie et investissement ferroviaire',
+        badge: 'ISF climatique et rénovation thermique globale',
         proposals: [
           'Création d’un ISF climatique taxant les investissements bruns et les patrimoines très polluants.',
           'Mix énergétique décarboné pragmatique : maintien et prolongation du nucléaire sûr combiné à l’essor rapide des renouvelables.',
@@ -893,7 +893,7 @@ const POLLS_DATA = {
   recentPolls: [
     {
       institute: 'Elabe',
-      sponsor: 'BFMTV & La Tribune Dimanche',
+      sponsor: 'BFMTV et La Tribune Dimanche',
       date: '15-18 octobre 2026',
       sample: '1 508 inscrits',
       margin: '±2,5 pts',
@@ -903,7 +903,7 @@ const POLLS_DATA = {
     },
     {
       institute: 'IFOP-Fiducial',
-      sponsor: 'Le Figaro & Sud Radio',
+      sponsor: 'Le Figaro et Sud Radio',
       date: '24-27 septembre 2026',
       sample: '1 820 inscrits',
       margin: '±2,3 pts',
@@ -913,7 +913,7 @@ const POLLS_DATA = {
     },
     {
       institute: 'Harris Interactive',
-      sponsor: 'M6 & RTL',
+      sponsor: 'M6 et RTL',
       date: '12-15 septembre 2026',
       sample: '1 450 inscrits',
       margin: '±2,6 pts',
@@ -933,7 +933,7 @@ const POLLS_DATA = {
     },
     {
       institute: 'OpinionWay',
-      sponsor: 'CNews & Europe 1',
+      sponsor: 'CNews et Europe 1',
       date: 'Juin 2026',
       sample: '1 200 inscrits',
       margin: '±2,8 pts',
@@ -948,7 +948,7 @@ const POLLS_DATA = {
       duel: 'Marine Le Pen vs Édouard Philippe',
       candidateA: { name: 'Marine Le Pen', party: 'RN', score: 51, color: '#173f70' },
       candidateB: { name: 'Édouard Philippe', party: 'Horizons', score: 49, color: '#111827' },
-      source: 'Elabe & IFOP (Automne 2026)',
+      source: 'Elabe et IFOP (Automne 2026)',
       status: 'Coude-à-coude dans la marge d’erreur'
     },
     {
@@ -969,7 +969,7 @@ const POLLS_DATA = {
       duel: 'Marine Le Pen vs Jean-Luc Mélenchon',
       candidateA: { name: 'Marine Le Pen', party: 'RN', score: 61, color: '#173f70' },
       candidateB: { name: 'Jean-Luc Mélenchon', party: 'LFI', score: 39, color: '#7b5dc8' },
-      source: 'IFOP & Harris (2026)',
+      source: 'IFOP et Harris (2026)',
       status: 'Large victoire mesurée pour le RN'
     }
   ]

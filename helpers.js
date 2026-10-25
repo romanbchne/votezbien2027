@@ -26,7 +26,8 @@ function makeDom(opts) {
   win.scrollTo = () => {};
   // De VRAIES balises <script> (comme un navigateur), pas eval() : eval isole
   // la portée lexicale de chaque fichier et fausserait le partage des `const`.
-  ['data.js', 'themes-and-polls.js', 'scoring.js', 'app.js'].forEach(f => {
+  const appScripts = Array.from(html.matchAll(/<script\b[^>]*\bsrc=["']\.\/([^"']+)["'][^>]*><\/script>/g), m => m[1]);
+  appScripts.forEach(f => {
     const el = win.document.createElement('script');
     el.textContent = fs.readFileSync(path.join(ROOT, f), 'utf8');
     win.document.body.appendChild(el);

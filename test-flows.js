@@ -22,6 +22,10 @@ function toFirstChoice(env, priorities) {
 (async () => {
   section('Sauvegarde et reprise');
   {
+    const fresh = makeDom({ seed: 2 }); await tick();
+    test('sans réponse enregistrée, la bannière de reprise est masquée', () => {
+      assert.strictEqual($(fresh, 'resumeBanner').hidden, true); assert.strictEqual($(fresh, 'btnResume').hidden, true);
+    });
     const env = makeDom({ seed: 3 }); startAndAnswer(env, 7);
     const stored = env.win.localStorage.getItem(KEY);
     test('l’état est enregistré après 7 réponses (question n° 8 en cours)', () => { const st = savedState(env); assert.strictEqual(st.index, 7); assert.strictEqual(Object.keys(st.answers).length, 7); });
@@ -153,8 +157,9 @@ function toFirstChoice(env, priorities) {
       assert.ok(!/réponses aux questions de précision/.test($(envSkip, 'resultsContent').textContent)); // aucune réponse concrète n'est annoncée
       assert.ok(/Les formations les plus proches de vos réponses/.test($(envSkip, 'resultsContent').textContent));
     });
-    test('« Refaire le test » efface la sauvegarde, désactive les écrans de résultats et revient à l’accueil', () => {
-      click(envSkip, $(envSkip, 'btnRedo')); assert.strictEqual(savedState(envSkip), null); assert.ok(isActive(envSkip, 'home')); assert.strictEqual($(envSkip, 'navResults').disabled, true);
+    test('« Refaire le test » efface la sauvegarde et laisse Mon profil accessible', () => {
+      click(envSkip, $(envSkip, 'btnRedo')); assert.strictEqual(savedState(envSkip), null); assert.ok(isActive(envSkip, 'home')); assert.strictEqual($(envSkip, 'navResults').disabled, false);
+      click(envSkip, $(envSkip, 'navResults')); assert.ok(isActive(envSkip, 'results')); assert.ok($(envSkip, 'resultsContent').textContent.includes('Commencez le test pour découvrir votre profil'));
     });
   }
   test('aucune erreur JavaScript dans aucun de ces parcours', () => H.assertNoErrors());

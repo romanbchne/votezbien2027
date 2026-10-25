@@ -10,15 +10,15 @@
   "lang": "fr",
   "icons": [
     {
-      "src": "./embleme-citoyen-192.png",
+      "src": "./embleme-solidaire-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./embleme-citoyen-512.jpg",
+      "src": "./embleme-solidaire-512.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

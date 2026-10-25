@@ -7,7 +7,7 @@
 
   const STORAGE_KEY = 'votezbien:v7:state';
   const SCALE_LABELS = ['Beaucoup plus A', 'Plutôt A', 'Entre les deux', 'Plutôt B', 'Beaucoup plus B'];
-  const VALID_SCREENS = ['home', 'quizStart', 'quiz', 'checkpoint', 'results', 'themes', 'polls', 'programs', 'parties', 'compare', 'candidatures', 'method'];
+  const VALID_SCREENS = ['home', 'quizStart', 'quiz', 'checkpoint', 'results', 'themes', 'polls', 'programs', 'parties', 'compare', 'candidatures', 'method', 'donate'];
 
   const qById = {};
   QUESTIONS.forEach(q => { qById[q.id] = q; });
@@ -162,7 +162,7 @@
   }
 
   /* ================================================================
-     NAVIGATION SPA (HASH ROUTING & HISTORIQUE)
+     NAVIGATION SPA (HASH ROUTING et HISTORIQUE)
      ================================================================ */
   function showScreen(name, updateHash) {
     if (updateHash === undefined) updateHash = true;
@@ -172,7 +172,7 @@
     const el = document.getElementById('screen-' + name);
     if (el) el.classList.add('active');
 
-    document.querySelectorAll('.navlink[data-nav]').forEach(b => {
+    document.querySelectorAll('.navlink[data-nav], .donate-quick[data-nav]').forEach(b => {
       const active = b.dataset.nav === name;
       b.classList.toggle('active', active);
       if (active) b.setAttribute('aria-current', 'page');
@@ -216,9 +216,9 @@
     }
   });
 
-  function setNavEnabled(enabled) {
+  function setNavEnabled() {
     const res = document.getElementById('navResults');
-    if (res) res.disabled = !enabled;
+    if (res) res.disabled = false;
   }
 
   /* ================================================================
@@ -575,7 +575,7 @@
   function renderResults() {
     const root = document.getElementById('resultsContent');
     if (!state.completed) {
-      root.innerHTML = `<div class="profile-empty"><span class="profile-empty-icon" aria-hidden="true">✦</span><p class="section-kicker">Mon profil</p><h1 id="resultsHeading">Votre profil reste à découvrir</h1><p class="lede">Vos réponses dessineront vos tendances sur six thèmes et les formations politiques dont les positions s’en rapprochent.</p><div class="profile-empty-steps"><span>${QUESTIONS.length} questions · ~5 min</span><span>Questions de précision ciblées</span></div><button class="btn btn-brass" id="btnStartFromProfile">Commencer le quiz <span aria-hidden="true">→</span></button></div>`;
+      root.innerHTML = `<div class="profile-empty"><span class="profile-empty-icon" aria-hidden="true">✦</span><p class="section-kicker">Mon profil</p><h1 id="resultsHeading">Commencez le test pour découvrir votre profil</h1><p class="lede">Répondez au questionnaire pour découvrir vos tendances sur six thèmes et voir quelles formations politiques se rapprochent de vos idées.</p><div class="profile-empty-steps"><span>${QUESTIONS.length} questions · ~5 min</span><span>Questions de précision ciblées</span></div><button class="btn btn-brass" id="btnStartFromProfile">Commencer le test <span aria-hidden="true">→</span></button></div>`;
       document.getElementById('btnStartFromProfile').addEventListener('click', () => showScreen('quizStart'));
       return;
     }
@@ -1046,7 +1046,7 @@
   });
 
   /* ================================================================
-     CANDIDATURES & CALENDRIER DE CAMPAGNE
+     CANDIDATURES et CALENDRIER DE CAMPAGNE
      Données réelles : les candidatures déclarées et les jalons vérifiés.
      ================================================================ */
   function renderCandidatures() {
@@ -1294,7 +1294,7 @@
   }
   document.getElementById('drawerBackdrop').addEventListener('click', closePartyDrawer);
 
-  /* Raccourcis clavier & Focus Trap */
+  /* Raccourcis clavier et Focus Trap */
   document.addEventListener('keydown', e => {
     const drawer = document.getElementById('partyDrawer');
     if (drawer && drawer.classList.contains('show')) {

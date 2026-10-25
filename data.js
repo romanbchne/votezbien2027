@@ -7,10 +7,10 @@
 const DIMENSIONS = {
   eco: {
     id: 'eco',
-    name: 'Économie & redistribution',
+    name: 'Économie et redistribution',
     short: 'Économie',
     plain: 'Ce que l’État doit faire pour l’économie et les inégalités : impôts, aides, protection des salariés.',
-    labelLeft: 'Intervention publique & redistribution',
+    labelLeft: 'Intervention publique et redistribution',
     labelRight: 'Liberté économique',
     weight: 0.24,
     color: '#c2410c',
@@ -18,29 +18,29 @@ const DIMENSIONS = {
   },
   soc: {
     id: 'soc',
-    name: 'Société & libertés',
+    name: 'Société et libertés',
     short: 'Société',
     plain: 'Les règles de la vie en société : libertés individuelles, égalité, évolution des modes de vie.',
-    labelLeft: 'Transformation sociale & libertés',
-    labelRight: 'Continuité & règles communes',
+    labelLeft: 'Transformation sociale et libertés',
+    labelRight: 'Continuité et règles communes',
     weight: 0.16,
     color: '#a21caf',
     note: null
   },
   auth: {
     id: 'auth',
-    name: 'Autorité, sécurité & pouvoir',
+    name: 'Autorité, sécurité et pouvoir',
     short: 'Autorité',
     plain: 'Sécurité, justice et équilibre des pouvoirs : jusqu’où l’État doit contrôler, sanctionner et décider vite.',
-    labelLeft: 'Prévention & contre-pouvoirs',
-    labelRight: 'Fermeté & pouvoir exécutif fort',
+    labelLeft: 'Prévention et contre-pouvoirs',
+    labelRight: 'Fermeté et pouvoir exécutif fort',
     weight: 0.16,
     color: '#0f172a',
     note: 'Cette dimension inclut des questions sur les institutions (contre-pouvoirs, pouvoirs exceptionnels). Elle mesure surtout un axe libéral / autoritaire, qui recoupe partiellement seulement le clivage gauche-droite classique.'
   },
   europe: {
     id: 'europe',
-    name: 'Europe & souveraineté',
+    name: 'Europe et souveraineté',
     short: 'Europe',
     plain: 'La place de l’Union européenne : décider à plusieurs pays, ou garder plus de décisions au niveau français (la souveraineté, c’est décider par soi-même).',
     labelLeft: 'Intégration européenne',
@@ -51,18 +51,18 @@ const DIMENSIONS = {
   },
   immig: {
     id: 'immig',
-    name: 'Immigration & ouverture',
+    name: 'Immigration et ouverture',
     short: 'Immigration',
     plain: 'Combien de personnes étrangères accueillir, dans quelles conditions, et comment les intégrer.',
-    labelLeft: 'Ouverture & intégration',
-    labelRight: 'Contrôle & restriction',
+    labelLeft: 'Ouverture et intégration',
+    labelRight: 'Contrôle et restriction',
     weight: 0.14,
     color: '#0e7490',
     note: null
   },
   ecology: {
     id: 'ecology',
-    name: 'Écologie & énergie',
+    name: 'Écologie et énergie',
     short: 'Écologie',
     plain: 'Comment et à quelle vitesse agir pour le climat et l’environnement, et avec quelles contraintes.',
     labelLeft: 'Transition accélérée',
@@ -285,13 +285,13 @@ const DEPARTAGE = [
     basis:'Positions publiques des formations, estimées à partir des sources listées sur le revenu universel, et recoupées avec les mesures sociales publiées.',
     sourceIds:['prog-economie','prog-travail'] },
 
-  { id:'dp-pouvoir-achat', dim:'eco', group:'pouvoir-achat', topic:'Salaires & prix',
+  { id:'dp-pouvoir-achat', dim:'eco', group:'pouvoir-achat', topic:'Salaires et prix',
     q:'Comment soutenir en priorité le pouvoir d’achat face au coût de la vie ?',
     plain:'Face à l’inflation, certains proposent de bloquer les prix ou de relever le salaire minimum, d’autres privilégient des primes défiscalisées ou des baisses de cotisations sociales.',
     options:[
       { pos:0, short:'Bloquer les prix et SMIC à 1600 €', text:'Bloquer les prix des produits de première nécessité et de l’énergie, et augmenter le SMIC net à 1600 euros.' },
       { pos:1, short:'Hausse des salaires par négociation', text:'Conditionner les aides publiques aux entreprises à des hausses de salaires et revaloriser les grilles de branches.' },
-      { pos:2, short:'Primes défiscalisées & allègements ciblés', text:'Développer les primes sans charges ni impôts (prime de partage de la valeur) et baisser les cotisations sur les classes moyennes.' },
+      { pos:2, short:'Primes défiscalisées et allègements ciblés', text:'Développer les primes sans charges ni impôts (prime de partage de la valeur) et baisser les cotisations sur les classes moyennes.' },
       { pos:3, short:'Baisse générale des impôts et charges', text:'Baisser massivement les charges sociales et la fiscalité de production pour stimuler l’emploi et le salaire net.' }
     ],
     stances:{ lfi:0, pcf:0, lo:0, ecolo:0.5, pp:1, rn:1.5, renaissance:2, horizons:2, lr:3, reconquete:3, dlf:1.5 },
@@ -304,13 +304,13 @@ const DEPARTAGE = [
     basis:'Positions reprises de la page « Pouvoir d’achat » d’Élections 2027, qui indique pour chaque candidat la mesure retenue, sa source et sa date.',
     sourceIds:['prog-pouvoir-achat'] },
 
-  { id:'dp-sante', dim:'soc', group:'sante', topic:'Déserts médicaux & soignants',
+  { id:'dp-sante', dim:'soc', group:'sante', topic:'Déserts médicaux et soignants',
     q:'Comment lutter contre les déserts médicaux et le manque de soignants ?',
     plain:'Un désert médical est une zone où l’accès à un médecin traitant ou à des spécialistes est très difficile. La liberté d’installation permet aux praticiens de choisir leur lieu d’exercice.',
     options:[
       { pos:0, short:'Réguler l’installation des médecins', text:'Réguler l’installation des médecins : obliger les nouveaux praticiens à exercer temporairement en zone sous-dotée.' },
-      { pos:1, short:'Centres de santé publics & incitations', text:'Créer massivement des centres de santé publics avec des médecins salariés et renforcer les bourses d’engagement.' },
-      { pos:2, short:'Incitations financières & délégations d’actes', text:'Conserver la liberté d’installation en augmentant les aides financières et en confiant plus d’actes aux infirmiers et pharmaciens.' },
+      { pos:1, short:'Centres de santé publics et incitations', text:'Créer massivement des centres de santé publics avec des médecins salariés et renforcer les bourses d’engagement.' },
+      { pos:2, short:'Incitations financières et délégations d’actes', text:'Conserver la liberté d’installation en augmentant les aides financières et en confiant plus d’actes aux infirmiers et pharmaciens.' },
       { pos:3, short:'Liberté totale et allègements de contraintes', text:'Garantir une liberté totale d’installation et supprimer les contraintes administratives pour attirer les soignants.' }
     ],
     stances:{ pcf:0, lfi:0, ecolo:1, pp:0.75, rn:1.5, lr:1.75, renaissance:2, horizons:2, reconquete:2.5, dlf:1.5, ne:1 },
@@ -322,14 +322,14 @@ const DEPARTAGE = [
     basis:'Positions reprises de la page « Santé » d’Élections 2027, qui indique pour chaque candidat la mesure retenue, sa source et sa date.',
     sourceIds:['prog-sante'] },
 
-  { id:'dp-logement', dim:'eco', group:'logement', topic:'Crise du logement & loyers',
+  { id:'dp-logement', dim:'eco', group:'logement', topic:'Crise du logement et loyers',
     q:'Quelle politique pour résoudre la crise du logement ?',
     plain:'L’encadrement des loyers plafonne le montant des loyers dans les zones tendues. Le statut de bailleur privé bénéficie parfois d’avantages fiscaux pour inciter à louer.',
     options:[
-      { pos:0, short:'Encadrement strict & réquisition de logements vides', text:'Généraliser l’encadrement strict des loyers, interdire les expulsions sans relogement et réquisitionner les logements vacants.' },
+      { pos:0, short:'Encadrement strict et réquisition de logements vides', text:'Généraliser l’encadrement strict des loyers, interdire les expulsions sans relogement et réquisitionner les logements vacants.' },
       { pos:1, short:'Construction massive de logements sociaux', text:'Relancer prioritairement la construction de logements sociaux publics et rénover thermiquement le parc existant.' },
       { pos:2, short:'Incitations aux propriétaires privés', text:'Encourager l’investissement locatif privé par des avantages fiscaux et assouplir les règles d’expulsion en cas d’impayés.' },
-      { pos:3, short:'Dérégulation & suppression du zonage', text:'Déréguler l’urbanisme, supprimer l’encadrement des loyers et réduire les normes environnementales pour construire plus vite.' }
+      { pos:3, short:'Dérégulation et suppression du zonage', text:'Déréguler l’urbanisme, supprimer l’encadrement des loyers et réduire les normes environnementales pour construire plus vite.' }
     ],
     stances:{ lfi:0, pcf:1, lo:0, ecolo:1, pp:1, rn:2.5, renaissance:2, horizons:2, lr:2.5, reconquete:3, dlf:2 },
     stanceNotes:{
@@ -697,7 +697,7 @@ const SOURCES = [
 ];
 
 /* ----------------------------------------------------------------------
-   PARTIS — 15 formations politiques & candidatures associées
+   PARTIS — 15 formations politiques et candidatures associées
    ------------------------------------------------------------------- */
 const PARTIES = [
   { id:'lfi', name:'La France insoumise', short:'LFI', family:'Gauche', color:'#7b5dc8',
@@ -835,12 +835,12 @@ const PARTIES = [
 ];
 
 /* ----------------------------------------------------------------------
-   THÈMES DÉTAILLÉS & POINTS DE VUE DES CANDIDATS (NOUVEL ONGLET THÈMES)
+   THÈMES DÉTAILLÉS et POINTS DE VUE DES CANDIDATS (NOUVEL ONGLET THÈMES)
    ------------------------------------------------------------------- */
 const THEMES = [
   {
     id: 'pouvoir-achat',
-    name: 'Pouvoir d’achat, salaires & inflation',
+    name: 'Pouvoir d’achat, salaires et inflation',
     icon: '💰',
     summary: 'La première préoccupation des Français : hausse des prix de l’alimentation et de l’énergie, salaires stagnants et partage de la valeur.',
     cleavages: 'La gauche propose le blocage des prix et la hausse immédiate du SMIC net à 1600 €. Le centre privilégie la prime de partage de la valeur défiscalisée et la baisse des charges. La droite et le RN misent sur des baisses massives de TVA et de cotisations patronales.',
@@ -867,7 +867,7 @@ const THEMES = [
   },
   {
     id: 'retraites-travail',
-    name: 'Retraites, travail & modèle social',
+    name: 'Retraites, travail et modèle social',
     icon: '⏳',
     summary: 'L’âge de départ, la pénibilité au travail et le financement pérenne des régimes de répartition.',
     cleavages: 'LFI, le PCF et LO exigent le retour à 60 ans. Place publique et les Écologistes défendent 62 ans avec prise en compte accrue de la pénibilité. Renaissance maintient 64 ans ; Horizons et LR demandent un relèvement à 65 ans.',
@@ -892,7 +892,7 @@ const THEMES = [
   },
   {
     id: 'sante-hopital',
-    name: 'Santé, hôpital public & déserts médicaux',
+    name: 'Santé, hôpital public et déserts médicaux',
     icon: '🏥',
     summary: 'Urgences saturées, crise de l’hôpital public, pénurie de médecins de campagne et accès aux spécialistes.',
     cleavages: 'La gauche et les communistes veulent réguler l’installation des médecins pour enrayer les déserts médicaux. La majorité présidentielle privilégie les délégations de tâches et les bourses incitatives. La droite défend la liberté absolue d’installation et la débureaucratisation.',
@@ -916,7 +916,7 @@ const THEMES = [
   },
   {
     id: 'logement',
-    name: 'Logement, loyers & rénovation',
+    name: 'Logement, loyers et rénovation',
     icon: '🏡',
     summary: 'Crise de la construction neuve, explosion des loyers dans les métropoles, passoires thermiques et pénurie de HLM.',
     cleavages: 'La gauche prône l’encadrement généralisé des loyers et le respect strict de la loi SRU (25 % de HLM). Le centre cherche à relancer l’investissement privé via des niches adaptées. La droite demande l’assouplissement du calendrier du DPE et des sanctions contre les squats.',
@@ -940,7 +940,7 @@ const THEMES = [
   },
   {
     id: 'ecologie-energie',
-    name: 'Écologie, climat & mix énergétique',
+    name: 'Écologie, climat et mix énergétique',
     icon: '🌱',
     summary: 'Relance des réacteurs nucléaires EPR2 contre le 100 % renouvelable, fin du moteur thermique en 2035 et sobriété.',
     cleavages: 'Les Écologistes et LFI veulent sortir du nucléaire et accélérer sur le solaire/éolien. Le PCF défend à la fois le nucléaire et les renouvelables. La majorité, la droite et le RN misent très lourdement sur l’atome et s’opposent aux éoliennes terrestres.',
@@ -962,7 +962,7 @@ const THEMES = [
   },
   {
     id: 'securite-justice',
-    name: 'Sécurité, justice & libertés publiques',
+    name: 'Sécurité, justice et libertés publiques',
     icon: '🛡️',
     summary: 'Augmentation des moyens de la police et de la justice, peines planchers, surpopulation carcérale et réinsertion.',
     cleavages: 'La gauche met l’accent sur la police de proximité, la prévention et la fin des peines courtes automatiques. Le centre et la droite prônent la fermeté, la création de places de prison et des peines minimales incompressibles.',
@@ -986,7 +986,7 @@ const THEMES = [
   },
   {
     id: 'immigration-asile',
-    name: 'Immigration, asile & intégration',
+    name: 'Immigration, asile et intégration',
     icon: '🛂',
     summary: 'Régulation des flux migratoires, droit du sol, régularisation des travailleurs sans-papiers et conventions d’asile.',
     cleavages: 'La gauche défend la régularisation des travailleurs des métiers en tension et le respect du droit d’asile. Le centre durcit les conditions de regroupement familial. La droite et le RN veulent supprimer le droit du sol et instaurer la priorité nationale.',
@@ -1007,7 +1007,7 @@ const THEMES = [
   },
   {
     id: 'europe-defense',
-    name: 'Europe, défense & souveraineté',
+    name: 'Europe, défense et souveraineté',
     icon: '🇪🇺',
     summary: 'Pacte de stabilité budgétaire, soutien militaire à l’Ukraine, rôle dans l’OTAN et autonomie stratégique de la France.',
     cleavages: 'Place publique et Renaissance veulent une Europe fédérale avec une armée commune et un soutien militaire massif à l’Ukraine. LFI critique les traités libéraux et refuse l’élargissement de l’OTAN. Le RN et Reconquête prônent la souveraineté des nations et la négociation diplomatique.',

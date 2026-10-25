@@ -8,12 +8,13 @@
 <meta property="og:title" content="Votez bien ! — Comprendre où vous vous situez avant 2027">
 <meta property="og:description" content="Quiz politique interactif et indépendant pour l'élection présidentielle 2027 : 22 questions, analyse multidimensionnelle, départage ciblé, thèmes détaillés et baromètre des sondages.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="./embleme-citoyen-512.jpg">
+<meta property="og:image" content="./embleme-solidaire-512.png">
+<meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#14213D">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./embleme-citoyen-192.png" type="image/png" sizes="192x192">
-<link rel="apple-touch-icon" href="./embleme-citoyen-180.png" sizes="180x180">
+<link rel="icon" href="./embleme-solidaire-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="./embleme-solidaire-180.png" sizes="180x180">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -25,9 +26,10 @@
 
   <header class="topbar">
     <button class="brand" data-nav="home" aria-label="Votez bien ! — retour à l'accueil">
-      <img class="mark" src="./embleme-citoyen-192.png" alt="" width="36" height="36" decoding="async">
+      <img class="mark" src="./embleme-solidaire-192.png" alt="" width="36" height="36" decoding="async">
       Votez bien !
     </button>
+    <button class="navlink navlink-donate donate-quick" data-nav="donate" id="navDonateQuick">Faire un don</button>
     <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Ouvrir le menu">
       <span class="nav-toggle-bar" aria-hidden="true"></span>
       <span class="nav-toggle-bar" aria-hidden="true"></span>
@@ -43,6 +45,7 @@
       <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="candidatures" id="navCandidatures">Candidatures</button>
       <button class="navlink" data-nav="method">Méthode</button>
+      <button class="navlink navlink-donate" data-nav="donate" id="navDonate">Faire un don</button>
     </nav>
   </header>
 
@@ -89,7 +92,7 @@
             <div class="hiw-item"><span class="hiw-num">1</span><div><h3><span data-count="questions">22</span> questions d’orientation</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire équilibré, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Questions concrètes pour départager</h3><p>Après un aperçu provisoire et vos 3 priorités, des questions précises (retraites, nucléaire, santé, pouvoir d’achat…) départagent les partis encore proches.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">3</span><div><h3>Votre profil nuancé</h3><p>Une orientation générale, le détail sur 6 thèmes avec indicateur de clarté, et vos priorités personnelles sans calcul opaque.</p></div></div>
-            <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Formations les plus proches & nuances</h3><p>Un indice éditorial de proximité sur 100, la transparence des données et l’affichage des propositions qui vous séparent.</p></div></div>
+            <div class="hiw-item"><span class="hiw-num">4</span><div><h3>Formations les plus proches et nuances</h3><p>Un indice éditorial de proximité sur 100, la transparence des données et l’affichage des propositions qui vous séparent.</p></div></div>
           </div>
         </div>
       </section>
@@ -160,7 +163,7 @@
       <!-- ============ NOUVEL ONGLET : THÈMES ============ -->
       <section class="screen" id="screen-themes" aria-labelledby="themesTitle">
         <div class="section-kicker">Panorama thématique 2027</div>
-        <h1 id="themesTitle">Les thèmes majeurs & propositions des candidats</h1>
+        <h1 id="themesTitle">Les thèmes majeurs et propositions des candidats</h1>
         <p class="lede">Explorez les 8 grands chantiers présidentiels (dont les 6 axes cardinaux de notre boussole), les clivages idéologiques et les engagements précis pris par chaque force politique en vue de 2027.</p>
         
         <div class="theme-filters-box">
@@ -173,7 +176,7 @@
       <!-- ============ NOUVEL ONGLET : SONDAGES ============ -->
       <section class="screen" id="screen-polls" aria-labelledby="pollsTitle">
         <div class="section-kicker">Baromètre électoral 2027</div>
-        <h1 id="pollsTitle">Les intentions de vote & synthèses des sondages</h1>
+        <h1 id="pollsTitle">Les intentions de vote et synthèses des sondages</h1>
         <p class="lede">Baromètre agrégé des enquêtes d’opinion publiées en octobre 2026 (IFOP, Elabe, Cluster17 et OpinionWay), avec le détail de chaque vague et le lien vers sa notice publiée à la Commission des sondages. Le baromètre tient compte des candidatures déclarées, dont celle de Raphaël Glucksmann issue de la primaire « Choisir 2027 » des 9 et 10 octobre 2026.</p>
 
         <div class="polls-notice-card">
@@ -215,7 +218,7 @@
       <!-- ============ PARTIS ============ -->
       <section class="screen" id="screen-parties" aria-labelledby="partiesTitle">
         <div class="section-kicker">Les formations politiques</div>
-        <h1 id="partiesTitle">Les partis & candidatures à explorer</h1>
+        <h1 id="partiesTitle">Les partis et candidatures à explorer</h1>
         <p class="lede" id="partyDirectoryIntro">Explorez les <span data-count="parties">16</span> formations, leur candidature ou personnalité de référence et leurs liens officiels. La distinction entre parti et candidat est précisée pour chaque fiche (ex. Place publique représentée par Raphaël Glucksmann).</p>
         <div class="party-directory-banner"><span class="flag-mark" aria-hidden="true"></span><p><strong>Un repère pour vous informer.</strong> Les portraits identifient des personnalités associées aux partis ; les candidatures évoluent. Consultez le statut daté et les sources de chaque fiche.</p></div>
         <div class="filter-row" id="familyFilters"></div>
@@ -223,14 +226,14 @@
         <div class="btn-row party-directory-actions" style="margin-top:1.8rem">
           <button class="btn btn-brass" id="btnStartFromParties">Faire le questionnaire</button>
           <button class="btn btn-ghost" data-nav="compare" id="btnCompareParties" hidden>Comparer jusqu’à 3 partis →</button>
-          <button class="btn btn-ghost" data-nav="candidatures">Candidatures & calendrier</button>
+          <button class="btn btn-ghost" data-nav="candidatures">Candidatures et calendrier</button>
         </div>
       </section>
 
-      <!-- ============ CANDIDATURES & CALENDRIER ============ -->
+      <!-- ============ CANDIDATURES et CALENDRIER ============ -->
       <section class="screen" id="screen-candidatures" aria-labelledby="candidaturesTitle">
         <div class="section-kicker">Qui se présente, et pour quand</div>
-        <h1 id="candidaturesTitle">Candidatures déclarées & calendrier de campagne</h1>
+        <h1 id="candidaturesTitle">Candidatures déclarées et calendrier de campagne</h1>
         <p class="lede">La liste complète des candidatures annoncées pour la présidentielle 2027, avec leur date de déclaration, et le calendrier de la campagne jusqu’au second tour.</p>
         <div id="candidaturesContent"></div>
       </section>
@@ -244,8 +247,13 @@
 
             <!-- ============ MÉTHODE ============ -->
       <section class="screen" id="screen-method" aria-labelledby="methodTitle">
-        <h1 id="methodTitle">Méthode & Transparence</h1>
+        <h1 id="methodTitle">Méthode et Transparence</h1>
         <p class="lede">Ce que mesure vraiment l’application, comment le score est calculé, et ce que vous devez garder à l’esprit en le lisant.</p>
+
+        <div class="method-section">
+          <h2>Pourquoi j’ai créé ce site</h2>
+          <p>À l’approche des élections, une partie de la population peut se sentir perdue face aux candidats, aux programmes et aux enjeux. J’ai eu envie de créer ce site pour aider chacun à mieux comprendre les candidats et ses propres idées, en mettant en regard ses opinions avec les positions publiques des formations politiques. L’objectif est de donner des repères, sans dire pour qui voter.</p>
+        </div>
 
         <div class="method-section">
           <h2>Ce n’est ni scientifique, ni infaillible</h2>
@@ -269,12 +277,12 @@
         </div>
 
         <div class="method-section">
-          <h2>Actualité politique & Candidatures 2026/2027</h2>
+          <h2>Actualité politique et Candidatures 2026/2027</h2>
           <p>Le site est actualisé en continu au fil des déclarations officielles. La primaire « Choisir 2027 » (Parti socialiste, Place publique et GRS) s’est tenue les <strong>9 et 10 octobre 2026</strong>, avec un résultat proclamé le 11 octobre 2026 : Raphaël Glucksmann l’a remportée dès le premier tour avec 66 % des suffrages, devant Olivier Faure, Ségolène Royal, Emmanuel Maurel et Jérôme Guedj. Il est donc le candidat porté par Place publique. Chaque fiche distingue la formation politique de la candidature qu’elle soutient, et l’écran « Candidatures » donne la liste complète des déclarations, y compris celles qui ne sont pas portées par une formation de ce site.</p>
         </div>
 
         <div class="method-section">
-          <h2>Transparence des données & couverture documentaire</h2>
+          <h2>Transparence des données et couverture documentaire</h2>
           <p>Une formation reçoit un indice si au moins <span data-count="threshold">15</span> % des questions de précision disposent d’une position documentée. À partir de trois questions posées, au moins <span data-count="answerThreshold">25</span> % de vos réponses doivent aussi être comparables, avec un minimum de trois positions communes. Les fiches signalent les données manquantes et leurs sources.</p>
         </div>
 
@@ -286,6 +294,18 @@
         <div class="method-section">
           <h2>Sources de recoupement</h2>
           <ul id="methodSources"></ul>
+        </div>
+      </section>
+
+      <!-- ============ SOUTENIR LE PROJET ============ -->
+      <section class="screen" id="screen-donate" aria-labelledby="donateTitle">
+        <div class="donation-panel">
+          <p class="section-kicker">Soutenir un projet citoyen</p>
+          <h1 id="donateTitle">Faire un don</h1>
+          <p class="lede">À l’approche des élections, une partie de la population peut se sentir perdue face aux candidats et aux programmes. J’ai eu envie de créer Votez bien ! pour aider chacun à mieux comprendre les candidats et ses propres idées, en mettant en regard ses opinions avec les positions publiques des formations politiques.</p>
+          <p>Pour m’aider à financer le projet, l’hébergement du site web et toutes ses mises à jour, un don m’aiderait énormément. Chaque contribution est libre et ne change ni le calcul du quiz ni la présentation des formations.</p>
+          <a class="btn btn-donate" href="https://www.onparticipe.fr/c/woesXZj5" target="_blank" rel="noopener noreferrer">Faire un don <span aria-hidden="true">↗</span></a>
+          <p class="confidence-note">Le lien ouvre la cagnotte sur OnParticipe.</p>
         </div>
       </section>
 
@@ -319,6 +339,8 @@
 </div>
 
 <script src="./data.js"></script>
-<script src="./scoring.js"></script> <script src="./app.js"></script>
+<script src="./themes-and-polls.js"></script>
+<script src="./scoring.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
