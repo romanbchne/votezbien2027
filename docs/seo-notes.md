@@ -24,7 +24,7 @@ Après l’ajout, le retrait ou le déplacement d’une page, exécuter ces comm
 ## État Pages et contrôle avant publication
 
 - Le dépôt contient un fichier `CNAME` correct et GitHub indique que Pages est activé.
-- L’API disponible n’expose pas ici le domaine configuré ni l’option HTTPS forcée. Dans `Settings → Pages`, vérifier que le domaine personnalisé est `www.votezbien2027.fr`, que la source de publication correspond à la racine de `main` (ou à la source réellement choisie) et que `Enforce HTTPS` est activé.
+- Le domaine personnalisé doit être `www.votezbien2027.fr`, la source de publication doit correspondre à la racine de `main` (ou à la source effectivement choisie) et `Enforce HTTPS` doit être activé.
 - Vérifier après déploiement que les URLs `/robots.txt`, `/sitemap.xml` et `/404.html` répondent depuis le domaine canonique.
 - Aucun dossier publié commençant par un souligné n’est nécessaire actuellement; `.nojekyll` n’est donc pas ajouté.
 
@@ -35,9 +35,11 @@ Après l’ajout, le retrait ou le déplacement d’une page, exécuter ces comm
 3. Lancer `npm run seo:sitemap`, `npm run seo:check`, `npm test`, `npm run build` et `npm run seo:dist`.
 4. Vérifier le workflow « SEO maintenance » ainsi que le workflow CI, notamment le contrôle des fichiers copiés dans dist/.
 5. Contrôler le rendu mobile, le clavier, les textes alternatifs, le contraste, les erreurs de console et les URLs publiées.
-6. Compléter puis faire relire les mentions légales et la politique de confidentialité avant de présenter leurs informations comme définitives.
+6. Maintenir les pages légales et de confidentialité alignées avec le fonctionnement réel du site et les services externes chargés.
 7. Confirmer le domaine personnalisé, le HTTPS forcé et les redirections registrar.
 
-## Informations restant à compléter
+## Mentions légales et confidentialité
 
-Le dépôt ne fournit pas le nom, l’adresse ou le contact de l’éditeur, ni le directeur de publication. Ces informations, ainsi que l’identité du responsable de traitement, la base juridique, les durées applicables et le moyen d’exercer les droits, restent signalées « À compléter » dans les mentions légales et la politique de confidentialité. Il faut les renseigner avant de présenter ces pages comme définitives.
+Les pages publiques décrivent le projet comme une initiative bénévole publiée à titre non professionnel. Elles ne publient pas de nom, d’adresse personnelle ou de courriel inventés. La page des mentions légales explique l’exception d’anonymat prévue à l’article 1-1, II de la LCEN et indique les coordonnées publiées par GitHub. Cette exception suppose que les renseignements d’identification de l’éditeur aient été communiqués à l’hébergeur.
+
+La politique de confidentialité distingue les réponses conservées dans le stockage local du navigateur, les journaux de sécurité de GitHub Pages et les requêtes vers Google Fonts, Wikimedia Commons et OnParticipe. Elle doit être revue si l’application ou ses fournisseurs changent.
