@@ -7,28 +7,32 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 /* ------------------------------------------------------------------
    Votez bien ! — site statique en JavaScript classique.
-
-   Le site n'a besoin ni de bundling, ni de transpilation, ni de
-   hachage : c'est du HTML, du CSS et des scripts classiques
-   (<script src="./data.js">). Vite sert ici de moteur de build, mais
-   la copie finale est faite à l'identique, ce qui garantit :
-     - des URL relatives (le site fonctionne à la racine d'un domaine
-       comme dans un sous-dossier) ;
-     - des noms de fichiers stables, donc une liste de préchargement
-       exacte pour le service worker ;
-     - un dist/ qui est une reproduction fidèle des sources.
+   Vite sert le site localement; ce plugin copie les fichiers publics
+   à l’identique dans dist/ et garde leurs URLs stables.
    ------------------------------------------------------------------ */
 const SITE_FILES = [
   'index.html',
+  '404.html',
+  'robots.txt',
+  'sitemap.xml',
+  'CNAME',
   'styles.css',
   'data.js',
+  'themes-and-polls.js',
   'scoring.js',
   'app.js',
   'service-worker.js',
   'manifest.json',
-  'embleme-citoyen-180.png',
-  'embleme-citoyen-192.png',
-  'embleme-citoyen-512.jpg'
+  'icon.svg',
+  'embleme-solidaire-180.png',
+  'embleme-solidaire-192.png',
+  'embleme-solidaire-512.png',
+  'assets/css/content-pages.css',
+  'a-propos/index.html',
+  'methode/index.html',
+  'mentions-legales/index.html',
+  'confidentialite/index.html',
+  'contact/index.html'
 ];
 
 function staticSite(): Plugin {
@@ -38,8 +42,8 @@ function staticSite(): Plugin {
     writeBundle(options) {
       const dir = options.dir;
 
-      /* Plus aucune ressource sous assets/ : toutes les URL du site sont
-         relatives et pointent vers la racine du dossier publié. */
+      // Vite may create bundled assets; remove them because this project
+      // publishes stable, hand-authored file paths, then copy public files.
       fs.rmSync(path.join(dir, 'assets'), { recursive: true, force: true });
 
       for (const file of SITE_FILES) {
@@ -48,7 +52,9 @@ function staticSite(): Plugin {
           this.warn('Fichier du site introuvable, ignoré : ' + file);
           continue;
         }
-        fs.copyFileSync(src, path.join(dir, file));
+        const destination = path.join(dir, file);
+        fs.mkdirSync(path.dirname(destination), { recursive: true });
+        fs.copyFileSync(src, destination);
       }
     }
   };

@@ -893,3 +893,9 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
   .candidature-card{padding:.9rem 1rem}
   .quiz-intro-card{padding:1rem}
 }
+
+
+/* Navigation de pied de page : liens utiles et lisibles sur tous les écrans. */
+.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.45rem 1rem;margin-top:.85rem}
+.footer-links a{color:inherit;text-underline-offset:.16em}
+.footer-links a:focus-visible{outline:3px solid var(--brass);outline-offset:3px;border-radius:3px}

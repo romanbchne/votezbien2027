@@ -3,14 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Votez bien ! — Comprendre où vous vous situez avant 2027</title>
-<meta name="description" content="Quiz politique interactif et indépendant pour l'élection présidentielle 2027 : 22 questions, analyse multidimensionnelle, départage ciblé, thèmes détaillés et baromètre des sondages.">
-<meta property="og:title" content="Votez bien ! — Comprendre où vous vous situez avant 2027">
-<meta property="og:description" content="Quiz politique interactif et indépendant pour l'élection présidentielle 2027 : 22 questions, analyse multidimensionnelle, départage ciblé, thèmes détaillés et baromètre des sondages.">
+<title>Quiz politique 2027 : comparez vos idées | Votez bien</title>
+<meta name="description" content="Quiz politique indépendant : comparez vos opinions aux positions des formations, explorez leurs programmes et consultez les sondages de la présidentielle 2027.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://www.votezbien2027.fr/">
+<meta property="og:title" content="Quiz politique 2027 : comparez vos idées | Votez bien">
+<meta property="og:description" content="Quiz politique indépendant : comparez vos opinions aux positions des formations, explorez leurs programmes et consultez les sondages de la présidentielle 2027.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="./embleme-solidaire-512.png">
+<meta property="og:url" content="https://www.votezbien2027.fr/">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:image" content="https://www.votezbien2027.fr/embleme-solidaire-512.png">
 <meta property="og:image:type" content="image/png">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Quiz politique 2027 : comparez vos idées | Votez bien">
+<meta name="twitter:description" content="Quiz politique indépendant pour comparer vos opinions aux positions des formations, explorer leurs programmes et consulter les sondages de la présidentielle 2027.">
+<meta name="twitter:image" content="https://www.votezbien2027.fr/embleme-solidaire-512.png">
 <meta name="theme-color" content="#14213D">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./embleme-solidaire-192.png" type="image/png" sizes="192x192">
@@ -19,6 +26,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Votez bien !",
+  "url": "https://www.votezbien2027.fr/",
+  "inLanguage": "fr-FR"
+}
+</script>
 </head>
 <body>
 <a href="#main" class="skip-link">Aller au contenu</a>
@@ -26,7 +42,7 @@
 
   <header class="topbar">
     <button class="brand" data-nav="home" aria-label="Votez bien ! — retour à l'accueil">
-      <img class="mark" src="./embleme-solidaire-192.png" alt="" width="36" height="36" decoding="async">
+      <img class="mark" src="./embleme-solidaire-192.png" alt="Emblème tricolore de Votez bien" width="36" height="36" decoding="async">
       Votez bien !
     </button>
     <button class="navlink navlink-donate donate-quick" data-nav="donate" id="navDonateQuick">Faire un don</button>
@@ -65,8 +81,8 @@
         <div class="hero">
           <div class="hero-text">
             <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> 100 % gratuit, anonyme, sans compte</p>
-            <h1 id="homeTitle">Vos idées. Les enjeux. <span class="accent">Les partis.</span></h1>
-            <p class="lede">Répondez à des questions concrètes, découvrez vos tendances sur les 6 axes cardinaux de notre boussole citoyenne et comparez vos réponses aux positions des <span data-count="parties">16</span> formations et candidats.</p>
+            <h1 id="homeTitle">Quiz politique 2027 : <span class="accent">comparez vos idées aux partis.</span></h1>
+            <p class="lede">Ce quiz politique indépendant compare vos réponses aux positions publiques de <span data-count="parties">16</span> formations et candidats. Répondez à des questions concrètes pour découvrir vos tendances sur six axes et explorer les programmes.</p>
             <div class="duration-grid" aria-label="Durée estimée du questionnaire">
               <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small><span data-count="questions">22</span> questions d’orientation · ~5 min</small></span></div>
               <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Questions concrètes ciblées</small></span></div>
@@ -87,7 +103,7 @@
         </div>
 
         <div class="how-it-works">
-          <h2>Comment ça marche</h2>
+          <h2>Comment fonctionne le quiz politique ?</h2>
           <div class="hiw-list">
             <div class="hiw-item"><span class="hiw-num">1</span><div><h3><span data-count="questions">22</span> questions d’orientation</h3><p>Deux propositions à chaque fois, dans un ordre aléatoire équilibré, une échelle en 5 positions, et une case « je ne sais pas » toujours disponible.</p></div></div>
             <div class="hiw-item"><span class="hiw-num">2</span><div><h3>Questions concrètes pour départager</h3><p>Après un aperçu provisoire et vos 3 priorités, des questions précises (retraites, nucléaire, santé, pouvoir d’achat…) départagent les partis encore proches.</p></div></div>
@@ -313,7 +329,16 @@
   </main>
 
   <footer>
-    Votez bien ! — outil indépendant d’aide à la compréhension politique pour la présidentielle 2027. Ne remplace pas la lecture des programmes officiels. 100 % local, respectueux de la vie privée.
+    Votez bien ! — outil indépendant d’aide à la compréhension politique pour la présidentielle 2027. Le résultat ne remplace pas la lecture des programmes officiels. Les réponses au quiz sont enregistrées dans le navigateur.
+    <nav class="footer-links" aria-label="Informations sur le site">
+      <a href="https://www.votezbien2027.fr/">Accueil</a>
+      <a href="https://www.votezbien2027.fr/a-propos/">À propos</a>
+      <a href="https://www.votezbien2027.fr/methode/">Méthode</a>
+      <a href="https://www.votezbien2027.fr/mentions-legales/">Mentions légales</a>
+      <a href="https://www.votezbien2027.fr/confidentialite/">Confidentialité</a>
+      <a href="https://www.votezbien2027.fr/contact/">Contact</a>
+      <a href="https://www.votezbien2027.fr/#donate">Faire un don</a>
+    </nav>
   </footer>
 </div>
 
