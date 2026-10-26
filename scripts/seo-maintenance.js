@@ -13,7 +13,6 @@ const REQUIRED = [
   'methode/index.html',
   'mentions-legales/index.html',
   'confidentialite/index.html',
-  'contact/index.html'
 ];
 const writeSitemap = process.argv.includes('--write');
 const failures = [];
@@ -178,7 +177,7 @@ if (process.argv.includes('--check-dist')) {
     'embleme-solidaire-192.png', 'embleme-solidaire-512.png',
     'assets/css/content-pages.css',
     'a-propos/index.html', 'methode/index.html', 'mentions-legales/index.html',
-    'confidentialite/index.html', 'contact/index.html'
+    'confidentialite/index.html'
   ];
   for (const file of distFiles) {
     const sourcePath = path.join(ROOT, file);

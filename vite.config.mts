@@ -31,8 +31,7 @@ const SITE_FILES = [
   'a-propos/index.html',
   'methode/index.html',
   'mentions-legales/index.html',
-  'confidentialite/index.html',
-  'contact/index.html'
+  'confidentialite/index.html'
 ];
 
 function staticSite(): Plugin {

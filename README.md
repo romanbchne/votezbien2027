@@ -65,7 +65,7 @@ Les scripts `npm test` incluent aussi un million de profils déterministes et ce
 
 URL canonique du site : https://www.votezbien2027.fr/
 
-Les pages publiques d’information sont rangées dans `a-propos/`, `methode/`, `mentions-legales/`, `confidentialite/` et `contact/`. Avant d’ajouter ou déplacer une page, lancer :
+Les pages publiques d’information sont rangées dans `a-propos/`, `methode/`, `mentions-legales/` et `confidentialite/`. Elles sont accessibles depuis le pied de page, sans ajouter d’onglets à la navigation principale. Avant d’ajouter ou déplacer une page, lancer :
 
 ```sh
 npm run seo:sitemap

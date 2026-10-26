@@ -3,7 +3,7 @@
 ## Conventions d’URL
 
 - Domaine canonique : https://www.votezbien2027.fr.
-- Les pages d’information utilisent des chemins minuscules, courts et terminés par une barre oblique : `/a-propos/`, `/methode/`, `/mentions-legales/`, `/confidentialite/` et `/contact/`.
+- Les pages d’information utilisent des chemins minuscules, courts et terminés par une barre oblique : `/a-propos/`, `/methode/`, `/mentions-legales/` et `/confidentialite/`. Elles sont liées dans le pied de page, sans entrée supplémentaire dans la navigation principale.
 - Chaque page publique déclare une balise canonical absolue sur le domaine `www` en HTTPS. Les liens internes utilisent ces URLs canoniques ou des chemins relatifs pour les ressources.
 - L’accueil de l’application reste à `/`. Les vues interactives sont des routes par fragment (par exemple `/#quizStart`) ; elles ne sont pas énumérées séparément dans le sitemap.
 - `404.html` retourne la page d’erreur GitHub Pages, reste en `noindex` et n’est pas dans le sitemap.
@@ -40,4 +40,4 @@ Après l’ajout, le retrait ou le déplacement d’une page, exécuter ces comm
 
 ## Informations restant à compléter
 
-Le dépôt ne fournit pas le nom et l’adresse de l’éditeur, la direction de publication, une adresse de contact ni les coordonnées juridiques vérifiées de l’hébergeur. La page mentions légales, la page Contact et la politique de confidentialité affichent donc « À compléter ». Renseigner le responsable de traitement, les bases juridiques, les durées de conservation et le moyen d’exercer les droits après vérification par l’éditeur.
+Le dépôt ne fournit pas le nom, l’adresse ou le contact de l’éditeur, ni le directeur de publication. Ces informations, ainsi que l’identité du responsable de traitement, la base juridique, les durées applicables et le moyen d’exercer les droits, restent signalées « À compléter » dans les mentions légales et la politique de confidentialité. Il faut les renseigner avant de présenter ces pages comme définitives.
