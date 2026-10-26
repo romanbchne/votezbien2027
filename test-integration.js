@@ -46,6 +46,14 @@ section('Écran résultats');
 
 section('Écran des partis, fiche détaillée, comparateur, méthode');
 {
+  const openMethodScreen = () => {
+    env.win.location.hash = '#method';
+    env.win.dispatchEvent(new env.win.Event('hashchange'));
+  };
+  test('Méthode reste accessible au pied de page, sans onglet principal', () => {
+    assert.strictEqual(env.doc.querySelector('#mainNav [data-nav="method"]'), null);
+    assert.ok(Array.from(env.doc.querySelectorAll('footer .footer-links a')).some(a => new URL(a.href).pathname === '/methode/'));
+  });
   click(env, env.doc.querySelector('[data-nav="parties"]'));
   const cards = env.doc.querySelectorAll('.party-card');
   test('les 16 partis sont rendus', () => { assert.ok(isActive(env, 'parties')); assert.strictEqual(cards.length, PARTIES.length); });
@@ -79,7 +87,7 @@ section('Écran des partis, fiche détaillée, comparateur, méthode');
     const rows = env.doc.querySelectorAll('#compareContent tbody tr'); assert.strictEqual(rows.length, DIM_KEYS.length + log.choice.filter(c => c.pos !== 'dk').length);
     assert.ok(env.doc.getElementById('compareContent').innerHTML.includes('<th>LE</th>') && env.doc.getElementById('compareContent').innerHTML.includes('<th>PP</th>'));
   });
-  click(env, env.doc.querySelector('[data-nav="method"]'));
+  openMethodScreen();
   test('la page Méthode liste les 6 thèmes et toutes les sources de recoupement (liens https)', () => {
     DIM_KEYS.forEach(k => assert.ok(decode(env.doc.getElementById('methodDims').innerHTML).includes(DIMENSIONS[k].name), k));
     const links = env.doc.querySelectorAll('#methodSources a'); assert.strictEqual(links.length, SOURCES.length);
@@ -93,7 +101,7 @@ section('Écran des partis, fiche détaillée, comparateur, méthode');
   test('l’onglet Sondages charge ses données et affiche la moyenne', () => {
     assert.ok(env.doc.querySelectorAll('#pollsContent .poll-bar-item').length > 0);
   });
-  click(env, env.doc.querySelector('[data-nav="method"]'));
+  openMethodScreen();
   test('la page Méthode explique pourquoi le site a été créé', () => {
     const t = env.doc.getElementById('screen-method').textContent; assert.ok(t.includes('À l’approche des élections')); assert.ok(t.includes('mieux comprendre les candidats'));
   });
