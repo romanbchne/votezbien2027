@@ -47,7 +47,7 @@ section('Écran résultats');
 section('Écran des partis, fiche détaillée, comparateur, méthode');
 {
   const openMethodScreen = () => {
-    env.win.location.hash = '#method';
+    env.win.history.replaceState(null, '', '#method');
     env.win.dispatchEvent(new env.win.Event('hashchange'));
   };
   test('Méthode reste accessible au pied de page, sans onglet principal', () => {
