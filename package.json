@@ -19,7 +19,10 @@
     "test:e2e": "node test-e2e-signconvention.js",
     "test:radar": "node test-radar.js",
     "test:massif": "node massive-simulation.js",
-    "test:syntax": "node check-syntax.js"
+    "test:syntax": "node check-syntax.js",
+    "seo:sitemap": "node scripts/seo-maintenance.js --write",
+    "seo:check": "node scripts/seo-maintenance.js --check",
+    "seo:dist": "node scripts/seo-maintenance.js --check-dist"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

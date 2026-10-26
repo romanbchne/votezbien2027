@@ -51,7 +51,7 @@ Les scripts et suites de tests sont à la racine du dépôt. Les parcours d’in
 
 ## Build
 
-`npm run build` utilise Vite avec un plugin `writeBundle` pour recopier les fichiers sources tels quels (sans hachage, sans dossier `/assets/`, URLs relatives). Le service worker précache la liste exacte des fichiers. Le build fonctionne depuis un chemin contenant des espaces/`&`.
+`npm run build` utilise Vite avec un plugin `writeBundle` pour recopier à l’identique les ressources de l’application et les pages publiques dans `dist/`. Les chemins restent stables et sans hachage; la feuille de style des pages d’information est publiée sous `assets/css/`. Le service worker précache la liste exacte des fichiers. Le build fonctionne depuis un chemin contenant des espaces/`&`.
 
 
 ## Améliorations de l’audit
@@ -59,3 +59,19 @@ Les scripts et suites de tests sont à la racine du dépôt. Les parcours d’in
 Les diagnostics internes distinguent les défauts bloquants des limites de couverture. Les positions non sourcées restent non renseignées : le site ne transforme pas une absence de données en position centriste. À ce jour, les axes manquants concernent cinq positions de l’UPR et l’axe Europe de Lutte ouvrière ; MoDem, UDR, Nouvelle Énergie et UPR restent parfois non classables faute de positions concrètes suffisantes. Ces lacunes sont des priorités éditoriales pour de futures mises à jour sourcées.
 
 Les scripts `npm test` incluent aussi un million de profils déterministes et cent mille tirages de l’ordre A/B. Le workflow GitHub Actions exécute cette suite et construit le site à chaque pull request.
+
+
+## SEO et GitHub Pages
+
+URL canonique du site : https://www.votezbien2027.fr/
+
+Les pages publiques d’information sont rangées dans `a-propos/`, `methode/`, `mentions-legales/` et `confidentialite/`. Elles sont accessibles depuis le pied de page, sans ajouter d’onglets à la navigation principale. Avant d’ajouter ou déplacer une page, lancer :
+
+```sh
+npm run seo:sitemap
+npm run seo:check
+```
+
+Le premier script régénère `sitemap.xml` à partir des pages HTML publiques; le second valide les canonicals, métadonnées, ressources et liens internes. Le workflow GitHub « SEO maintenance » refait ces contrôles à chaque push sur `main` et pour chaque pull request. GitHub Pages publie les fichiers suivant la source indiquée dans Settings → Pages; vérifier le domaine personnalisé `www.votezbien2027.fr` et l’option HTTPS forcée avant publication. Les domaines alternatifs sont redirigés côté registrar.
+
+Le rapport de maintenance et la checklist sont dans `docs/seo-notes.md`.

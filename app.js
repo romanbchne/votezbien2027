@@ -866,7 +866,7 @@
     ctx.fillStyle = '#64748B';
     ctx.font = '12px "Inter", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Faites le quiz gratuit et anonyme sur votezbien.fr', w / 2, h - 22);
+    ctx.fillText('Faites le quiz gratuit et anonyme sur www.votezbien2027.fr', w / 2, h - 22);
   }
 
   /* ================================================================
@@ -1144,7 +1144,7 @@
     grid.innerHTML = list.map(({ party, match }) => {
       const checked = compareSelection.includes(party.id) ? ' checked' : '';
       const portrait = party.portraitFile
-        ? `<img class="party-photo" src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+        ? `<img class="party-photo" src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}" width="100" height="128" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
         : `<div class="party-photo portrait-placeholder" aria-hidden="true">${party.short}</div>`;
       const photoCredit = party.portraitFile
         ? `<span class="portrait-credit"><a href="${portraitPageURL(party.portraitFile)}" target="_blank" rel="noopener">Photo : ${party.portraitCredit}</a> · <a href="${party.portraitLicenseUrl}" target="_blank" rel="noopener">${party.portraitLicense}</a></span>`
@@ -1231,7 +1231,7 @@
     }
 
     const portrait = party.portraitFile
-      ? `<figure class="drawer-portrait"><img src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}"><figcaption><a href="${portraitPageURL(party.portraitFile)}" target="_blank" rel="noopener">${party.portraitCredit}</a> · <a href="${party.portraitLicenseUrl}" target="_blank" rel="noopener">${party.portraitLicense}</a></figcaption></figure>`
+      ? `<figure class="drawer-portrait"><img src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}" width="90" height="116" loading="lazy" decoding="async"><figcaption><a href="${portraitPageURL(party.portraitFile)}" target="_blank" rel="noopener">${party.portraitCredit}</a> · <a href="${party.portraitLicenseUrl}" target="_blank" rel="noopener">${party.portraitLicense}</a></figcaption></figure>`
       : '';
     let html = `<div class="drawer-top">
       ${portrait}
