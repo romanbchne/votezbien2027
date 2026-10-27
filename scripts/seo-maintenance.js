@@ -13,6 +13,11 @@ const REQUIRED = [
   'methode/index.html',
   'mentions-legales/index.html',
   'confidentialite/index.html',
+  'quiz-presidentielle-2027/index.html',
+  'test-orientation-politique/index.html',
+  'comment-voter-presidentielle-2027/index.html',
+  'faq/index.html',
+  'ressources-presidentielle-2027/index.html',
 ];
 const writeSitemap = process.argv.includes('--write');
 const failures = [];
@@ -175,9 +180,13 @@ if (process.argv.includes('--check-dist')) {
     'styles.css', 'data.js', 'themes-and-polls.js', 'scoring.js', 'app.js',
     'service-worker.js', 'manifest.json', 'embleme-solidaire-180.png',
     'embleme-solidaire-192.png', 'embleme-solidaire-512.png',
+    'favicon.ico', 'apple-touch-icon.png',
     'assets/css/content-pages.css',
     'a-propos/index.html', 'methode/index.html', 'mentions-legales/index.html',
-    'confidentialite/index.html'
+    'confidentialite/index.html',
+    'quiz-presidentielle-2027/index.html', 'test-orientation-politique/index.html',
+    'comment-voter-presidentielle-2027/index.html', 'faq/index.html',
+    'ressources-presidentielle-2027/index.html'
   ];
   for (const file of distFiles) {
     const sourcePath = path.join(ROOT, file);

@@ -23,6 +23,8 @@ const SITE_FILES = [
   'app.js',
   'service-worker.js',
   'manifest.json',
+  'favicon.ico',
+  'apple-touch-icon.png',
   'icon.svg',
   'embleme-solidaire-180.png',
   'embleme-solidaire-192.png',
@@ -31,7 +33,12 @@ const SITE_FILES = [
   'a-propos/index.html',
   'methode/index.html',
   'mentions-legales/index.html',
-  'confidentialite/index.html'
+  'confidentialite/index.html',
+  'quiz-presidentielle-2027/index.html',
+  'test-orientation-politique/index.html',
+  'comment-voter-presidentielle-2027/index.html',
+  'faq/index.html',
+  'ressources-presidentielle-2027/index.html'
 ];
 
 function staticSite(): Plugin {

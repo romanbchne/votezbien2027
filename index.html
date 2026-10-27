@@ -29,10 +29,25 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Votez bien !",
-  "url": "https://www.votezbien2027.fr/",
-  "inLanguage": "fr-FR"
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://www.votezbien2027.fr/#website",
+      "url": "https://www.votezbien2027.fr/",
+      "name": "Votez bien !",
+      "inLanguage": "fr-FR"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.votezbien2027.fr/#webpage",
+      "url": "https://www.votezbien2027.fr/",
+      "name": "Quiz politique 2027 : comparez vos idées | Votez bien",
+      "inLanguage": "fr-FR",
+      "isPartOf": {
+        "@id": "https://www.votezbien2027.fr/#website"
+      }
+    }
+  ]
 }
 </script>
 </head>
@@ -60,6 +75,10 @@
       <button class="navlink" data-nav="programs" id="navPrograms">Les programmes</button>
       <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="candidatures" id="navCandidatures">Candidatures</button>
+      <a class="navlink navlink-page" href="/comment-voter-presidentielle-2027/">Guide voter</a>
+      <a class="navlink navlink-page" href="/methode/">Méthodologie</a>
+      <a class="navlink navlink-page" href="/faq/">FAQ</a>
+      <a class="navlink navlink-page" href="/a-propos/">À propos</a>
       <button class="navlink navlink-donate" data-nav="donate" id="navDonate">Faire un don</button>
     </nav>
   </header>
@@ -91,6 +110,7 @@
               <button class="btn btn-brass" id="btnStart">Faire le quiz <span aria-hidden="true">→</span></button>
               <button class="btn btn-ghost" data-nav="themes">Explorer les <span data-count="themes">8</span> thèmes</button>
               <button class="btn btn-ghost" data-nav="polls">Baromètre des sondages</button>
+              <a class="btn btn-ghost" href="/quiz-presidentielle-2027/">Découvrir le quiz</a>
             </div>
             <div class="trust-row">
               <div><strong data-count="questions">22</strong>questions d’orientation</div>
@@ -332,7 +352,12 @@
     <nav class="footer-links" aria-label="Informations sur le site">
       <a href="https://www.votezbien2027.fr/">Accueil</a>
       <a href="https://www.votezbien2027.fr/a-propos/">À propos</a>
+      <a href="https://www.votezbien2027.fr/quiz-presidentielle-2027/">Quiz présidentielle 2027</a>
+      <a href="https://www.votezbien2027.fr/test-orientation-politique/">Test d’orientation</a>
+      <a href="https://www.votezbien2027.fr/comment-voter-presidentielle-2027/">Guide voter</a>
       <a href="https://www.votezbien2027.fr/methode/">Méthode</a>
+      <a href="https://www.votezbien2027.fr/ressources-presidentielle-2027/">Sources et ressources</a>
+      <a href="https://www.votezbien2027.fr/faq/">FAQ</a>
       <a href="https://www.votezbien2027.fr/mentions-legales/">Mentions légales</a>
       <a href="https://www.votezbien2027.fr/confidentialite/">Confidentialité</a>
       <a href="https://www.votezbien2027.fr/#donate">Faire un don</a>
