@@ -27,5 +27,5 @@ dt{font-weight:700}dd{margin:0 0 .6rem}
 .site-footer{border-top:1px solid var(--line);padding:1.25rem max(1rem,calc((100vw - 900px)/2));color:var(--muted);font-size:.93rem}
 .site-footer p{margin:.2rem 0 .8rem}
 .site-footer nav a{color:var(--ink)}
-@media(max-width:680px){.site-header{align-items:flex-start;flex-direction:column;padding:.8rem 1rem}.site-header nav{gap:.4rem .8rem}.page-wrap{width:calc(100% - 1rem);margin:.5rem auto 2rem}.content-card{border-radius:.8rem}dl{grid-template-columns:1fr;gap:.1rem}dd{margin:0 0 .8rem}}
+@media(max-width:680px){.site-header{align-items:flex-start;flex-direction:column;padding:.8rem 1rem}.site-header nav{gap:.4rem .8rem}.site-header nav a,.site-footer nav a{display:inline-flex;align-items:center;min-height:44px;padding:.2rem .3rem}.page-wrap{width:calc(100% - 1rem);margin:.5rem auto 2rem}.content-card{border-radius:.8rem}dl{grid-template-columns:1fr;gap:.1rem}dd{margin:0 0 .8rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
