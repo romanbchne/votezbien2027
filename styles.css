@@ -97,6 +97,7 @@ p{margin:0 0 .9em; max-width:64ch}
 }
 .donate-quick{display:none}
 .navlink:disabled{opacity:.4; cursor:not-allowed}
+#mainNav a.navlink{text-decoration:none}
 .navlink.navlink-donate,.navlink.navlink-donate.active{background:var(--brass); color:#fff; font-weight:800; box-shadow:0 3px 12px rgba(201,57,72,.25)}
 .navlink.navlink-donate:hover:not(:disabled){background:var(--brass-deep); color:#fff}
 .donation-panel{max-width:780px; margin:1.4rem auto; padding:clamp(1.4rem,4vw,2.6rem); background:var(--paper-raised); border:1px solid var(--line); border-top:4px solid var(--brass); border-radius:var(--radius-lg); box-shadow:var(--shadow-card)}
