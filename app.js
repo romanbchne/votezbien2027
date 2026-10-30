@@ -55,6 +55,7 @@
   let programPhase = 'main';
   let programPartyFilter = 'all';
   let selectedThemeId = (typeof THEMES !== 'undefined' && THEMES.length) ? THEMES[0].id : null;
+  let selectedThemePartyId = null;
   let pollView = 'first-round';
 
   function freshState() {
@@ -893,6 +894,7 @@
     pillsWrap.querySelectorAll('.theme-pill').forEach(function(button) {
       button.addEventListener('click', function() {
         selectedThemeId = button.dataset.theme;
+        selectedThemePartyId = null;
         renderThemes();
       });
     });
@@ -911,7 +913,8 @@
       const marker = known ? Math.max(0, Math.min(100, ((score + 2) / 4) * 100)) : 50;
       const coverage = partyCoverage(party);
       html += '<article class="theme-position-card" style="--theme-party-color:' + party.color + '">' +
-        '<div class="theme-position-card-head"><span class="party-family">' + party.short + '</span><strong>' + party.personName + '</strong></div>' +
+        '<div class="theme-position-card-head"><span class="party-family">' + party.short + '</span><button class="theme-candidate-trigger" type="button" data-theme-party="' + party.id + '" aria-label="Voir les idées et propositions de ' + party.personName + ' pour ' + theme.name + '" aria-expanded="false" aria-controls="themeCandidateDetail">' + party.personName + '</button></div>' +
+        '<span class="theme-candidate-open-hint">Voir ses idées pour ce thème →</span>' +
         '<p>' + (known ? positionLabel(theme.id, score) : 'Position non documentée') + '</p>' +
         '<div class="theme-position-track' + (known ? '' : ' is-unknown') + '" aria-hidden="true"><span style="left:' + marker + '%"></span></div>' +
         '<div class="theme-position-labels"><span>' + dimension.labelLeft + '</span><span>' + dimension.labelRight + '</span></div>' +
@@ -919,12 +922,71 @@
         '<a href="' + (party.program || party.site) + '" target="_blank" rel="noopener">Source officielle de ' + party.short + ' ↗</a></article>';
     });
     html += '</div></section>';
+    html += '<section id="themeCandidateDetail" class="theme-candidate-detail" aria-live="polite" aria-labelledby="themeCandidateDetailTitle" hidden></section>';
     html += '<section class="theme-question-links"><div><h3>Explorer les questions de ce thème</h3><p>' +
       generalQuestions.length + ' questions générales et ' + detailQuestions.length + ' questions de précision dans la banque. Le quiz détaillé en sélectionne jusqu’à ' + Scoring.MAX_DEPARTAGE + ' selon vos réponses.</p></div>' +
       '<button class="btn btn-ghost" id="themeOpenPrograms">Voir les réponses et leurs sources →</button></section>';
     if (dimension.note) html += '<p class="confidence-note">' + dimension.note + '</p>';
     detailWrap.innerHTML = html;
+    detailWrap.querySelectorAll('.theme-candidate-trigger').forEach(function(button) {
+      button.addEventListener('click', function() {
+        const party = PARTIES.find(function(item) { return item.id === button.dataset.themeParty; });
+        if (party) renderThemeCandidateDetail(theme, party, true);
+      });
+    });
+    if (selectedThemePartyId) {
+      const selectedParty = PARTIES.find(function(item) { return item.id === selectedThemePartyId; });
+      if (selectedParty) renderThemeCandidateDetail(theme, selectedParty, false);
+    }
     document.getElementById('themeOpenPrograms').addEventListener('click', function() { showScreen('programs'); });
+  }
+
+  function renderThemeCandidateDetail(theme, party, scrollToPanel) {
+    const panel = document.getElementById('themeCandidateDetail');
+    if (!panel) return;
+    const themeQuestions = DEPARTAGE.filter(function(question) { return question.dim === theme.id; });
+    const documented = themeQuestions.filter(function(question) {
+      return question.stances && typeof question.stances[party.id] === 'number';
+    });
+    const missing = themeQuestions.length - documented.length;
+    selectedThemePartyId = party.id;
+    detailWrapCandidateState(panel, party.id);
+    let html = '<div class="theme-candidate-detail-head"><div><p class="section-kicker">' + theme.name + ' · propositions documentées</p><h3 id="themeCandidateDetailTitle">' + party.personName + '</h3><p>' + party.name + ' · ' + party.personRole + '</p></div><button class="btn btn-ghost btn-sm" type="button" data-theme-close>Fermer</button></div>';
+    html += '<p class="confidence-note">Les positions ci-dessous sont des codages éditoriaux des positions publiques de la formation, pas des réponses mot pour mot de la personne citée.</p>';
+    html += '<p class="confidence-note">' + documented.length + (documented.length === 1 ? ' position suffisamment documentée' : ' positions suffisamment documentées') + ' sur ' + themeQuestions.length + ' questions de précision.' + (missing ? ' Pour ' + missing + ' autre' + (missing > 1 ? 's' : '') + ' question' + (missing > 1 ? 's' : '') + ', aucune position suffisamment sourcée n’est enregistrée.' : '') + '</p>';
+    if (!documented.length) {
+      html += '<p class="theme-candidate-empty">Aucune proposition détaillée suffisamment sourcée n’est disponible pour cette formation sur ce thème.</p>';
+    } else {
+      html += '<div class="theme-candidate-proposals">';
+      documented.forEach(function(question, index) {
+        const relatedSources = (question.sourceIds || []).map(function(id) { return SOURCES.find(function(source) { return source.id === id; }); }).filter(Boolean);
+        html += '<details class="theme-candidate-proposal"' + (index === 0 ? ' open' : '') + '><summary><span>' + question.topic + '</span><strong>' + question.q + '</strong></summary><div class="theme-candidate-proposal-content">';
+        if (question.plain) html += '<p class="program-question-plain">' + question.plain + '</p>';
+        html += '<p class="theme-candidate-options-title">Choix proposés dans le quiz</p><ul class="theme-candidate-options">' + question.options.map(function(option) { return '<li>' + option.text + '</li>'; }).join('') + '</ul>';
+        html += '<div class="program-answer-list">' + programPartyRows(question, true, [party]) + '</div>';
+        html += '<p class="program-basis"><strong>Base éditoriale :</strong> ' + (question.basis || 'Aucune base documentaire détaillée n’est enregistrée.') + '</p>';
+        if (relatedSources.length) html += '<div class="theme-candidate-sources"><strong>Sources de contexte :</strong><ul>' + relatedSources.map(function(source) { return '<li><a href="' + source.url + '" target="_blank" rel="noopener">' + source.label + '</a> <span>(' + (source.type || 'source de recoupement') + ')</span></li>'; }).join('') + '</ul></div>';
+        html += '</div></details>';
+      });
+      html += '</div>';
+    }
+    panel.innerHTML = html;
+    panel.hidden = false;
+    const closeButton = panel.querySelector('[data-theme-close]');
+    closeButton.addEventListener('click', function() {
+      selectedThemePartyId = null;
+      panel.hidden = true;
+      detailWrapCandidateState(panel, null);
+      const trigger = Array.from(document.querySelectorAll('.theme-candidate-trigger')).find(function(button) { return button.dataset.themeParty === party.id; });
+      if (trigger) trigger.focus();
+    });
+    if (scrollToPanel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function detailWrapCandidateState(panel, selectedId) {
+    document.querySelectorAll('.theme-candidate-trigger').forEach(function(button) {
+      button.setAttribute('aria-expanded', button.dataset.themeParty === selectedId ? 'true' : 'false');
+    });
   }
 
   /* ================================================================

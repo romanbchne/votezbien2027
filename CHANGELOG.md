@@ -1,3 +1,9 @@
+## V7.10.4 — propositions détaillées depuis les thèmes
+
+- Le nom de chaque candidat dans l’onglet « Thèmes » ouvre désormais ses positions détaillées sur le thème choisi, avec réponses codées, explications éditoriales et sources déjà documentées.
+- Les positions sans source suffisante sont signalées comme non documentées ; elles ne sont pas reconstituées.
+- Ajout des états de sélection accessibles au clavier et d’une présentation adaptée au mobile ; cache hors ligne mis à jour.
+
 ## V7.10.3 — hypothèses de second tour complètes
 
 - Ajout aux séries hebdomadaires des hypothèses Hollande–Le Pen et Retailleau–Le Pen recensées pendant la fenêtre étudiée, avec une note précisant que ces hypothèses de sondage ne confirment pas une candidature.

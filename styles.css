@@ -998,3 +998,27 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
 .poll-trend-table td small{color:var(--ink-muted);font-size:.72rem}
 @media(max-width:760px){.poll-trend-card{padding:.8rem}.poll-trend-legend{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.poll-trend-legend{grid-template-columns:1fr}.poll-trend-table{min-width:900px}}
+
+/* Détail cliquable des positions par candidat et par thème */
+.theme-candidate-trigger{display:inline;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-size:1rem;font-weight:800;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:.18em;cursor:pointer}
+.theme-candidate-trigger:hover{text-decoration-color:currentColor}
+.theme-candidate-trigger:focus-visible{outline:3px solid var(--blue);outline-offset:3px;border-radius:.15rem}
+.theme-candidate-detail{margin:1rem 0;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--paper-raised);box-shadow:var(--shadow-card)}
+.theme-candidate-detail[hidden]{display:none}
+.theme-candidate-detail-head{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.theme-candidate-detail-head h3,.theme-candidate-detail-head p{margin:.15rem 0}
+.theme-candidate-detail-head .section-kicker{color:var(--blue);font-weight:800}
+.theme-candidate-proposal{margin:.6rem 0;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper)}
+.theme-candidate-proposal>summary{display:grid;gap:.25rem;padding:.8rem 1rem;cursor:pointer}
+.theme-candidate-proposal>summary>span{font-size:.76rem;color:var(--ink-muted);font-weight:750;text-transform:uppercase;letter-spacing:.04em}
+.theme-candidate-proposal>summary>strong{font-size:.96rem}
+.theme-candidate-proposal-content{padding:0 1rem 1rem}
+.theme-candidate-options-title{margin:.5rem 0 .2rem;font-weight:750;font-size:.84rem}
+.theme-candidate-options{margin:.3rem 0 .8rem;padding-left:1.3rem}
+.theme-candidate-options li{margin:.25rem 0}
+.theme-candidate-sources{margin-top:.7rem;font-size:.85rem}
+.theme-candidate-sources ul{margin:.25rem 0;padding-left:1.2rem}
+.theme-candidate-empty{padding:.8rem;border-left:3px solid var(--line);background:var(--paper)}
+@media(max-width:520px){.theme-candidate-detail{padding:.8rem}.theme-candidate-detail-head{align-items:flex-start}.theme-candidate-proposal>summary{padding:.75rem}}
+
+.theme-candidate-open-hint{display:block;margin:-.2rem 0 .45rem;color:var(--blue);font-size:.78rem;font-weight:750}
