@@ -235,12 +235,12 @@ const DEPARTAGE = [
     stances:{ lfi:0, pcf:0, ecolo:0.75, pp:1, dlf:1, renaissance:2.5, horizons:2.5, rn:2.5, lr:3, reconquete:3 },
     stanceNotes:{
       horizons:'Ramener le déficit à 2 % du PIB en fin de quinquennat (programme de campagne, octobre 2026).',
-      renaissance:'150 milliards d’euros d’économies et un déficit sous 3 % du PIB avant la fin du mandat (« Messmer II », 23 septembre 2026).',
+      renaissance:'Programme de campagne publié le 28 octobre : 150 milliards d’euros d’économies sur cinq ans, règle d’or budgétaire dans la Constitution, stabilité fiscale de dix ans pour les entreprises et réduction visée d’un quart de la charge administrative.',
       rn:'Règle d’or budgétaire inscrite dans la Constitution : 4,9 % du PIB en 2027 ramené à 2,4 % en 2033 (tribune du 1er octobre 2026).',
       reconquete:'Réduire les dépenses publiques d’au moins 100 milliards d’euros par an (entretien du 19 mai 2026).'
     },
     basis:'Positions reprises de la page « Économie et impôts » d’Élections 2027, qui indique pour chaque candidat la mesure retenue, sa source et sa date.',
-    sourceIds:['prog-economie'] },
+    sourceIds:['prog-economie', 'attal-economic-program-2026-10'] },
 
   { id:'dp-propriete', dim:'eco', group:'fiscal', topic:'Entreprises publiques',
     q:'Quel rôle pour l’État dans la propriété des entreprises ?',
@@ -253,10 +253,11 @@ const DEPARTAGE = [
     ],
     stances:{ lfi:3, pcf:2, lo:3, dlf:2.5, ecolo:2, rn:2, pp:1, reconquete:1, renaissance:0.75, horizons:0.75, lr:0 },
     stanceNotes:{
-      pcf:'Nationaliser une « grande banque », présentée comme une impérieuse nécessité (discours de campagne, septembre 2026).'
+      pcf:'Nationaliser une « grande banque », présentée comme une impérieuse nécessité (discours de campagne, septembre 2026).',
+      renaissance:'Le programme du 28 octobre privilégie l’offre et la planification, mais prévoit aussi que l’État puisse entrer au capital de certaines entreprises stratégiques. Cette nuance ne constitue pas une proposition de nationalisations générales ; le codage reste une estimation.'
     },
     basis:'Positions reprises de la page « Économie et impôts » d’Élections 2027, complétées par les propositions publiques des formations sur les nationalisations.',
-    sourceIds:['prog-economie'] },
+    sourceIds:['prog-economie', 'attal-economic-program-2026-10'] },
 
   { id:'dp-rsa', dim:'eco', group:'eco-social', topic:'RSA',
     q:'Faut-il demander une contrepartie pour toucher le RSA ?',
@@ -299,10 +300,11 @@ const DEPARTAGE = [
       lfi:'Bloquer les prix et porter le SMIC à 1 600 euros net (programme « L’avenir en commun »).',
       pcf:'Exiger de TotalEnergies une baisse de 30 à 50 centimes par litre, sous peine de nationalisation (septembre 2026).',
       ecolo:'Porter le salaire minimum à 2 000 euros brut par mois (programme « Prospérité écologique », juillet 2026).',
-      rn:'Ramener de 5,5 % à 0 % la TVA sur un panier de cent produits de première nécessité (4 juin 2026).'
+      rn:'Ramener de 5,5 % à 0 % la TVA sur un panier de cent produits de première nécessité (4 juin 2026).',
+      renaissance:'Le programme du 28 octobre fixe des objectifs de 3 millions d’emplois et de hausse des salaires de 50 % sur dix ans, et mentionne un « droit au brut ». Il ne propose pas dans cette publication de blocage général des prix.'
     },
     basis:'Positions reprises de la page « Pouvoir d’achat » d’Élections 2027, qui indique pour chaque candidat la mesure retenue, sa source et sa date.',
-    sourceIds:['prog-pouvoir-achat'] },
+    sourceIds:['prog-pouvoir-achat', 'attal-economic-program-2026-10'] },
 
   { id:'dp-sante', dim:'soc', group:'sante', topic:'Déserts médicaux et soignants',
     q:'Comment lutter contre les déserts médicaux et le manque de soignants ?',
@@ -356,12 +358,12 @@ const DEPARTAGE = [
     stances:{ lfi:0, ecolo:0.5, pp:2, renaissance:3, horizons:2, lr:2.5, pcf:2.5, dlf:2.5, rn:3, reconquete:3, udi: 2.5 },
     stanceNotes:{
       lfi:'Planifier la sortie du nucléaire dans le cadre d’une planification écologique (programme « L’avenir en commun »).',
-      renaissance:'Sécuriser la construction de 14 réacteurs EPR au rythme d’un par an (« Messmer II », 23 septembre 2026).',
+      renaissance:'Le programme présenté le 28 octobre défend un plan « Messmer II », une électrification massive et l’accélération du programme de 14 réacteurs EPR2.',
       horizons:'Relancer le nucléaire et électrifier massivement les usages (programme de campagne, octobre 2026).',
       udi: "Le programme européen veut renforcer la place du nucléaire et tripler la production européenne d’ici 2050. Le codage reste intermédiaire car le texte ne fixe pas un nombre de nouveaux réacteurs en France."
     },
     basis:'Positions reprises de la page « Écologie et énergie » d’Élections 2027, et recoupées avec les deux sources sectorielles sur le mix électrique.',
-    sourceIds:['prog-ecologie', 'nucleaire-sfen', 'energie-revolution', 'udi-europe-2024'] },
+    sourceIds:['prog-ecologie', 'nucleaire-sfen', 'energie-revolution', 'udi-europe-2024', 'attal-economic-program-2026-10'] },
 
   { id:'dp-carbone', dim:'ecology', group:'ecologie', topic:'Taxe carbone',
     q:'Que faire de la taxe carbone ?',
@@ -416,14 +418,14 @@ const DEPARTAGE = [
     stances:{ pp:0, renaissance:0, modem:0, udi:0.25, ecolo:0.25, horizons:0.5, lfi:1.25, pcf:1.25, lr:2, rn:2, reconquete:2, dlf:3, upr:3, udi: 0.25 },
     stanceNotes:{
       pp:'Supprimer le droit de veto au sein de l’Union européenne et lancer un grand emprunt européen (mai 2026).',
-      renaissance:'Bâtir des « États-Unis d’Europe » avec un noyau de pays volontaires (discours de Reims, 17 septembre 2026).',
+      renaissance:'Programme présenté le 27 octobre : États-Unis d’Europe autour de pays volontaires, union bancaire et des marchés de capitaux, régulateur commun, planification écologique commune et projet soumis aux Européens par référendum.',
       lfi:'Désobéir aux décisions européennes jugées contraires aux intérêts des Français et modifier les traités (débat Medef, 27 août 2026).',
       lr:'Inscrire dans la Constitution la primauté de la Constitution française sur le droit de l’Union européenne (3 septembre 2026).',
       dlf:'Cesser de verser chaque année environ dix milliards d’euros nets de contribution au budget de l’Union européenne (8 mars 2025).',
       udi: "L’UDI défend une intégration politique européenne et la suppression de vetos qui paralysent les décisions. Codage de son orientation générale en faveur d’une UE plus intégrée."
     },
     basis:'Positions reprises de la page « Europe et international » d’Élections 2027, recoupées avec le programme de la France insoumise et une analyse indépendante des positions européennes.',
-    sourceIds:['prog-europe', 'lfi-europe', 'europe-elyseescope', 'udi-values', 'udi-veto', 'udi-europe-2024'] },
+    sourceIds:['prog-europe', 'lfi-europe', 'europe-elyseescope', 'udi-values', 'udi-veto', 'udi-europe-2024', 'attal-europe-program-2026-10'] },
 
   { id:'dp-otan', dim:'europe', group:'defense', topic:'OTAN',
     q:'Quelle place pour la France dans l’OTAN ?',
@@ -483,14 +485,13 @@ const DEPARTAGE = [
       { pos:1, short:'Coopération renforcée', text:'Renforcer la coopération entre armées nationales (achats communs, industrie, commandement coordonné), sans armée unique.' },
       { pos:2, short:'Chaque pays garde sa défense', text:'Garder une défense nationale, avec une coopération au cas par cas.' }
     ],
-    stances:{ pp:0, renaissance:0, ecolo:0.5, horizons:0.5, lr:1.5, lfi:2, pcf:2, rn:2, reconquete:2, dlf:2, udi: 1 },
+    stances:{ pp:0, ecolo:0.5, horizons:0.5, lr:1.5, lfi:2, pcf:2, rn:2, reconquete:2, dlf:2, udi: 1 },
     stanceNotes:{
       pp:'Supprimer le droit de veto au sein de l’Union européenne et lancer un grand emprunt européen (mai 2026).',
-      renaissance:'Bâtir des « États-Unis d’Europe » avec une union bancaire et des marchés de capitaux communs (17 septembre 2026).',
       udi: "Le programme propose une force européenne de réaction rapide et une coopération renforcée; il ne propose pas une armée unique avec commandement commun."
     },
-    basis:'Positions reprises de la page « Europe et international » d’Élections 2027, et estimées pour les autres formations à partir des sources listées sur la défense européenne.',
-    sourceIds:['prog-europe', 'udi-europe-2024'] },
+    basis:'Positions reprises de la page « Europe et international » d’Élections 2027, et estimées pour les formations à partir des sources listées. Pour Renaissance, le site de campagne évoque une architecture de sécurité européenne et une base industrielle de défense, sans proposition explicite d’armée unique avec commandement commun ; aucune position n’est donc codée sur cette question.',
+    sourceIds:['prog-europe', 'udi-europe-2024', 'attal-defense-europe-2026-06'] },
 
   { id:'dp-dissuasion', dim:'europe', group:'defense', topic:'Armes nucléaires',
     q:'Que faire de la dissuasion nucléaire française ?',
@@ -690,6 +691,10 @@ const SOURCES = [
   {"id":"udi-veto","label":"UDI — Pour la suppression des vetos qui paralysent l’Europe","url":"https://parti-udi.fr/actualites/pour-la-suppression-des-vetos-qui-paralysent-leurope","type":"Source primaire · UDI"},
   {"id":"opinionway-oct22","label":"OpinionWay pour CNEWS — Notice présidentielle (22 octobre 2026)","url":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2352","type":"Notice officielle · Commission des sondages"},
   {"id":"toluna-oct23","label":"Toluna Harris pour M6 et RTL — Notice présidentielle (23 octobre 2026)","url":"https://www.commission-des-sondages.fr/notices/medias/fichiers/add/2351","type":"Notice officielle · Commission des sondages"},
+  { id:'attal-economic-program-2026-10', label:'Vision économique de Gabriel Attal, présentée le 28 octobre 2026', url:'https://attalpresident.fr/actualites/gabriel-attal-vision-economique-liberer-innover-independance-france', type:'Programme officiel de campagne' },
+  { id:'attal-europe-program-2026-10', label:'Projet d’États-Unis d’Europe, présenté le 27 octobre 2026', url:'https://attalpresident.fr/actualites/gabriel-attal-responsabilite-generation-etats-unis-europe', type:'Programme officiel de campagne' },
+  { id:'attal-primary-proposal-2026-10', label:'Proposition de primaire de Gabriel Attal et périmètre précisé les 28–29 octobre 2026 (Le Monde)', url:'https://www.lemonde.fr/politique/article/2026/10/29/presidentielle-2027-apres-sa-proposition-d-une-primaire-aux-contours-flous-gabriel-attal-cible-le-centre-et-la-droite_6802391_823448.html', type:'Presse' },
+  { id:'attal-defense-europe-2026-06', label:'Stratégie de souveraineté et de sécurité européenne présentée à Eurosatory (16 juin 2026)', url:'https://attalpresident.fr/actualites/eurosatory-gabriel-attal-presente-sa-strategie-de-souverainete-technologique-et-d-independance-europeenne-au-salon', type:'Programme officiel de campagne' },
   { id:'status-renaissance', label:'Gabriel Attal — candidature présidentielle, site officiel de campagne', url:'https://attalpresident.fr/', type:'Source officielle · statut de candidature' },
   { id:'status-horizons', label:'Édouard Philippe — comité de campagne présidentielle, 8 septembre 2026', url:'https://www.edouardphilippe.fr/actualites/le-comite-de-campagne-est-lance', type:'Source officielle · statut de candidature' },
   { id:'status-lr', label:'Les Républicains — désignation de Bruno Retailleau, 20 avril 2026', url:'https://republicains.fr/actualites/2026/04/20/bruno-retailleau-largement-designe-comme-candidat-des-republicains-pour-lelection-presidentielle/', type:'Source officielle · statut de candidature' },
@@ -741,8 +746,8 @@ const PARTIES = [
     candidacyId:'attal',
     candidacyStatus:'declared',
     site:'https://parti-renaissance.fr/', program:'https://parti-renaissance.fr/',
-    status:'Gabriel Attal a officialisé sa candidature le 22 mai 2026.',
-    statusDate:'2026-10', statusSource:'https://attalpresident.fr/',
+    status:'Gabriel Attal a officialisé sa candidature le 22 mai 2026. Les 28 et 29 octobre, il a proposé une primaire de départage, puis précisé que le centre et la droite pourraient en constituer une première étape. Au 30 octobre, aucun accord de participation ni processus arrêté n’est établi. Son programme économique publié le 28 octobre propose notamment 150 milliards d’euros d’économies sur cinq ans, une règle d’or budgétaire constitutionnelle et dix ans de stabilité fiscale pour les entreprises.',
+    statusDate:'2026-10-30', statusSource:'https://www.lemonde.fr/politique/article/2026/10/29/presidentielle-2027-apres-sa-proposition-d-une-primaire-aux-contours-flous-gabriel-attal-cible-le-centre-et-la-droite_6802391_823448.html',
     personName:'Gabriel Attal', personRole:'Candidat déclaré selon le statut indiqué', portraitFile:'Gabriel Attal 2025 (close crop).jpg', portraitCredit:'Ismail Aissoub', portraitLicense:'CC BY 4.0', portraitLicenseUrl:'https://creativecommons.org/licenses/by/4.0/',
     positions:{ eco:0.8, soc:-0.3, auth:0.3, europe:-1.5, immig:0.3, ecology:0 } },
   { id:'modem', name:'Mouvement Démocrate', short:'MD', family:'Centre', color:'#4c67c7',
