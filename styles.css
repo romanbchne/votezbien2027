@@ -975,3 +975,26 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
   .candidate-compare-spectrum-labels{font-size:.73rem}
   .theme-position-card{padding:.9rem}
 }
+
+/* Graphiques de sondages : lisibles sur ordinateur et défilables sur mobile */
+.poll-trend-card{margin:1.2rem 0;padding:1rem;border:1px solid var(--line);border-radius:var(--radius-md);background:var(--paper-raised);box-shadow:var(--shadow-card)}
+.poll-trend-card h3{margin:.1rem 0 .5rem}
+.poll-trend-scroll,.poll-trend-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+.poll-trend-svg{display:block;width:760px;max-width:none;height:auto}
+.poll-grid-line{stroke:var(--line);stroke-width:1}
+.poll-grid-vertical{opacity:.35}
+.poll-axis-label{fill:var(--ink-muted);font:600 11px var(--font-body)}
+.poll-week-count{fill:var(--ink-faint);font:500 9px var(--font-body)}
+.poll-trend-legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.45rem .8rem;margin:.9rem 0;padding:0;list-style:none}
+.poll-trend-legend li{display:flex;align-items:center;gap:.45rem;min-width:0}
+.poll-trend-legend li>span:nth-child(2){flex:1}
+.poll-trend-legend strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.poll-legend-dot{display:inline-block;width:.7rem;height:.7rem;flex:0 0 .7rem;border-radius:50%}
+.poll-trend-table-scroll{margin-top:.75rem}
+.poll-trend-table{min-width:980px;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.poll-trend-table caption{padding:.5rem;text-align:left;font-weight:750}
+.poll-trend-table th,.poll-trend-table td{padding:.45rem .55rem;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.poll-trend-table th:first-child{text-align:left;background:var(--paper-raised)}
+.poll-trend-table td small{color:var(--ink-muted);font-size:.72rem}
+@media(max-width:760px){.poll-trend-card{padding:.8rem}.poll-trend-legend{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.poll-trend-legend{grid-template-columns:1fr}.poll-trend-table{min-width:900px}}

@@ -954,32 +954,53 @@
     dataset.periods.forEach(function(period, i) {
       const x = xAt(i);
       svg += '<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (top + plotHeight) + '" class="poll-grid-line poll-grid-vertical"></line>';
-      svg += '<text x="' + x + '" y="' + (height - 20) + '" text-anchor="middle" class="poll-axis-label">' + (dataset.periodsShort ? dataset.periodsShort[i] : period) + '</text>';
+      svg += '<text x="' + x + '" y="' + (height - 24) + '" text-anchor="middle" class="poll-axis-label">' + (dataset.periodsShort ? dataset.periodsShort[i] : period) + '</text>';
+      if (dataset.weekCounts) svg += '<text x="' + x + '" y="' + (height - 7) + '" text-anchor="middle" class="poll-week-count">n=' + dataset.weekCounts[i] + '</text>';
     });
     dataset.series.forEach(function(series) {
-      const points = series.values.map(function(value, i) { return xAt(i) + ',' + yAt(value); }).join(' ');
-      svg += '<polyline points="' + points + '" fill="none" stroke="' + series.color + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+      let segment = [];
+      const flushSegment = function() {
+        if (segment.length > 1) {
+          svg += '<polyline points="' + segment.map(function(point) { return point.x + ',' + point.y; }).join(' ') + '" fill="none" stroke="' + series.color + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+        }
+        segment = [];
+      };
       series.values.forEach(function(value, i) {
-        svg += '<circle cx="' + xAt(i) + '" cy="' + yAt(value) + '" r="5" fill="' + series.color + '" stroke="#fff" stroke-width="2"><title>' + series.name + ', ' + dataset.periods[i] + ' : ' + value + ' %</title></circle>';
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          flushSegment();
+          return;
+        }
+        segment.push({x:xAt(i),y:yAt(value)});
+      });
+      flushSegment();
+      series.values.forEach(function(value, i) {
+        if (typeof value !== 'number' || !Number.isFinite(value)) return;
+        svg += '<circle cx="' + xAt(i) + '" cy="' + yAt(value) + '" r="4.5" fill="' + series.color + '" stroke="#fff" stroke-width="2"><title>' + series.name + ', ' + dataset.periods[i] + ' : ' + value + ' %</title></circle>';
       });
     });
     svg += '</svg>';
     let legend = '<ul class="poll-trend-legend">';
     dataset.series.forEach(function(series) {
-      const latest = series.values[series.values.length - 1];
-      legend += '<li><span class="poll-legend-dot" style="background:' + series.color + '"></span><span>' + series.name + '</span><strong>' + Number(latest).toLocaleString('fr-FR') + ' %</strong></li>';
+      let latestIndex = series.values.length - 1;
+      while (latestIndex >= 0 && (typeof series.values[latestIndex] !== 'number' || !Number.isFinite(series.values[latestIndex]))) latestIndex--;
+      const latest = latestIndex >= 0 ? Number(series.values[latestIndex]).toLocaleString('fr-FR') + ' %' : 'Aucune mesure';
+      legend += '<li><span class="poll-legend-dot" style="background:' + series.color + '"></span><span>' + series.name + '</span><strong>' + latest + '</strong></li>';
     });
     legend += '</ul>';
-    let table = '<div class="poll-trend-table-scroll"><table class="poll-trend-table"><caption>Valeurs de chaque vague, en pourcentage</caption><thead><tr><th scope="col">Personnalité</th>';
+    let table = '<div class="poll-trend-table-scroll"><table class="poll-trend-table"><caption>Moyennes par semaine, en pourcentage (n = enquêtes utilisées pour la ligne)</caption><thead><tr><th scope="col">Personnalité</th>';
     dataset.periods.forEach(function(period) { table += '<th scope="col">' + period + '</th>'; });
     table += '</tr></thead><tbody>';
     dataset.series.forEach(function(series) {
       table += '<tr><th scope="row"><span class="poll-legend-dot" style="background:' + series.color + '"></span> ' + series.name + '</th>';
-      series.values.forEach(function(value) { table += '<td>' + Number(value).toLocaleString('fr-FR') + ' %</td>'; });
+      series.values.forEach(function(value, i) {
+        const shown = typeof value === 'number' && Number.isFinite(value) ? Number(value).toLocaleString('fr-FR') + ' %' : '—';
+        const count = series.counts ? '<small> · n=' + series.counts[i] + '</small>' : '';
+        table += '<td>' + shown + count + '</td>';
+      });
       table += '</tr>';
     });
     table += '</tbody></table></div>';
-    return '<section class="poll-trend-card" aria-labelledby="' + id + '-heading"><h3 id="' + id + '-heading">' + dataset.title + '</h3><p class="confidence-note">' + dataset.note + ' <a href="' + dataset.source + '" target="_blank" rel="noopener">Lire la notice officielle</a></p><div class="poll-trend-scroll">' + svg + '</div>' + legend + table + '<p class="confidence-note poll-trend-source">Valeurs et méthodologie : <a href="' + dataset.source + '" target="_blank" rel="noopener">notice de l’enquête</a></p></section>';
+    return '<section class="poll-trend-card" aria-labelledby="' + id + '-heading"><h3 id="' + id + '-heading">' + dataset.title + '</h3><p class="confidence-note">' + dataset.note + ' <a href="' + dataset.source + '" target="_blank" rel="noopener">Voir la liste des sondages sur Wikipédia</a></p><div class="poll-trend-scroll">' + svg + '</div>' + legend + table + '<p class="confidence-note poll-trend-source">Source et détail des résultats : <a href="' + dataset.source + '" target="_blank" rel="noopener">liste Wikipédia et notices des enquêtes</a></p></section>';
   }
 
   function renderPolls() {
@@ -1343,18 +1364,9 @@
       }).join('');
     };
     let html = '<div class="candidate-compare-selectors"><label for="compareCandidateA"><span>Premier candidat</span><select id="compareCandidateA">' + optionHTML(partyA.id) + '</select></label><label for="compareCandidateB"><span>Deuxième candidat</span><select id="compareCandidateB">' + optionHTML(partyB.id) + '</select></label></div>';
-    html += '<div class="candidate-compare-intro"><p>Choisissez deux personnes pour comparer les positions publiques codées de leur formation. Les orientations thématiques résument six axes ; les questions concrètes affichent les réponses documentées et les points sans source suffisante.</p><p class="confidence-note">À ce stade, ce comparateur couvre les personnalités rattachées aux formations documentées. Il ne transforme pas les prétendants sans programme vérifiable en scores fictifs. La liste officielle des candidats est attendue au plus tard le 26 mars 2027.</p></div>';
+    html += '<div class="candidate-compare-intro"><p>Choisissez deux personnes pour comparer leurs positions publiques, réforme par réforme. Les réponses documentées et les points sans source suffisante sont signalés clairement.</p><p class="confidence-note">À ce stade, ce comparateur couvre les personnalités rattachées aux formations documentées. Il ne transforme pas les prétendants sans programme vérifiable en scores fictifs. La liste officielle des candidats est attendue au plus tard le 26 mars 2027.</p></div>';
     html += '<div class="candidate-compare-identities"><article style="--party-color:' + partyA.color + '"><span class="party-family">' + partyA.family + ' · ' + partyA.short + '</span><h2>' + partyA.personName + '</h2><p>' + partyA.personRole + '</p><p class="confidence-note">' + partyA.status + '</p><a href="' + (partyA.program || partyA.site) + '" target="_blank" rel="noopener">Positions et programme public ↗</a></article><span class="candidate-compare-versus" aria-hidden="true">VS</span><article style="--party-color:' + partyB.color + '"><span class="party-family">' + partyB.family + ' · ' + partyB.short + '</span><h2>' + partyB.personName + '</h2><p>' + partyB.personRole + '</p><p class="confidence-note">' + partyB.status + '</p><a href="' + (partyB.program || partyB.site) + '" target="_blank" rel="noopener">Positions et programme public ↗</a></article></div>';
-    html += '<section class="candidate-compare-axes" aria-labelledby="compareAxesTitle"><h2 id="compareAxesTitle">Vue d’ensemble sur six thèmes</h2><p class="confidence-note">Les curseurs situent une orientation éditoriale des formations, pas une réponse personnelle des candidats.</p>';
-    DIM_KEYS.forEach(function(key) {
-      const dim = DIMENSIONS[key];
-      const aValue = partyA.positions[key];
-      const bValue = partyB.positions[key];
-      const aLeft = typeof aValue === 'number' ? Math.max(0, Math.min(100, ((aValue + 2) / 4) * 100)) : 50;
-      const bLeft = typeof bValue === 'number' ? Math.max(0, Math.min(100, ((bValue + 2) / 4) * 100)) : 50;
-      html += '<article class="candidate-compare-axis"><div class="candidate-compare-axis-head"><h3>' + dim.name + '</h3><span>' + (typeof aValue === 'number' && typeof bValue === 'number' ? (Math.abs(aValue - bValue) < 0.6 ? 'Orientations proches' : 'Orientations différentes') : 'Données partielles') + '</span></div><div class="candidate-compare-axis-values"><div><strong>' + partyA.personName + '</strong><span>' + positionLabel(key, aValue) + '</span></div><div><strong>' + partyB.personName + '</strong><span>' + positionLabel(key, bValue) + '</span></div></div><div class="candidate-compare-spectrum" aria-hidden="true"><span class="candidate-compare-spectrum-a" style="left:' + aLeft + '%"></span><span class="candidate-compare-spectrum-b" style="left:' + bLeft + '%"></span></div><div class="candidate-compare-spectrum-labels"><span>' + dim.labelLeft + '</span><span>' + dim.labelRight + '</span></div></article>';
-    });
-    html += '</section><section class="candidate-compare-details" aria-labelledby="compareDetailsTitle"><h2 id="compareDetailsTitle">Comparer les positions question par question</h2><p class="confidence-note">Les positions ci-dessous s’appuient sur les éléments publics cités dans l’onglet « Les programmes ». Une position non documentée reste affichée comme telle.</p>';
+    html += '<section class="candidate-compare-details" aria-labelledby="compareDetailsTitle"><h2 id="compareDetailsTitle">Comparer les positions question par question</h2><p class="confidence-note">Les positions ci-dessous s’appuient sur les éléments publics cités dans l’onglet « Les programmes ». Une position non documentée reste affichée comme telle.</p>';
     DIM_KEYS.forEach(function(key, index) {
       const questions = DEPARTAGE.filter(function(q) { return q.dim === key; });
       if (!questions.length) return;

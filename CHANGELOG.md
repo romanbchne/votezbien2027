@@ -1,3 +1,9 @@
+## V7.10.2 — courbes hebdomadaires et comparateur simplifié
+
+- Remplacement des courbes à quelques vagues par des moyennes par semaine sur la fenêtre glissante du 30 juillet au 30 octobre 2026, à partir des tableaux Wikipédia et des notices qu’ils référencent. Les duels de second tour restent séparés selon l’adversaire ; aucune semaine sans mesure n’est interpolée.
+- Retrait de la vue d’ensemble à curseurs du comparateur ; la page présente désormais directement la comparaison détaillée, réforme par réforme.
+- Mise à jour du cache hors ligne et du rendu mobile des graphiques.
+
 ## V7.10 — actualisation éditoriale au 30 octobre 2026
 
 - Vérification complémentaire des annonces de campagne d’Attal des 27–29 octobre : programme économique, projet européen et proposition de primaire, en distinguant les annonces d’un accord politique acté.
