@@ -75,7 +75,7 @@
       <button class="navlink" data-nav="programs" id="navPrograms">Les programmes</button>
       <button class="navlink" data-nav="parties" id="navParties">Les partis</button>
       <button class="navlink" data-nav="candidatures" id="navCandidatures">Candidatures</button>
-      <a class="navlink navlink-page" href="/a-propos/">À propos</a>
+      <button class="navlink" data-nav="compare" id="navCompare">Comparer</button>
       <button class="navlink navlink-donate" data-nav="donate" id="navDonate">Faire un don</button>
     </nav>
   </header>
@@ -97,15 +97,15 @@
           <div class="hero-text">
             <p class="eyebrow-note">Présidentielle 2027 <span aria-hidden="true">·</span> 100 % gratuit, anonyme, sans compte</p>
             <h1 id="homeTitle">Quiz politique 2027 : <span class="accent">Vos idées face aux partis.</span></h1>
-            <p class="lede">Ce quiz politique indépendant compare vos réponses aux positions publiques de <span data-count="parties">16</span> formations et candidats. Répondez à des questions concrètes pour découvrir vos tendances sur six axes et explorer les programmes.</p>
+            <p class="lede">Ce quiz politique indépendant rapproche vos réponses des positions publiques de <span data-count="parties">16</span> formations politiques et de leurs personnalités de référence. Explorez votre profil, les programmes documentés, les candidatures suivies et les sondages publiés.</p><p class="home-data-stamp">Informations relues au 30 octobre 2026 · sondages jusqu’au 26 octobre · calendrier électoral officiel.</p>
             <div class="duration-grid" aria-label="Durée estimée du questionnaire">
               <div class="duration-card"><span class="duration-icon" aria-hidden="true">01</span><span><strong>Votre profil</strong><small><span data-count="questions">22</span> questions d’orientation · ~5 min</small></span></div>
-              <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Départager les partis</strong><small>Questions concrètes ciblées</small></span></div>
+              <div class="duration-card"><span class="duration-icon" aria-hidden="true">02</span><span><strong>Préciser votre profil</strong><small>Jusqu’à 15 questions ciblées · ~4 min</small></span></div>
             </div>
             <p class="duration-total">La seconde étape s’arrête dès qu’une formation ressort nettement. Vos réponses restent sur votre appareil.</p>
             <div class="hero-actions btn-row">
               <button class="btn btn-brass" id="btnStart">Faire le quiz <span aria-hidden="true">→</span></button>
-              <button class="btn btn-ghost" data-nav="themes">Explorer les <span data-count="themes">8</span> thèmes</button>
+              <button class="btn btn-ghost" data-nav="themes">Explorer les <span data-count="themes">6</span> thèmes</button>
               <button class="btn btn-ghost" data-nav="polls">Baromètre des sondages</button>
               <a class="btn btn-ghost" href="/quiz-presidentielle-2027/">Découvrir le quiz</a>
             </div>
@@ -195,8 +195,8 @@
       <!-- ============ NOUVEL ONGLET : THÈMES ============ -->
       <section class="screen" id="screen-themes" aria-labelledby="themesTitle">
         <div class="section-kicker">Panorama thématique 2027</div>
-        <h1 id="themesTitle">Les thèmes majeurs et propositions des candidats</h1>
-        <p class="lede">Explorez les 8 grands chantiers présidentiels (dont les 6 axes cardinaux de notre boussole), les clivages idéologiques et les engagements précis pris par chaque force politique en vue de 2027.</p>
+        <h1 id="themesTitle">Six repères thématiques pour comparer les positions</h1>
+        <p class="lede">Parcourez les six axes du quiz et voyez comment les formations sont situées sur les repères utilisés pour les résultats. Les réponses précises, leurs sources et les positions inconnues sont détaillées dans l’onglet des programmes.</p>
         
         <div class="theme-filters-box">
           <div class="theme-pills" id="themePills" role="tablist" aria-label="Choisir un thème"></div>
@@ -209,7 +209,7 @@
       <section class="screen" id="screen-polls" aria-labelledby="pollsTitle">
         <div class="section-kicker">Baromètre électoral 2027</div>
         <h1 id="pollsTitle">Les intentions de vote et synthèses des sondages</h1>
-        <p class="lede">Baromètre agrégé des enquêtes d’opinion publiées en octobre 2026 (IFOP, Elabe, Cluster17 et OpinionWay), avec le détail de chaque vague et le lien vers sa notice publiée à la Commission des sondages. Le baromètre tient compte des candidatures déclarées, dont celle de Raphaël Glucksmann issue de la primaire « Choisir 2027 » des 9 et 10 octobre 2026.</p>
+        <p class="lede">Synthèse au 30 octobre 2026 : moyenne arithmétique égale de trois enquêtes de fin octobre testant la même liste de dix personnalités, complétée par un graphique d’évolution comparable, des duels de second tour et quatre enquêtes détaillées avec leurs notices officielles.</p>
 
         <div class="polls-notice-card">
           <span class="flag-mark" aria-hidden="true"></span>
@@ -217,9 +217,9 @@
         </div>
 
         <div class="polls-controls">
-          <button class="filter-chip sel" data-poll-view="first-round">Premier tour (Moyenne agrégée)</button>
+          <button class="filter-chip sel" data-poll-view="first-round">Premier tour · moyenne comparable</button>
           <button class="filter-chip" data-poll-view="second-round">Duels de 2nd tour</button>
-          <button class="filter-chip" data-poll-view="waves">Détail des dernières enquêtes</button>
+          <button class="filter-chip" data-poll-view="waves">Détail des 4 enquêtes récentes</button>
         </div>
 
         <div id="pollsContent"></div>
@@ -229,8 +229,8 @@
       <section class="screen" id="screen-programs" aria-labelledby="programsTitle">
         <div class="section-kicker">Comprendre les positions</div>
         <h1 id="programsTitle">Les programmes, question par question</h1>
-        <p class="lede">Comparez les positions politiques utilisées dans les deux quiz, avec les nuances et les points encore non documentés.</p>
-        <div class="programs-note"><strong>Comment lire cette page</strong><p>Les <span data-count="questions">22</span> premières questions indiquent une tendance générale par thème : elles ne sont pas des réponses mot pour mot des candidats. Pour les questions de précision, une position n’apparaît que lorsqu’elle a été codée à partir d’une prise de position publique ; sinon, elle est indiquée comme non documentée. La comparaison porte sur les formations, et non sur une promesse officielle de chaque personne citée.</p><p>Les candidatures évoluent : la liste officielle de l’élection n’est pas encore publiée, et la date de proclamation de la liste des candidats reste à confirmer par l’autorité compétente. Le calendrier de campagne appliqué ici est celui de <a href="https://www.elections2027.com/calendrier" target="_blank" rel="noopener">l’agrégateur Élections 2027</a>, avec la mention explicite des dates qui sont indicatives.</p></div>
+        <p class="lede">Données et codages éditoriaux consultés au 30 octobre 2026. Chaque réponse renvoie aux positions documentées ; lorsqu’une source manque, la comparaison le dit.</p>
+        <div class="programs-note"><strong>Comment lire cette page</strong><p>Les <span data-count="questions">22</span> premières questions situent des orientations générales par thème ; elles ne sont pas des réponses mot pour mot des personnes citées. Pour les questions de précision, une position n’apparaît que lorsqu’elle est étayée par une prise de position publique. Les codages portent sur les formations et ne valent pas programme officiel individuel.</p><p>Au 30 octobre 2026, la liste officielle des candidats n’est pas encore publiée. Le calendrier électoral et les échéances sont ceux indiqués par <a href="https://www.info.gouv.fr/actualite/election-presidentielle-2027" target="_blank" rel="noopener">le site officiel du Gouvernement</a>.</p></div>
         <div class="programs-controls">
           <div class="program-tabs" role="tablist" aria-label="Choisir un questionnaire">
             <button class="program-tab active" type="button" id="programTabMain" data-program-phase="main" role="tab" aria-controls="programPanel" aria-selected="true" tabindex="0">Quiz 1 · <span data-count="questions">22</span> questions générales</button>
@@ -257,7 +257,7 @@
         <div class="party-grid" id="partyGrid"></div>
         <div class="btn-row party-directory-actions" style="margin-top:1.8rem">
           <button class="btn btn-brass" id="btnStartFromParties">Faire le questionnaire</button>
-          <button class="btn btn-ghost" data-nav="compare" id="btnCompareParties" hidden>Comparer jusqu’à 3 partis →</button>
+          <button class="btn btn-ghost" data-nav="compare" id="btnCompareParties">Comparer deux candidatures →</button>
           <button class="btn btn-ghost" data-nav="candidatures">Candidatures et calendrier</button>
         </div>
       </section>
@@ -266,14 +266,14 @@
       <section class="screen" id="screen-candidatures" aria-labelledby="candidaturesTitle">
         <div class="section-kicker">Qui se présente, et pour quand</div>
         <h1 id="candidaturesTitle">Candidatures déclarées et calendrier de campagne</h1>
-        <p class="lede">La liste complète des candidatures annoncées pour la présidentielle 2027, avec leur date de déclaration, et le calendrier de la campagne jusqu’au second tour.</p>
+        <p class="lede">Un suivi éditorial des déclarations, désignations et prétentions recensées, accompagné des jalons électoraux confirmés. La liste officielle des candidats sera publiée au plus tard le 26 mars 2027.</p>
         <div id="candidaturesContent"></div>
       </section>
 
       <!-- ============ COMPARER ============ -->
       <section class="screen" id="screen-compare" aria-labelledby="compareTitle">
-        <h1 id="compareTitle">Comparer des partis</h1>
-        <p class="lede">Choisissez jusqu’à 3 formations depuis l’écran « Les partis » pour les mettre côte à côte.</p>
+        <h1 id="compareTitle">Comparer deux candidatures</h1>
+        <p class="lede">Sélectionnez deux personnalités pour comparer leurs orientations sur six thèmes, puis examinez les réponses et les écarts documentés question par question.</p>
         <div id="compareContent"></div>
       </section>
 

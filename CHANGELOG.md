@@ -1,3 +1,12 @@
+## V7.10 — actualisation éditoriale au 30 octobre 2026
+
+- Actualisation du suivi des candidatures, des statuts des formations et des prochaines échéances à partir du calendrier gouvernemental et des sources citées.
+- Remplacement des anciennes affirmations thématiques par six repères issus du modèle du quiz ; ajout des limites de codage visibles et maintien des réponses précises documentées par source.
+- Ajout d’un comparateur accessible depuis le menu, avec deux sélecteurs de candidatures, six axes et comparaison détaillée des questions sans données inventées.
+- Mise à jour du baromètre : moyenne égale de trois enquêtes testant la même liste de dix noms, évolution de vagues comparables, détails de quatre sondages et duels de second tour.
+- Remplacement de l’onglet « À propos » par « Comparer » dans la navigation du haut ; le lien vers À propos reste dans le pied de page.
+- Mise à jour des liens de navigation des pages support, des dates du sitemap et du cache hors ligne.
+
 # Changelog — Audit V5.1 → refonte V6
 
 ## V7.4 — accueil compact, quiz et positions détaillées

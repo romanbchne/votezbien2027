@@ -17,10 +17,10 @@
      `candidacyStatus` de chaque formation). Aucune formation n'est
      présentée ici avec un statut écrit à la main dans le code. */
   const CANDIDACY_STATUS = {
-    official:    { label: 'Candidature officielle',          hint: 'Candidature désignée par les adhérents ou retenue officiellement par la formation.' },
-    declared:    { label: 'Candidature déclarée',           hint: 'Candidature annoncée publiquement, sans investiture officielle enregistrée à ce jour.' },
-    conditional: { label: 'Candidature à confirmer',         hint: 'Candidature envisagée, encore soumise à une décision interne (vote, convention…).' },
-    reference:   { label: 'Personnalité de référence',       hint: 'Personnalité associée à la formation ; aucun candidat n’est annoncé à ce jour.' }
+    official:    { label: 'Désignée par sa formation',       hint: 'Désignation interne au parti ; la liste officielle du Conseil constitutionnel n’est pas encore publiée.' },
+    declared:    { label: 'Déclaration publique',           hint: 'Annonce publique ; cela ne vaut pas validation sur la liste officielle des candidats.' },
+    conditional: { label: 'Décision interne à venir',        hint: 'Une décision du parti ou une étape interne doit encore intervenir.' },
+    reference:   { label: 'Personnalité de référence',       hint: 'Personnalité associée à la formation ; aucune candidature n’est annoncée à ce jour.' }
   };
 
   function candidacyBadge(party) {
@@ -204,7 +204,6 @@
   document.querySelectorAll('[data-nav]').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.nav;
-      if (target === 'compare' && !state.completed) { showScreen('parties'); return; }
       showScreen(target);
     });
   });
@@ -625,6 +624,15 @@
       });
       html += `</div>`;
       if (!ranked.length) html += '<p class="confidence-note">Aucune formation ne dispose ici d’assez de positions comparables pour un classement fiable.</p>';
+      const allSorted = ranked.map(function(m) {
+        return '<li><span>' + m.party.personName + ' · ' + m.party.short + '</span><strong>' + Math.round(m.matchPercent) + ' / 100</strong></li>';
+      }).join('');
+      html += '<details class="all-ranked-candidates"><summary>Afficher le classement complet des ' + ranked.length + ' formations comparables</summary><ol>' + allSorted + '</ol></details>';
+      const notRanked = CANDIDATURES.filter(function(c) { return !c.partyId || !ranked.some(function(m) { return m.party.id === c.partyId; }); });
+      html += '<p class="confidence-note candidate-result-limit">Le quiz classe les formations dont les positions publiques sont assez documentées ; il ne donne pas un score personnel aux prétendants sans base vérifiable. La liste officielle des candidats n’est attendue qu’au plus tard le 26 mars 2027.</p>';
+      if (notRanked.length) {
+        html += '<details class="unranked-candidates"><summary>Personnalités suivies mais non classées (' + notRanked.length + ')</summary><ul>' + notRanked.map(function(c) { return '<li><strong>' + c.name + '</strong> — ' + (c.scopeReason || c.declarationNote || 'aucune position suffisamment documentée') + '</li>'; }).join('') + '</ul></details>';
+      }
       const partialCount = matches.filter(m => m.partial).length;
       if (partialCount) html += `<p class="confidence-note">${partialCount} formations ne sont pas classées, car leur couverture documentaire est trop faible ou trop incomplète sur vos réponses.</p>`;
       html += `<div class="btn-row" style="margin-top:1rem"><button class="btn btn-ghost btn-sm" id="btnSeeAllParties">Voir les ${PARTIES.length} formations et leur détail</button></div></div>`;
@@ -876,53 +884,47 @@
     const pillsWrap = document.getElementById('themePills');
     const detailWrap = document.getElementById('themeDetailCard');
     if (!pillsWrap || !detailWrap || typeof THEMES === 'undefined') return;
-
     if (!selectedThemeId && THEMES.length) selectedThemeId = THEMES[0].id;
-
-    pillsWrap.innerHTML = THEMES.map(t => {
-      const active = t.id === selectedThemeId;
-      return `<button class="theme-pill${active ? ' active' : ''}" type="button" data-theme="${t.id}" aria-selected="${active ? 'true' : 'false'}">
-        <span aria-hidden="true">${t.icon || '📌'}</span> ${t.name}
-      </button>`;
+    pillsWrap.innerHTML = THEMES.map(function(theme) {
+      const active = theme.id === selectedThemeId;
+      return '<button class="theme-pill' + (active ? ' active' : '') + '" type="button" role="tab" data-theme="' + theme.id + '" aria-selected="' + (active ? 'true' : 'false') + '">' +
+        '<span aria-hidden="true">' + theme.icon + '</span> ' + theme.name + '</button>';
     }).join('');
-
-    pillsWrap.querySelectorAll('.theme-pill').forEach(btn => {
-      btn.addEventListener('click', () => {
-        selectedThemeId = btn.dataset.theme;
+    pillsWrap.querySelectorAll('.theme-pill').forEach(function(button) {
+      button.addEventListener('click', function() {
+        selectedThemeId = button.dataset.theme;
         renderThemes();
       });
     });
-
-    const currentTheme = THEMES.find(t => t.id === selectedThemeId) || THEMES[0];
-    if (!currentTheme) return;
-
-    let html = `<article class="theme-briefing-box">
-      <h2><span aria-hidden="true">${currentTheme.icon || '📌'}</span> ${currentTheme.name}</h2>
-      <p class="lede">${currentTheme.summary}</p>
-      <div class="theme-cleavages-tag"><strong>Lignes de fracture 2027 :</strong> ${currentTheme.cleavages}</div>
-    </article>`;
-
-    html += `<h3 style="margin-top:1.2rem; font-size:1.25rem">Positions et propositions des formations et candidats</h3>
-    <div class="theme-candidates-grid">`;
-
-    currentTheme.candidates.forEach(c => {
-      html += `<div class="theme-candidate-card" style="--candidate-color:${c.color || '#244B83'}">
-        <div class="tc-head">
-          <div>
-            <h4 class="tc-candidate">${c.candidateName}</h4>
-            <span class="tc-party-badge" style="border-left:3px solid ${c.color || '#244B83'}">${c.partyShort} · ${c.partyName}</span>
-          </div>
-        </div>
-        <p class="tc-stance">« ${c.stance} »</p>
-        <ul class="tc-proposals">
-          ${c.proposals.map(p => `<li>${p}</li>`).join('')}
-        </ul>
-        ${c.sourceUrl ? `<p class="confidence-note tc-source" style="margin:.5rem 0 0"><a href="${c.sourceUrl}" target="_blank" rel="noopener">${c.sourceLabel || 'Source du programme'}</a></p>` : ''}
-      </div>`;
+    const theme = THEMES.find(function(item) { return item.id === selectedThemeId; }) || THEMES[0];
+    if (!theme) return;
+    const dimension = DIMENSIONS[theme.id];
+    const generalQuestions = QUESTIONS.filter(function(question) { return question.dim === theme.id; });
+    const detailQuestions = DEPARTAGE.filter(function(question) { return question.dim === theme.id; });
+    let html = '<article class="theme-briefing-box"><h2><span aria-hidden="true">' + theme.icon + '</span> ' + theme.name + '</h2>' +
+      '<p class="lede">' + dimension.plain + '</p>' +
+      '<p class="confidence-note">Ce repère résume les orientations éditoriales codées dans le quiz. Il ne vaut pas déclaration personnelle des personnes présentées. Une position sans base suffisante reste non documentée dans les réponses détaillées.</p></article>';
+    html += '<section class="theme-position-section" aria-labelledby="themePositionsTitle"><div class="theme-position-section-head"><div><h3 id="themePositionsTitle">Orientations comparées</h3><p>Repères sur une échelle, d’après les positions générales codées des formations.</p></div><span>' + PARTIES.length + ' formations</span></div><div class="theme-position-grid">';
+    PARTIES.forEach(function(party) {
+      const score = party.positions ? party.positions[theme.id] : null;
+      const known = typeof score === 'number';
+      const marker = known ? Math.max(0, Math.min(100, ((score + 2) / 4) * 100)) : 50;
+      const coverage = partyCoverage(party);
+      html += '<article class="theme-position-card" style="--theme-party-color:' + party.color + '">' +
+        '<div class="theme-position-card-head"><span class="party-family">' + party.short + '</span><strong>' + party.personName + '</strong></div>' +
+        '<p>' + (known ? positionLabel(theme.id, score) : 'Position non documentée') + '</p>' +
+        '<div class="theme-position-track' + (known ? '' : ' is-unknown') + '" aria-hidden="true"><span style="left:' + marker + '%"></span></div>' +
+        '<div class="theme-position-labels"><span>' + dimension.labelLeft + '</span><span>' + dimension.labelRight + '</span></div>' +
+        '<small>' + coverage.coded + ' positions détaillées documentées sur ' + coverage.total + ' questions dans la banque du quiz.</small>' +
+        '<a href="' + (party.program || party.site) + '" target="_blank" rel="noopener">Source officielle de ' + party.short + ' ↗</a></article>';
     });
-
-    html += `</div>`;
+    html += '</div></section>';
+    html += '<section class="theme-question-links"><div><h3>Explorer les questions de ce thème</h3><p>' +
+      generalQuestions.length + ' questions générales et ' + detailQuestions.length + ' questions de précision dans la banque. Le quiz détaillé en sélectionne jusqu’à ' + Scoring.MAX_DEPARTAGE + ' selon vos réponses.</p></div>' +
+      '<button class="btn btn-ghost" id="themeOpenPrograms">Voir les réponses et leurs sources →</button></section>';
+    if (dimension.note) html += '<p class="confidence-note">' + dimension.note + '</p>';
     detailWrap.innerHTML = html;
+    document.getElementById('themeOpenPrograms').addEventListener('click', function() { showScreen('programs'); });
   }
 
   /* ================================================================
@@ -935,111 +937,95 @@
     return arrow + ' ' + Math.abs(t).toFixed(1) + ' pt' + (Math.abs(t) > 1 ? 's' : '') + ' par rapport à la mesure précédente';
   }
 
+
+  function pollTrendChartHTML(dataset, id) {
+    if (!dataset || !dataset.series || !dataset.series.length) return '';
+    const width = 760, height = 310, left = 54, right = 20, top = 20, bottom = 52;
+    const plotWidth = width - left - right, plotHeight = height - top - bottom;
+    const xAt = function(i) { return left + (dataset.periods.length < 2 ? plotWidth / 2 : plotWidth * i / (dataset.periods.length - 1)); };
+    const yAt = function(value) { return top + plotHeight * (dataset.max - value) / (dataset.max - dataset.min); };
+    let svg = '<svg class="poll-trend-svg" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-labelledby="' + id + '-title ' + id + '-desc">';
+    svg += '<title id="' + id + '-title">' + dataset.title + '</title><desc id="' + id + '-desc">' + dataset.note + '</desc>';
+    dataset.ticks.forEach(function(tick) {
+      const y = yAt(tick);
+      svg += '<line x1="' + left + '" y1="' + y + '" x2="' + (width - right) + '" y2="' + y + '" class="poll-grid-line"></line>';
+      svg += '<text x="' + (left - 10) + '" y="' + (y + 4) + '" text-anchor="end" class="poll-axis-label">' + tick + ' %</text>';
+    });
+    dataset.periods.forEach(function(period, i) {
+      const x = xAt(i);
+      svg += '<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (top + plotHeight) + '" class="poll-grid-line poll-grid-vertical"></line>';
+      svg += '<text x="' + x + '" y="' + (height - 20) + '" text-anchor="middle" class="poll-axis-label">' + (dataset.periodsShort ? dataset.periodsShort[i] : period) + '</text>';
+    });
+    dataset.series.forEach(function(series) {
+      const points = series.values.map(function(value, i) { return xAt(i) + ',' + yAt(value); }).join(' ');
+      svg += '<polyline points="' + points + '" fill="none" stroke="' + series.color + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>';
+      series.values.forEach(function(value, i) {
+        svg += '<circle cx="' + xAt(i) + '" cy="' + yAt(value) + '" r="5" fill="' + series.color + '" stroke="#fff" stroke-width="2"><title>' + series.name + ', ' + dataset.periods[i] + ' : ' + value + ' %</title></circle>';
+      });
+    });
+    svg += '</svg>';
+    let legend = '<ul class="poll-trend-legend">';
+    dataset.series.forEach(function(series) {
+      const latest = series.values[series.values.length - 1];
+      legend += '<li><span class="poll-legend-dot" style="background:' + series.color + '"></span><span>' + series.name + '</span><strong>' + Number(latest).toLocaleString('fr-FR') + ' %</strong></li>';
+    });
+    legend += '</ul>';
+    let table = '<div class="poll-trend-table-scroll"><table class="poll-trend-table"><caption>Valeurs de chaque vague, en pourcentage</caption><thead><tr><th scope="col">Personnalité</th>';
+    dataset.periods.forEach(function(period) { table += '<th scope="col">' + period + '</th>'; });
+    table += '</tr></thead><tbody>';
+    dataset.series.forEach(function(series) {
+      table += '<tr><th scope="row"><span class="poll-legend-dot" style="background:' + series.color + '"></span> ' + series.name + '</th>';
+      series.values.forEach(function(value) { table += '<td>' + Number(value).toLocaleString('fr-FR') + ' %</td>'; });
+      table += '</tr>';
+    });
+    table += '</tbody></table></div>';
+    return '<section class="poll-trend-card" aria-labelledby="' + id + '-heading"><h3 id="' + id + '-heading">' + dataset.title + '</h3><p class="confidence-note">' + dataset.note + ' <a href="' + dataset.source + '" target="_blank" rel="noopener">Lire la notice officielle</a></p><div class="poll-trend-scroll">' + svg + '</div>' + legend + table + '<p class="confidence-note poll-trend-source">Valeurs et méthodologie : <a href="' + dataset.source + '" target="_blank" rel="noopener">notice de l’enquête</a></p></section>';
+  }
+
   function renderPolls() {
     const root = document.getElementById('pollsContent');
     if (!root || typeof POLLS === 'undefined') return;
-
-    document.querySelectorAll('[data-poll-view]').forEach(btn => {
+    document.querySelectorAll('[data-poll-view]').forEach(function(btn) {
       btn.classList.toggle('sel', btn.dataset.pollView === pollView);
     });
-
     let html = '';
     if (pollView === 'first-round') {
-      const inScope = POLLS.averageFirstRound.filter(e => e.inScope !== false);
-      const outScope = POLLS.averageFirstRound.filter(e => e.inScope === false);
-      html += `<div class="poll-aggregate-box">
-        <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:.5rem">
-          <div>
-            <h2 style="margin:0">Moyenne agrégée du 1er tour</h2>
-            <p class="confidence-note" style="margin:.2rem 0 0">Mise à jour du ${POLLS.updatedAt} · ${POLLS.aggregationNote} <a href="${POLLS.sourceUrl}" target="_blank" rel="noopener">Source de l’agrégat</a></p>
-          </div>
-          <span class="quiz-duration">Élection présidentielle 2027</span>
-        </div>
-        <div class="poll-bars-list">`;
-
-      POLLS.averageFirstRound.forEach(item => {
-        const barWidth = item.score;
-        const outside = item.inScope === false;
-        html += `<div class="poll-bar-item${outside ? ' poll-out-scope' : ''}">
-          <div class="poll-candidate-info">
-            <strong>${item.candidate}</strong>
-            <span>${item.partyShort === '—' ? '' : item.partyShort + ' · '}${item.family} · ${item.waves} vague${item.waves > 1 ? 's' : ''} · ${trendLabel(item)}</span>
-            ${item.note ? `<span class="poll-note">${item.note}</span>` : ''}
-          </div>
-          <div class="poll-bar-track" aria-hidden="true">
-            <div class="poll-bar-fill" style="width:${barWidth}%; background:${item.color || '#244B83'}"></div>
-          </div>
-          <div class="poll-score-val" style="color:${item.color || 'var(--ink)'}">${item.score} %</div>
-        </div>`;
+      html += '<div class="poll-aggregate-box"><div class="poll-average-header"><div><h2>Moyenne des trois enquêtes à liste commune</h2><p class="confidence-note">Actualisée au ' + POLLS.updatedAt + ' · ' + POLLS.aggregationNote + ' <a href="' + POLLS.sourceUrl + '" target="_blank" rel="noopener">Consulter les notices à la Commission des sondages</a></p></div><span class="quiz-duration">Moyenne descriptive</span></div><div class="poll-bars-list">';
+      POLLS.averageFirstRound.forEach(function(item) {
+        html += '<div class="poll-bar-item"><div class="poll-candidate-info"><strong>' + item.candidate + '</strong><span>' + (item.partyShort === '—' ? '' : item.partyShort + ' · ') + item.family + ' · moyenne de ' + item.waves + ' instituts</span></div><div class="poll-bar-track" aria-hidden="true"><div class="poll-bar-fill" style="width:' + item.score + '%; background:' + (item.color || '#244B83') + '"></div></div><div class="poll-score-val" style="color:' + (item.color || 'var(--ink)') + '">' + Number(item.score).toLocaleString('fr-FR') + ' %</div></div>';
       });
-
-      html += `</div>`;
-      if (outScope.length) {
-        html += `<p class="confidence-note" style="margin-top:1rem">${outScope.length} candidature${outScope.length > 1 ? 's' : ''} mesurée${outScope.length > 1 ? 's' : ''} par les instituts figure${outScope.length > 1 ? 'nt' : ''} dans la moyenne sans faire l’objet d’une comparaison ici : aucune formation de ce site ne porte cette candidature, et aucune position n’est codée pour elle. ${outScope.map(e => e.candidate).join(', ')}.</p>`;
-      }
-      html += `</div>`;
+      html += '</div><p class="confidence-note poll-scope-note">' + POLLS.aggregationScopeNote + '</p></div>';
+      html += pollTrendChartHTML(POLLS.trendSeries, 'poll-first-trend');
     } else if (pollView === 'second-round') {
-      html += `<div class="poll-aggregate-box">
-        <h2 style="margin:0 0 .3rem">Duels de second tour mesurés</h2>
-        <p class="confidence-note">Chaque duel est la moyenne des vagues qui l’ont testé. Les duels qui n’ont pas été mesurés ne sont pas affichés : ils n’existent pas dans les enquêtes publiées. <a href="${POLLS.secondRoundSourceUrl}" target="_blank" rel="noopener">Source</a></p>
-        <div class="duels-grid" style="margin-top:1.2rem">`;
-
-      POLLS.secondRoundDuels.forEach(d => {
-        html += `<div class="duel-card">
-          <h3>${d.duel}</h3>
-          <div class="duel-spread">${d.waves} vague${d.waves > 1 ? 's' : ''} · écart de ${Math.abs(d.candidateA.score - d.candidateB.score).toFixed(1)} point${Math.abs(d.candidateA.score - d.candidateB.score) > 1 ? 's' : ''}</div>
-          <div class="duel-bars-wrap" style="--color-a:${d.candidateA.color}; --color-b:${d.candidateB.color}">
-            <div class="duel-bar-a" style="width:${d.candidateA.score}%"></div>
-            <div class="duel-bar-b" style="width:${d.candidateB.score}%"></div>
-          </div>
-          <div class="duel-labels">
-            <span style="color:${d.candidateA.color}">${d.candidateA.name} : ${d.candidateA.score} %</span>
-            <span style="color:${d.candidateB.color}">${d.candidateB.name} : ${d.candidateB.score} %</span>
-          </div>
-          ${d.detail && d.detail.length ? `<details class="duel-detail"><summary>Détail des ${d.detail.length} mesures</summary><ul>${d.detail.map(x => `<li><span>${x.institute}</span><span>${x.date}</span><strong>${x.a} – ${x.b}</strong>${x.notice ? `<a href="${x.notice}" target="_blank" rel="noopener">notice</a>` : ''} </li>`).join('')}</ul></details>` : ''}
-        </div>`;
+      html += '<div class="poll-aggregate-box"><h2>Duels de second tour mesurés</h2><p class="confidence-note">Moyenne simple des deux mesures les plus récentes quand un même duel a été testé par OpinionWay et Toluna Harris Interactive, les 22 et 23 octobre. Les détails conservent le score de chaque institut et sa notice ; les duels non mesurés ne sont pas extrapolés.</p><div class="duels-grid">';
+      POLLS.secondRoundDuels.forEach(function(d) {
+        const gap = Math.abs(d.candidateA.score - d.candidateB.score);
+        html += '<article class="duel-card"><h3>' + d.duel + '</h3><div class="duel-spread">Moyenne de ' + d.waves + ' enquêtes · écart de ' + gap.toLocaleString('fr-FR') + ' points</div><div class="duel-bars-wrap" style="--color-a:' + d.candidateA.color + '; --color-b:' + d.candidateB.color + '"><div class="duel-bar-a" style="width:' + d.candidateA.score + '%"></div><div class="duel-bar-b" style="width:' + d.candidateB.score + '%"></div></div><div class="duel-labels"><span style="color:' + d.candidateA.color + '">' + d.candidateA.name + ' : ' + Number(d.candidateA.score).toLocaleString('fr-FR') + ' %</span><span style="color:' + d.candidateB.color + '">' + d.candidateB.name + ' : ' + Number(d.candidateB.score).toLocaleString('fr-FR') + ' %</span></div>';
+        if (d.detail && d.detail.length) {
+          html += '<details class="duel-detail"><summary>Comparer les deux mesures</summary><ul>';
+          d.detail.forEach(function(x) { html += '<li><span>' + x.institute + '</span><span>' + x.date + '</span><strong>' + x.a + ' – ' + x.b + '</strong><a href="' + x.notice + '" target="_blank" rel="noopener">notice</a></li>'; });
+          html += '</ul></details>';
+        }
+        html += '</article>';
       });
-
-      html += `</div></div>`;
+      html += '</div></div>';
+      html += pollTrendChartHTML(POLLS.secondRoundTrend, 'poll-second-trend');
     } else {
-      html += `<div class="poll-aggregate-box">
-        <h2 style="margin:0 0 .3rem">Détail des ${POLLS.waves.length} dernières vagues publiées</h2>
-        <p class="confidence-note">Chaque vague est reconstituée depuis sa notice de la Commission des sondages : commanditaire, terrain, taille d’échantillon et lien vers la notice d’origine.</p>
-        <div style="display:flex; flex-direction:column; gap:1.3rem; margin-top:1.2rem">`;
-
-      POLLS.waves.forEach(w => {
-        html += `<div class="depart-item" style="padding:1.1rem">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.5rem">
-            <div>
-              <h3 style="font-size:1.05rem; margin-bottom:.15rem">${w.institute}${w.sponsor ? ' pour ' + w.sponsor : ''}</h3>
-              <p class="confidence-note" style="margin:0">Publiée le ${w.publishedAt} · terrain du ${w.terrain} · ${w.sampleSize.toLocaleString('fr-FR')} personnes inscrites</p>
-              ${w.sampleNote ? `<p class="confidence-note" style="margin:.2rem 0 0">${w.sampleNote}</p>` : ''}
-              ${w.sponsorNote ? `<p class="confidence-note" style="margin:.2rem 0 0">${w.sponsorNote}</p>` : ''}
-            </div>
-            <span class="tc-party-badge">${w.scenario}</span>
-          </div>
-          <div class="poll-bars-list" style="margin-top:.8rem; gap:.5rem">`;
-
-        w.results.forEach(r => {
-          html += `<div style="display:flex; justify-content:space-between; gap:.6rem; font-size:.86rem; padding:.25rem 0; border-bottom:1px solid var(--line-soft)">
-            <span>${r.candidate}${r.partyShort ? ' <small class="text-muted">(' + r.partyShort + ')</small>' : ''}</span>
-            <strong style="font-family:var(--font-display)">${r.score} %</strong>
-          </div>`;
+      html += '<div class="poll-aggregate-box"><h2>Les quatre enquêtes récentes détaillées</h2><p class="confidence-note">Les résultats ci-dessous reprennent les colonnes publiées dans les notices officielles. Une hypothèse de premier tour est une liste testée par l’institut, pas une liste de candidatures validées.</p><div class="poll-wave-list">';
+      POLLS.waves.forEach(function(w) {
+        html += '<article class="poll-wave-card"><div class="poll-wave-head"><div><h3>' + w.institute + (w.sponsor ? ' pour ' + w.sponsor : '') + '</h3><p class="confidence-note">Publié le ' + w.publishedAt + ' · terrain du ' + w.terrain + '</p><p class="confidence-note">' + w.sampleLabel + '</p>' + (w.sampleNote ? '<p class="confidence-note">' + w.sampleNote + '</p>' : '') + '</div><span class="tc-party-badge">' + w.scenario + '</span></div><div class="poll-wave-results">';
+        w.results.forEach(function(r) {
+          html += '<div class="poll-wave-result"><span>' + r.candidate + (r.partyShort ? ' <small>(' + r.partyShort + ')</small>' : '') + '</span><strong>' + Number(r.score).toLocaleString('fr-FR') + ' %</strong></div>';
         });
-
-        html += `</div>
-          <p class="confidence-note" style="margin:.7rem 0 0"><a href="${w.notice}" target="_blank" rel="noopener">Notice de la Commission des sondages</a></p>
-        </div>`;
+        html += '</div><p class="confidence-note poll-wave-source">Les chiffres dépendent de l’hypothèse et comportent une marge d’incertitude. <a href="' + w.notice + '" target="_blank" rel="noopener">Lire la notice officielle</a></p></article>';
       });
-
-      html += `</div></div>`;
+      html += '</div></div>';
     }
-
     root.innerHTML = html;
   }
 
-  document.querySelectorAll('[data-poll-view]').forEach(btn => {
-    btn.addEventListener('click', () => {
+  document.querySelectorAll('[data-poll-view]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
       pollView = btn.dataset.pollView;
       renderPolls();
     });
@@ -1049,6 +1035,15 @@
      CANDIDATURES et CALENDRIER DE CAMPAGNE
      Données réelles : les candidatures déclarées et les jalons vérifiés.
      ================================================================ */
+  function latestPollForCandidate(name) {
+    const waves = (typeof POLLS !== 'undefined' && POLLS.waves) ? POLLS.waves : [];
+    const matches = waves.filter(function(w) { return (w.results || []).some(function(r) { return r.candidate === name; }); });
+    matches.sort(function(a, b) { return String(b.publishedISO || '').localeCompare(String(a.publishedISO || '')); });
+    if (!matches.length) return null;
+    const wave = matches[0], result = wave.results.find(function(r) { return r.candidate === name; });
+    return {wave:wave,result:result};
+  }
+
   function renderCandidatures() {
     const root = document.getElementById('candidaturesContent');
     if (!root || typeof CANDIDATURES === 'undefined') return;
@@ -1056,9 +1051,7 @@
     const inScope = CANDIDATURES.filter(c => c.inScope !== false);
     const outScope = CANDIDATURES.filter(c => c.inScope === false);
 
-    let html = `<p class="confidence-note">${CANDIDATURES.length} candidatures sont recensées ici pour la présidentielle 2027. ` +
-      `${inScope.length} sont portées par une formation comparée sur ce site ; ${outScope.length} ne le sont pas et ne font l\'objet d\'aucun codage de position. ` +
-      `Déclarer sa candidature ne vaut pas désignation officielle : chaque ligne indique la date et la forme exacte de la déclaration, et signale les cas où la déclaration n\'est pas établie.</p>`;
+    let html = '<p class="confidence-note">Répertoire éditorial relu au 30 octobre 2026 : ' + CANDIDATURES.length + ' personnalités déclarées, désignées ou citées comme prétendantes sont suivies ici. ' + inScope.length + ' sont rattachées à une formation dont les positions sont comparées ; ' + outScope.length + ' restent hors classement, faute de positions publiques suffisamment codées. Cette sélection ne constitue pas une liste exhaustive ni la liste officielle, attendue au plus tard le 26 mars 2027. <a href="https://www.info.gouv.fr/actualite/election-presidentielle-2027" target="_blank" rel="noopener">Calendrier officiel</a> · <a href="https://www.lemonde.fr/les-decodeurs/article/2026/10/12/presidentielle-2027-qui-sont-les-principaux-candidats-declares-ou-probables_6680905_4355771.html" target="_blank" rel="noopener">Suivi de presse consulté</a>.</p>';;
 
     html += '<div class="candidatures-grid">';
     inScope.forEach(c => {
@@ -1070,10 +1063,10 @@
         </div>
         <p class="candidature-party">${c.party} · <span class="text-muted">${c.declaredOn ? 'déclarée le ' + formatFullDate(c.declaredOn) : 'date de déclaration non précisée'}</span></p>
         <p class="candidature-note">${c.declarationNote || ''}</p>
-        ${c.pollScore !== null && c.pollScore !== undefined
-          ? `<p class="candidature-poll">Dernier relevé : <strong>${c.pollScore} %</strong>${c.pollWaves ? ' (' + c.pollWaves + ' vague' + (c.pollWaves > 1 ? 's' : '') + ')' : ''}</p>`
-          : '<p class="candidature-poll text-muted">Aucun relevé public dans la base des sondages</p>'}
-        ${c.url ? `<a class="program-primary-source" href="${c.url}" target="_blank" rel="noopener">Voir la déclaration</a>` : ''}
+        ${latestPollForCandidate(c.name)
+          ? (function() { const poll = latestPollForCandidate(c.name); return '<p class="candidature-poll">Dernière enquête recensée : <strong>' + Number(poll.result.score).toLocaleString('fr-FR') + ' %</strong> · ' + poll.wave.institute + ', publiée le ' + poll.wave.publishedAt + '.</p><a class="program-primary-source" href="' + poll.wave.notice + '" target="_blank" rel="noopener">Voir la notice du sondage</a>'; })()
+          : '<p class="candidature-poll text-muted">Aucune mesure récente retenue dans les notices affichées</p>'}
+        ${c.url ? `<a class="program-primary-source" href="${c.url}" target="_blank" rel="noopener">Source sur la candidature</a>` : ''}
       </article>`;
     });
     html += '</div>';
@@ -1142,7 +1135,7 @@
     const directory = hasResults ? matches.map(m => ({ party: m.party, match: m })) : PARTIES.map(party => ({ party, match: null }));
     const list = directory.filter(item => !familyFilter || item.party.family === familyFilter);
     grid.innerHTML = list.map(({ party, match }) => {
-      const checked = compareSelection.includes(party.id) ? ' checked' : '';
+
       const portrait = party.portraitFile
         ? `<img class="party-photo" src="${portraitURL(party.portraitFile)}" alt="Portrait de ${party.personName}" width="100" height="128" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
         : `<div class="party-photo portrait-placeholder" aria-hidden="true">${party.short}</div>`;
@@ -1152,9 +1145,7 @@
       const comparison = match
         ? `${matchRingHTML(match.matchPercent, 56)}<span class="match-caption">${captionFor(match)}</span>`
         : '<span class="party-unscored">À comparer après le questionnaire</span>';
-      const comparePick = hasResults
-        ? `<label class="compare-pick"><input type="checkbox" data-compare="${party.id}"${checked}> Ajouter au comparateur</label>`
-        : '';
+
       return `<article class="party-card">
         <div class="party-main">
           <span class="party-portrait">${portrait}${photoCredit}</span>
@@ -1168,23 +1159,12 @@
             <span class="party-open-hint">Voir la fiche et le programme <span aria-hidden="true">→</span></span>
           </button>
         </div>
-        ${comparePick ? `<div class="party-card-actions">${comparePick}</div>` : ''}
+
       </article>`;
     }).join('') || '<p>Aucun parti dans cette famille.</p>';
 
     grid.querySelectorAll('.party-card-text').forEach(card => {
       card.addEventListener('click', () => openPartyDrawer(card.dataset.party));
-    });
-    grid.querySelectorAll('[data-compare]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const id = cb.dataset.compare;
-        if (cb.checked) {
-          if (compareSelection.length >= 3) { cb.checked = false; showToast('3 partis maximum pour la comparaison'); return; }
-          compareSelection.push(id);
-        } else {
-          compareSelection = compareSelection.filter(x => x !== id);
-        }
-      });
     });
     const intro = document.getElementById('partyDirectoryIntro');
     if (intro) intro.innerHTML = hasResults
@@ -1201,7 +1181,7 @@
       };
     }
     const compareButton = document.getElementById('btnCompareParties');
-    if (compareButton) compareButton.hidden = !hasResults;
+    if (compareButton) compareButton.hidden = false;
   }
 
   function portraitURL(file) {
@@ -1343,41 +1323,69 @@
      ================================================================ */
   function renderCompare() {
     const root = document.getElementById('compareContent');
-    if (!state.completed || !lastDimResults) {
-      root.innerHTML = '<p class="lede">Pour comparer des formations politiques à vos idées, effectuez d’abord le questionnaire. Vous pouvez aussi consulter la liste des partis.</p><div class="btn-row"><button class="btn btn-brass" id="btnGoQuizFromCompare">Faire le quiz</button><button class="btn btn-ghost" id="btnGoPartiesFromCompare">Voir les partis</button></div>';
-      const b1 = document.getElementById('btnGoQuizFromCompare');
-      if (b1) b1.addEventListener('click', () => showScreen('quizStart'));
-      const b2 = document.getElementById('btnGoPartiesFromCompare');
-      if (b2) b2.addEventListener('click', () => showScreen('parties'));
+    if (!root) return;
+    const eligible = PARTIES.filter(function(p) { return !!p.candidacyId && !!p.personName; });
+    if (eligible.length < 2) {
+      root.innerHTML = '<p class="lede">Les données publiques ne permettent pas encore de comparer deux candidatures.</p>';
       return;
     }
-    if (compareSelection.length === 0) {
-      root.innerHTML = '<p class="lede">Aucun parti sélectionné pour l’instant. Depuis l’écran « Les partis », cochez « Ajouter au comparateur » sur les formations qui vous intéressent.</p><div class="btn-row"><button class="btn btn-primary" id="btnGoPartiesFromCompare">Voir les partis</button></div>';
-      const b = document.getElementById('btnGoPartiesFromCompare');
-      if (b) b.addEventListener('click', () => showScreen('parties'));
-      return;
-    }
-    const parties = compareSelection.map(id => PARTIES.find(p => p.id === id)).filter(Boolean);
-    let html = '<div class="compare-table-wrap"><table class="compare"><thead><tr><th>Thème</th><th>Vous</th>' +
-      parties.map(p => `<th>${p.short}</th>`).join('') + '</tr></thead><tbody>';
-    DIM_KEYS.forEach(k => {
-      const d = lastDimResults[k];
-      html += `<tr><td>${DIMENSIONS[k].name}</td><td>${d.n > 0 ? positionLabel(k, d.score) : 'Non renseigné'}</td>`;
-      parties.forEach(p => { html += `<td>${positionLabel(k, p.positions[k])}</td>`; });
-      html += '</tr>';
+    const validIds = eligible.map(function(p) { return p.id; });
+    let selected = (compareSelection || []).filter(function(id, index, ids) { return validIds.includes(id) && ids.indexOf(id) === index; }).slice(0, 2);
+    if (selected.length < 2) selected = ['rn','horizons'].filter(function(id) { return validIds.includes(id); }).slice(0, 2);
+    if (selected.length < 2) selected = validIds.slice(0, 2);
+    compareSelection = selected;
+    const partyA = eligible.find(function(p) { return p.id === selected[0]; });
+    const partyB = eligible.find(function(p) { return p.id === selected[1]; });
+    if (!partyA || !partyB) return;
+    const optionHTML = function(current) {
+      return eligible.map(function(p) {
+        return '<option value="' + p.id + '"' + (p.id === current ? ' selected' : '') + '>' + p.personName + ' · ' + p.short + '</option>';
+      }).join('');
+    };
+    let html = '<div class="candidate-compare-selectors"><label for="compareCandidateA"><span>Premier candidat</span><select id="compareCandidateA">' + optionHTML(partyA.id) + '</select></label><label for="compareCandidateB"><span>Deuxième candidat</span><select id="compareCandidateB">' + optionHTML(partyB.id) + '</select></label></div>';
+    html += '<div class="candidate-compare-intro"><p>Choisissez deux personnes pour comparer les positions publiques codées de leur formation. Les orientations thématiques résument six axes ; les questions concrètes affichent les réponses documentées et les points sans source suffisante.</p><p class="confidence-note">À ce stade, ce comparateur couvre les personnalités rattachées aux formations documentées. Il ne transforme pas les prétendants sans programme vérifiable en scores fictifs. La liste officielle des candidats est attendue au plus tard le 26 mars 2027.</p></div>';
+    html += '<div class="candidate-compare-identities"><article style="--party-color:' + partyA.color + '"><span class="party-family">' + partyA.family + ' · ' + partyA.short + '</span><h2>' + partyA.personName + '</h2><p>' + partyA.personRole + '</p><p class="confidence-note">' + partyA.status + '</p><a href="' + (partyA.program || partyA.site) + '" target="_blank" rel="noopener">Positions et programme public ↗</a></article><span class="candidate-compare-versus" aria-hidden="true">VS</span><article style="--party-color:' + partyB.color + '"><span class="party-family">' + partyB.family + ' · ' + partyB.short + '</span><h2>' + partyB.personName + '</h2><p>' + partyB.personRole + '</p><p class="confidence-note">' + partyB.status + '</p><a href="' + (partyB.program || partyB.site) + '" target="_blank" rel="noopener">Positions et programme public ↗</a></article></div>';
+    html += '<section class="candidate-compare-axes" aria-labelledby="compareAxesTitle"><h2 id="compareAxesTitle">Vue d’ensemble sur six thèmes</h2><p class="confidence-note">Les curseurs situent une orientation éditoriale des formations, pas une réponse personnelle des candidats.</p>';
+    DIM_KEYS.forEach(function(key) {
+      const dim = DIMENSIONS[key];
+      const aValue = partyA.positions[key];
+      const bValue = partyB.positions[key];
+      const aLeft = typeof aValue === 'number' ? Math.max(0, Math.min(100, ((aValue + 2) / 4) * 100)) : 50;
+      const bLeft = typeof bValue === 'number' ? Math.max(0, Math.min(100, ((bValue + 2) / 4) * 100)) : 50;
+      html += '<article class="candidate-compare-axis"><div class="candidate-compare-axis-head"><h3>' + dim.name + '</h3><span>' + (typeof aValue === 'number' && typeof bValue === 'number' ? (Math.abs(aValue - bValue) < 0.6 ? 'Orientations proches' : 'Orientations différentes') : 'Données partielles') + '</span></div><div class="candidate-compare-axis-values"><div><strong>' + partyA.personName + '</strong><span>' + positionLabel(key, aValue) + '</span></div><div><strong>' + partyB.personName + '</strong><span>' + positionLabel(key, bValue) + '</span></div></div><div class="candidate-compare-spectrum" aria-hidden="true"><span class="candidate-compare-spectrum-a" style="left:' + aLeft + '%"></span><span class="candidate-compare-spectrum-b" style="left:' + bLeft + '%"></span></div><div class="candidate-compare-spectrum-labels"><span>' + dim.labelLeft + '</span><span>' + dim.labelRight + '</span></div></article>';
     });
-    Object.keys(state.dpAnswers).forEach(id => {
-      const q = qById[id];
-      const ans = state.dpAnswers[id];
-      if (!q || typeof ans !== 'number') return;
-      html += `<tr><td>${q.topic}</td><td>${Scoring.stanceLabel(q, ans).label}</td>`;
-      parties.forEach(p => { html += `<td>${Scoring.stanceLabel(q, q.stances[p.id]).label}</td>`; });
-      html += '</tr>';
+    html += '</section><section class="candidate-compare-details" aria-labelledby="compareDetailsTitle"><h2 id="compareDetailsTitle">Comparer les positions question par question</h2><p class="confidence-note">Les positions ci-dessous s’appuient sur les éléments publics cités dans l’onglet « Les programmes ». Une position non documentée reste affichée comme telle.</p>';
+    DIM_KEYS.forEach(function(key, index) {
+      const questions = DEPARTAGE.filter(function(q) { return q.dim === key; });
+      if (!questions.length) return;
+      html += '<details class="candidate-compare-theme"' + (index === 0 ? ' open' : '') + '><summary>' + DIMENSIONS[key].name + '<span>' + questions.length + ' questions</span></summary><div class="candidate-compare-question-list">';
+      questions.forEach(function(q) {
+        const valueA = q.stances && Object.prototype.hasOwnProperty.call(q.stances, partyA.id) ? q.stances[partyA.id] : undefined;
+        const valueB = q.stances && Object.prototype.hasOwnProperty.call(q.stances, partyB.id) ? q.stances[partyB.id] : undefined;
+        const stanceA = Scoring.stanceLabel(q, valueA);
+        const stanceB = Scoring.stanceLabel(q, valueB);
+        const close = typeof valueA === 'number' && typeof valueB === 'number' && Math.abs(valueA - valueB) < 0.26;
+        html += '<article class="candidate-compare-question"><h3>' + q.q + '</h3>' + (q.plain ? '<p>' + q.plain + '</p>' : '') + '<div class="candidate-compare-answers"><div><strong>' + partyA.personName + '</strong><span class="' + (stanceA.known ? '' : 'is-unknown') + '">' + stanceA.label + '</span>' + (q.stanceNotes && q.stanceNotes[partyA.id] ? '<small>' + q.stanceNotes[partyA.id] + '</small>' : '') + '</div><div><strong>' + partyB.personName + '</strong><span class="' + (stanceB.known ? '' : 'is-unknown') + '">' + stanceB.label + '</span>' + (q.stanceNotes && q.stanceNotes[partyB.id] ? '<small>' + q.stanceNotes[partyB.id] + '</small>' : '') + '</div></div><p class="candidate-compare-difference">' + (stanceA.known && stanceB.known ? (close ? 'Les formations retiennent une position très proche sur ce point.' : 'Les positions codées prennent des orientations différentes sur ce point.') : 'La comparaison est incomplète : au moins une position n’est pas documentée.') + '</p></article>';
+      });
+      html += '</div></details>';
     });
-    html += '</tbody></table></div>';
-    html += '<div class="btn-row" style="margin-top:1.2rem"><button class="btn btn-ghost" id="btnClearCompare">Vider la comparaison</button></div>';
+    html += '</section><div class="btn-row"><button class="btn btn-ghost" id="btnComparePrograms">Voir les réponses détaillées dans les programmes</button></div>';
     root.innerHTML = html;
-    document.getElementById('btnClearCompare').addEventListener('click', () => { compareSelection = []; renderCompare(); });
+    const selectA = document.getElementById('compareCandidateA');
+    const selectB = document.getElementById('compareCandidateB');
+    selectA.addEventListener('change', function(event) {
+      const previous = compareSelection[0];
+      if (event.target.value === compareSelection[1]) compareSelection[1] = previous;
+      compareSelection[0] = event.target.value;
+      renderCompare();
+    });
+    selectB.addEventListener('change', function(event) {
+      const previous = compareSelection[1];
+      if (event.target.value === compareSelection[0]) compareSelection[0] = previous;
+      compareSelection[1] = event.target.value;
+      renderCompare();
+    });
+    document.getElementById('btnComparePrograms').addEventListener('click', function() { showScreen('programs'); });
   }
 
   /* ================================================================
@@ -1474,8 +1482,8 @@
     const isDepartage = programPhase === 'departage';
     const questions = isDepartage ? DEPARTAGE : QUESTIONS;
     phaseIntro.textContent = isDepartage
-      ? `La banque contient ${DEPARTAGE.length} questions concrètes ; le quiz en pose jusqu’à ${Scoring.MAX_DEPARTAGE}, choisies selon vos réponses. Si deux formations restent proches, il privilégie une question documentée qui les distingue. Les positions sont des estimations éditoriales, pas des réponses officielles.`
-      : 'Chaque repère rapproche le profil thématique d’une formation de la proposition A ou B. Il ne signifie pas que la personne citée a répondu mot pour mot à la question.';
+      ? 'Banque de ' + DEPARTAGE.length + ' questions concrètes ; le quiz en pose jusqu’à ' + Scoring.MAX_DEPARTAGE + ', choisies selon vos réponses. Les positions documentées reposent sur des déclarations ou documents publics consultés au 30 octobre 2026 ; ce sont des codages éditoriaux, pas des réponses officielles des personnes citées.'
+      : 'Ces repères résument les positions publiques des formations consultées au 30 octobre 2026. Ils donnent une tendance par thème et ne signifient pas que la personne citée a répondu mot pour mot à la question.';
 
     list.innerHTML = questions.map((question, index) => {
       const title = isDepartage ? question.q : question.topic;
