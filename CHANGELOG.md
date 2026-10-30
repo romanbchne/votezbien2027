@@ -1,3 +1,9 @@
+## V7.10.3 — hypothèses de second tour complètes
+
+- Ajout aux séries hebdomadaires des hypothèses Hollande–Le Pen et Retailleau–Le Pen recensées pendant la fenêtre étudiée, avec une note précisant que ces hypothèses de sondage ne confirment pas une candidature.
+- Précision que la courbe de chaque duel indique le score du candidat nommé après « face à ».
+- Invalidation du cache hors ligne.
+
 ## V7.10.2 — courbes hebdomadaires et comparateur simplifié
 
 - Remplacement des courbes à quelques vagues par des moyennes par semaine sur la fenêtre glissante du 30 juillet au 30 octobre 2026, à partir des tableaux Wikipédia et des notices qu’ils référencent. Les duels de second tour restent séparés selon l’adversaire ; aucune semaine sans mesure n’est interpolée.

@@ -1372,7 +1372,7 @@ const POLLS = {
     },
   secondRoundTrend: {
       "title": "Second tour · moyennes hebdomadaires par duel",
-      "note": "Chaque ligne suit une hypothèse distincte opposant Marine Le Pen à une autre personnalité. Les valeurs sont les moyennes arithmétiques des enquêtes recensées pour ce duel, regroupées selon le milieu du terrain. Les hypothèses ne sont pas mélangées ; les semaines sans enquête restent vides, sans interpolation ni extrapolation.",
+      "note": "Chaque série montre le score hebdomadaire de la personnalité après « face à », dans un duel hypothétique contre Marine Le Pen. On ne moyenne jamais des adversaires différents ensemble ; les semaines sans mesure restent vides. Les hypothèses Hollande et Retailleau sont conservées parce qu’elles figurent dans des enquêtes de la période : leur présence ne signifie pas qu’ils sont candidats.",
       "periods": [
         "Semaine du 27 juillet 2026",
         "Semaine du 3 août 2026",
@@ -1556,6 +1556,78 @@ const POLLS = {
             1,
             4,
             2,
+            0
+          ]
+        },
+        {
+          "name": "Le Pen face à François Hollande",
+          "color": "#7c5c45",
+          "values": [
+            null,
+            null,
+            null,
+            null,
+            46,
+            null,
+            null,
+            44,
+            null,
+            null,
+            null,
+            45,
+            41,
+            null
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0
+          ]
+        },
+        {
+          "name": "Le Pen face à Bruno Retailleau",
+          "color": "#0f766e",
+          "values": [
+            null,
+            null,
+            null,
+            null,
+            42,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "counts": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0
           ]
         }
