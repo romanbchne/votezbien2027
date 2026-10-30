@@ -1,5 +1,7 @@
 ## V7.10 — actualisation éditoriale au 30 octobre 2026
 
+- Vérification complémentaire des annonces de campagne d’Attal des 27–29 octobre : programme économique, projet européen et proposition de primaire, en distinguant les annonces d’un accord politique acté.
+
 - Actualisation du suivi des candidatures, des statuts des formations et des prochaines échéances à partir du calendrier gouvernemental et des sources citées.
 - Remplacement des anciennes affirmations thématiques par six repères issus du modèle du quiz ; ajout des limites de codage visibles et maintien des réponses précises documentées par source.
 - Ajout d’un comparateur accessible depuis le menu, avec deux sélecteurs de candidatures, six axes et comparaison détaillée des questions sans données inventées.
