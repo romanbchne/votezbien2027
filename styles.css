@@ -1022,3 +1022,6 @@ footer{background:var(--blue-deep); color:#D6E0ED; padding:1.8rem 1.2rem; text-a
 @media(max-width:520px){.theme-candidate-detail{padding:.8rem}.theme-candidate-detail-head{align-items:flex-start}.theme-candidate-proposal>summary{padding:.75rem}}
 
 .theme-candidate-open-hint{display:block;margin:-.2rem 0 .45rem;color:var(--blue);font-size:.78rem;font-weight:750}
+
+.theme-candidate-card-action{width:100%;justify-content:center;gap:.45rem;margin:.75rem 0 .55rem;border-color:var(--blue);color:var(--blue);font-weight:800}
+.theme-candidate-card-action:hover{background:var(--line-soft);border-color:var(--blue)}

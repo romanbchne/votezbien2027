@@ -1,3 +1,9 @@
+## V7.10.5 — bouton de propositions dans chaque fiche de thème
+
+- Ajout d’un bouton visible dans chaque fiche candidat pour ouvrir les idées et réformes documentées du thème courant. Le nom reste également cliquable.
+- Le focus clavier revient au bouton qui a ouvert le panneau lorsqu’on le ferme.
+- Invalidation du cache hors ligne.
+
 ## V7.10.4 — propositions détaillées depuis les thèmes
 
 - Le nom de chaque candidat dans l’onglet « Thèmes » ouvre désormais ses positions détaillées sur le thème choisi, avec réponses codées, explications éditoriales et sources déjà documentées.

@@ -914,11 +914,11 @@
       const coverage = partyCoverage(party);
       html += '<article class="theme-position-card" style="--theme-party-color:' + party.color + '">' +
         '<div class="theme-position-card-head"><span class="party-family">' + party.short + '</span><button class="theme-candidate-trigger" type="button" data-theme-party="' + party.id + '" aria-label="Voir les idées et propositions de ' + party.personName + ' pour ' + theme.name + '" aria-expanded="false" aria-controls="themeCandidateDetail">' + party.personName + '</button></div>' +
-        '<span class="theme-candidate-open-hint">Voir ses idées pour ce thème →</span>' +
         '<p>' + (known ? positionLabel(theme.id, score) : 'Position non documentée') + '</p>' +
         '<div class="theme-position-track' + (known ? '' : ' is-unknown') + '" aria-hidden="true"><span style="left:' + marker + '%"></span></div>' +
         '<div class="theme-position-labels"><span>' + dimension.labelLeft + '</span><span>' + dimension.labelRight + '</span></div>' +
         '<small>' + coverage.coded + ' positions détaillées documentées sur ' + coverage.total + ' questions dans la banque du quiz.</small>' +
+        '<button class="btn btn-ghost theme-candidate-card-action" type="button" data-theme-party="' + party.id + '" aria-label="Voir les idées et réformes de ' + party.personName + ' pour ' + theme.name + '" aria-expanded="false" aria-controls="themeCandidateDetail">Voir les idées et réformes <span aria-hidden="true">→</span></button>' +
         '<a href="' + (party.program || party.site) + '" target="_blank" rel="noopener">Source officielle de ' + party.short + ' ↗</a></article>';
     });
     html += '</div></section>';
@@ -928,10 +928,10 @@
       '<button class="btn btn-ghost" id="themeOpenPrograms">Voir les réponses et leurs sources →</button></section>';
     if (dimension.note) html += '<p class="confidence-note">' + dimension.note + '</p>';
     detailWrap.innerHTML = html;
-    detailWrap.querySelectorAll('.theme-candidate-trigger').forEach(function(button) {
+    detailWrap.querySelectorAll('.theme-candidate-trigger, .theme-candidate-card-action').forEach(function(button) {
       button.addEventListener('click', function() {
         const party = PARTIES.find(function(item) { return item.id === button.dataset.themeParty; });
-        if (party) renderThemeCandidateDetail(theme, party, true);
+        if (party) renderThemeCandidateDetail(theme, party, true, button);
       });
     });
     if (selectedThemePartyId) {
@@ -941,7 +941,7 @@
     document.getElementById('themeOpenPrograms').addEventListener('click', function() { showScreen('programs'); });
   }
 
-  function renderThemeCandidateDetail(theme, party, scrollToPanel) {
+  function renderThemeCandidateDetail(theme, party, scrollToPanel, triggerButton) {
     const panel = document.getElementById('themeCandidateDetail');
     if (!panel) return;
     const themeQuestions = DEPARTAGE.filter(function(question) { return question.dim === theme.id; });
@@ -977,14 +977,14 @@
       selectedThemePartyId = null;
       panel.hidden = true;
       detailWrapCandidateState(panel, null);
-      const trigger = Array.from(document.querySelectorAll('.theme-candidate-trigger')).find(function(button) { return button.dataset.themeParty === party.id; });
+      const trigger = triggerButton || Array.from(document.querySelectorAll('.theme-candidate-trigger, .theme-candidate-card-action')).find(function(button) { return button.dataset.themeParty === party.id; });
       if (trigger) trigger.focus();
     });
     if (scrollToPanel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function detailWrapCandidateState(panel, selectedId) {
-    document.querySelectorAll('.theme-candidate-trigger').forEach(function(button) {
+    document.querySelectorAll('.theme-candidate-trigger, .theme-candidate-card-action').forEach(function(button) {
       button.setAttribute('aria-expanded', button.dataset.themeParty === selectedId ? 'true' : 'false');
     });
   }
